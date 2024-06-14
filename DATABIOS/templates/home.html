@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %} Home {% endblock %}
+{% block content %}
+{% if 'Administrador' in grupos_usuario %}
+    <h2>Panel de administrador</h2>
+    <p>Este contenido es exclusivo para administradores...</p>
+{% elif 'Vendedor' in grupos_usuario %}
+    <h2>Panel de vendedor</h2>
+    <p>Este contenido es exclusivo para vendedores...</p>
+{% else %}
+<h1> Este usuario no tiene grupo </h1>
+{% endif %}
+{% endblock %}

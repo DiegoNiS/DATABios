@@ -2,23 +2,32 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Base HTML{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
-<body>
-    <header>
-        <h1>Este es Base HTML</h1>
-    </header>
 
-    <main>
-        <a href="{% url 'logout' %}">Logout</a>
+<body>
+    <div class="sidenav">
+        <a href="#dashboard">Dashboard</a>
+        <a href="#pedidos">Pedidos</a>
+        <a href="#inventario">Inventario</a>
+        <a href="#ventas">Ventas</a>
+        <a href="#usuarios">Usuarios</a>
+    </div>
+    <div class="topnav">
+        <div class="topnav-right">
+            <p>Bienvenido {{ nombre_usuario }}</p>
+            <a href="{% url 'logout' %}">Logout</a>
+        </div>
+    </div>
+    <div class="main-content">
         {% block content %}
-        <!-- Content from other templates will be inserted here -->
         {% endblock %}
-    </main>
+    </div>
 
     <footer>
         <p>&copy; 2024 Django project</p>
@@ -26,5 +35,5 @@
 
     <script src="{% static 'js/scripts.js' %}"></script>
 </body>
+
 </html>
-    
