@@ -3,6 +3,18 @@ from django.contrib import messages
 from django.contrib.auth.models import User, auth, Group
 from django.contrib.auth.decorators import login_required, user_passes_test
 
+
+def list_usuarios(request):
+    usuarios = User.objects.all()
+    return render(request, 'lista_usuarios.html', {
+        'usuarios': usuarios
+    })
+
+
+
+
+# Max's Creations
+
 #Creacion de grupos
 def crear_grupos():
     Group.objects.get_or_create(name='Administrador')
