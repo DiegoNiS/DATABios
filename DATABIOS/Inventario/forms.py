@@ -1,7 +1,7 @@
 # Proyecto/inventario/forms.py
 
 from django import forms
-from .models import Producto, Categoria
+from Core.models import Producto, Categoria
 
 class ProductoForm(forms.ModelForm):
     class Meta:
