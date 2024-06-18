@@ -60,6 +60,7 @@ footer {
 
 .topnav-right {
     float: right;
+    display: block;
 }
 
 .topnav-right a, .topnav-right p {
