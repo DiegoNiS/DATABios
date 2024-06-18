@@ -75,7 +75,7 @@ footer {
 .main-content {
     margin-left: 250px; /* Deja espacio para la sidenav */
     padding: 20px;
-    padding-top: 500px; /* Ajuste para la topnav */
+    padding-top: 180px; /* Ajuste para la topnav */
     min-height: calc(100vh - 100px); /* Ajuste para que el contenido ocupe el espacio restante después de la topnav y footer */
     box-sizing: border-box; /* Incluye el padding y border en el cálculo del tamaño */
     color: black;
