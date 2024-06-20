@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.contrib.auth.models import User, auth, Group
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth import authenticate, login
-from django.contrib.auth.forms import UserCreationForm
+from .models import Usuario, ConjuntoPermisos
 
 
 def list_usuarios(request):
@@ -15,16 +15,36 @@ def list_usuarios(request):
 @login_required
 @user_passes_test(lambda u: u.is_superuser)
 def agregar_usuario(request):
-    if request.method == "POST":
-        form = UserCreationForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('lista_usuarios')
-        else:
-            return render(request, 'agregar_usuario.html', {'form': form, 'error': 'Por favor corrige los errores abajo.'})
-    else:
-        form = UserCreationForm()
-    return render(request, 'agregar_usuario.html', {'form': form})
+    if request.method == 'POST':
+        username = request.POST['username']
+        email = request.POST['email']
+        password = request.POST['password']
+        nombre = request.POST['nombre']
+        apellido = request.POST['apellido']
+        categoria = request.POST['categoria']
+        permisos = ConjuntoPermisos.objects.create()
+        user = Usuario.objects.create_user(
+            username=username,
+            email=email,
+            password=password,
+            nombre=nombre,
+            apellido=apellido,
+            categoria=categoria,
+            id_permisos=permisos
+        )
+        login(request, user)
+        return redirect('lista_usuarios')
+    return render(request, 'agregar_usuario.html')
+    # if request.method == "POST":
+    #     form = UserCreationForm(request.POST)
+    #     if form.is_valid():
+    #         form.save()
+    #         return redirect('lista_usuarios')
+    #     else:
+    #         return render(request, 'agregar_usuario.html', {'form': form, 'error': 'Por favor corrige los errores abajo.'})
+    # else:
+    #     form = UserCreationForm()
+    # return render(request, 'agregar_usuario.html', {'form': form})
 
 def inicio_sesion(request):
     if request.method == 'POST':
@@ -35,8 +55,8 @@ def inicio_sesion(request):
             login(request, user)
             return redirect('lista_usuarios')  # Redirige a la lista de usuarios después de iniciar sesión
         else:
-            return render(request, 'usuarios/login.html', {'error': 'Credenciales inválidas'})
-    else:
+            return render(request, 'login.html', {'error': 'Credenciales inválidas'})
+    else:   
         return render(request, 'login.html')
 
 def cerrar_sesion(request):

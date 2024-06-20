@@ -73,6 +73,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'DATABIOS.wsgi.application'
 
+AUTH_USER_MODEL = 'Usuario.Usuario' #temp
 LOGIN_REDIRECT_URL = '/usuarios/' #temp
 LOGOUT_REDIRECT_URL = '/usuarios/login/' #temp
 LOGIN_URL = '/usuarios/login/' #temp

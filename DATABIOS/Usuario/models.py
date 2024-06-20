@@ -1,43 +1,54 @@
 from django.db import models
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 
-# Create your models here.
+class ConjuntoPermisos(models.Model):
+    pedidos_pen_CUD = models.BooleanField(default=False)
+    pedidos_pen_S = models.BooleanField(default=False)
+    pedidos_rec_G = models.BooleanField(default=False)
+    inventario_cat_CUD = models.BooleanField(default=False)
+    inventario_pro_CUD = models.BooleanField(default=False)
+    inventario_pro_G = models.BooleanField(default=False)
+    ventas_CD = models.BooleanField(default=False)
+    panel_admin = models.BooleanField(default=False)
 
-class Pedido(models.Model):
-    # Define tus campos aquí
-    nombre = models.CharField(max_length=255)
-    descripcion = models.TextField()
+    def __str__(self):
+        return f"Permisos {self.id}"
 
-    class Meta:
-        permissions = [
-            ("eliminar_pendientes", "Puede eliminar pendientes en la tabla pedidos"),
-            ("editar_pendientes", "Puede editar pendientes en la tabla pedidos"),
-            ("agregar_pendientes", "Puede agregar pendientes en la tabla pedidos"),
-            ("confirmar_pendientes", "Puede confirmar pendientes en la tabla pedidos"),
-            ("eliminar_registro_pedidos", "Puede eliminar registro de pedidos en la tabla pedidos"),
-            ("generar_reportes_registro_pedidos", "Puede generar reportes de registro de pedidos en la tabla pedidos"),
-        ]
+class UsuarioManager(BaseUserManager):
+    def create_user(self, username, email, password=None, **extra_fields):
+        if not email:
+            raise ValueError('El usuario debe tener un correo electrónico')
+        email = self.normalize_email(email)
+        user = self.model(username=username, email=email, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
 
-class Producto(models.Model):
-    # Define tus campos aquí
-    nombre = models.CharField(max_length=255)
-    descripcion = models.TextField()
+    def create_superuser(self, username, email, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
 
-    class Meta:
-        permissions = [
-            ("editar_productos", "Puede editar productos en la tabla inventario"),
-            ("eliminar_productos", "Puede eliminar productos en la tabla inventario"),
-            ("agregar_productos", "Puede agregar productos en la tabla inventario"),
-            ("generar_reportes_productos", "Puede generar reportes de productos en la tabla inventario"),
-        ]
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError('El superusuario debe tener is_staff=True.')
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError('El superusuario debe tener is_superuser=True.')
 
-class Venta(models.Model):
-    # Define tus campos aquí
-    producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
-    cantidad = models.IntegerField()
+        return self.create_user(username, email, password, **extra_fields)
 
-    class Meta:
-        permissions = [
-            ("eliminar_ventas", "Puede eliminar ventas en la tabla ventas"),
-            ("agregar_ventas", "Puede agregar ventas en la tabla ventas"),
-            ("generar_reportes_ventas", "Puede generar reportes de ventas en la tabla ventas"),
-        ]
+class Usuario(AbstractBaseUser, PermissionsMixin):
+    username = models.CharField(max_length=10, unique=True)
+    email = models.EmailField(max_length=15, unique=True)
+    nombre = models.CharField(max_length=18)
+    apellido = models.CharField(max_length=18)
+    categoria = models.CharField(max_length=18)
+    id_permisos = models.OneToOneField(ConjuntoPermisos, on_delete=models.CASCADE)
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+
+    objects = UsuarioManager()
+
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = ['email']
+
+    def __str__(self):
+        return self.username
