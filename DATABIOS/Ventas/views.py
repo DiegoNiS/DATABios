@@ -4,6 +4,7 @@ from django.http import HttpResponse
 from .models import Venta, Vendedor
 from .forms import VentaForm
 
+
 def ventas_list(request):
     ventas = Venta.objects.all()
     return render(request, 'ventas_list.html', {'ventas': ventas})
@@ -28,3 +29,5 @@ def venta_delete(request, pk):
 def export_to_excel(request):
     # Aquí iría la lógica para exportar a Excel
     return HttpResponse('Función para exportar a Excel aún no implementada')
+
+

@@ -1,108 +1,144 @@
-/* myapp/static/css/styles.css */
-
-/* Estilos generales */
 body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f0f0f0; /* Color de fondo general */
+    background-color: #f0f0f0;
 }
 
-/* Estilos para el header */
-header {
-    background-color: #333;
-    color: white;
-    padding: 1rem;
-    text-align: center;
-    position: fixed;
-    top: 0;
-    width: 100%;
-    z-index: 1000; /* Asegura que el header esté sobre otros elementos */
+.logo {
+    background-color: #f0f0f0;
 }
-
-/* Estilos para el footer */
-footer {
-    background-color: #333;
-    color: white;
-    padding: 1rem;
-    text-align: center;
-    position: fixed;
-    bottom: 0;
-    width: 100%;
+.img {
+    width: 500%;
+    height: 300%;
 }
-
-/* Estilos para la barra de navegación lateral */
+/* Barra de navegación lateral */
 .sidenav {
     height: 100%;
     width: 250px;
     position: fixed;
-    top: 60px; /* Ajuste para dejar espacio para el header */
+    z-index: 1;
+    top: 0;
     left: 0;
-    background-color: #333;
-    padding-top: 20px;
-    z-index: 900; /* Asegura que esté debajo del header pero sobre el contenido */
-    overflow-y: auto; /* Permite desplazamiento si hay muchos elementos */
-    transition: 0.3s; /* Transición suave para abrir y cerrar */
+    background-color: #0a2979;
+    overflow-x: hidden;
+    transition: 0.5s;
+    padding-top: 0px;
 }
 
 .sidenav a {
-    padding: 15px 20px;
+    padding: 15px 25px;
     text-decoration: none;
-    color: white;
+    font-size: 18px;
+    color: #ffffff;
     display: block;
+    transition: 0.3s;
 }
 
 .sidenav a:hover {
-    background-color: #555;
+    background-color: #1e3a8a;
 }
 
-/* Estilos para el contenido principal */
+.sidenav .logo {
+    text-align: center;
+    padding: 1px 0;
+}
+
+.sidenav .logo img {
+    width: 90%;
+    max-width: 250px;
+}
+
+/* Contenido principal */
 .main-content {
-    margin-left: 250px; /* Deja espacio para la sidenav */
+    margin-left: 250px;
     padding: 20px;
-    padding-top: 120px; /* Ajuste para el header */
-    min-height: calc(100vh - 120px); /* Ajuste para que ocupe el espacio restante */
-    box-sizing: border-box; /* Incluye el padding y border en el cálculo del tamaño */
-    color: black;
-    transition: margin-left 0.3s; /* Transición suave al abrir y cerrar la sidenav */
+    transition: margin-left .5s;
 }
 
-/* Ajuste para cuando la sidenav está abierta */
-.sidenav-open .main-content {
-    margin-left: 0;
-}
-
-/* Estilos para la barra de navegación superior */
+/* Barra superior */
 .topnav {
+    background-color: #0a2979;
     overflow: hidden;
-    background-color: #333;
     position: fixed;
-    width: 100%;
     top: 0;
-    z-index: 1100; /* Asegura que esté sobre todo */
+    left: 250px;
+    right: 0;
+    z-index: 2;
+    transition: left .5s;
 }
 
 .topnav-right {
     float: right;
-}
-
-.topnav-right a, .topnav-right p {
-    padding: 15px 20px;
-    text-decoration: none;
+    padding: 15px;
     color: white;
 }
 
-.topnav-right a:hover {
-    background-color: #555;
+.topnav-right a {
+    color: white;
+    text-decoration: none;
+    margin-left: 15px;
 }
 
-/* Estilos para el logo en el header */
-.header-logo {
-    max-width: 150px;
-    margin-top: -10px; /* Ajuste para centrar verticalmente */
+/* Estilos para la tabla */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: white;
 }
 
-/* Estilos para la transición suave del contenido */
-.transition-content {
-    transition: margin-left 0.3s; /* Transición suave al abrir y cerrar la sidenav */
+th, td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: left;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+/* Estilos para botones */
+.btn {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.btn-primary {
+    background-color: #0056b3;
+    color: white;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    color: white;
+}
+
+/* Filtros */
+.filters {
+    margin-bottom: 20px;
+}
+
+.filters input, .filters select {
+    padding: 8px;
+    margin-right: 10px;
+}
+
+/* Paginación */
+.pagination {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.pagination a {
+    color: #0a2979;
+    padding: 8px 16px;
+    text-decoration: none;
+}
+
+.pagination a:hover {
+    background-color: #ddd;
 }
