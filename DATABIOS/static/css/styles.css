@@ -1,86 +1,144 @@
-/* myapp/static/css/styles.css */
 body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
+    background-color: #f0f0f0;
 }
 
-header {
-    background-color: #333;
-    color: white;
-    padding: 1rem;
-    text-align: center;
-    position: fixed;
-    top: 0;
-    width: 100%;
-    z-index: 1; /* Add this line to ensure the header appears above other elements */
+.logo {
+    background-color: #f0f0f0;
 }
-
-footer {
-    background-color: #333;
-    color: white;
-    padding: 1rem;
-    text-align: center;
-    position: fixed;
-    bottom: 0;
-    width: 100%;
+.img {
+    width: 500%;
+    height: 300%;
 }
-
-/* Estilos para la barra de navegación lateral */
+/* Barra de navegación lateral */
 .sidenav {
     height: 100%;
     width: 250px;
     position: fixed;
+    z-index: 1;
     top: 0;
     left: 0;
-    background-color: #333;
-    padding-top: 20px;
+    background-color: #0a2979;
+    overflow-x: hidden;
+    transition: 0.5s;
+    padding-top: 0px;
 }
 
 .sidenav a {
-    padding: 15px 20px;
+    padding: 15px 25px;
     text-decoration: none;
-    color: white;
+    font-size: 18px;
+    color: #ffffff;
     display: block;
+    transition: 0.3s;
 }
 
 .sidenav a:hover {
-    background-color: #555;
+    background-color: #1e3a8a;
 }
 
-/* Estilos para la barra de navegación superior */
+.sidenav .logo {
+    text-align: center;
+    padding: 1px 0;
+}
+
+.sidenav .logo img {
+    width: 90%;
+    max-width: 250px;
+}
+
+/* Contenido principal */
+.main-content {
+    margin-left: 250px;
+    padding: 20px;
+    transition: margin-left .5s;
+}
+
+/* Barra superior */
 .topnav {
+    background-color: #0a2979;
     overflow: hidden;
-    background-color: #333;
     position: fixed;
-    width: calc(100% - 250px); /* Ajuste para que la topnav no quede debajo del sidenav */
-    left: 250px; /* Alineado con el sidenav */
     top: 0;
+    left: 250px;
+    right: 0;
+    z-index: 2;
+    transition: left .5s;
 }
 
 .topnav-right {
     float: right;
-    display: block;
-}
-
-.topnav-right a, .topnav-right p {
-    padding: 15px 20px;
-    text-decoration: none;
+    padding: 15px;
     color: white;
 }
 
-.topnav-right a:hover {
-    background-color: #555;
+.topnav-right a {
+    color: white;
+    text-decoration: none;
+    margin-left: 15px;
 }
-/* Ajuste para el contenido principal */
-.main-content {
-    margin-left: 250px; /* Deja espacio para la sidenav */
-    padding: 20px;
-    padding-top: 180px; /* Ajuste para la topnav */
-    min-height: calc(100vh - 100px); /* Ajuste para que el contenido ocupe el espacio restante después de la topnav y footer */
-    box-sizing: border-box; /* Incluye el padding y border en el cálculo del tamaño */
-    color: black;
-    display: flex;
-    justify-content: center; /* Centrado horizontal */
-    align-items: center;     /* Centrado vertical */
+
+/* Estilos para la tabla */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: white;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: left;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+/* Estilos para botones */
+.btn {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.btn-primary {
+    background-color: #0056b3;
+    color: white;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    color: white;
+}
+
+/* Filtros */
+.filters {
+    margin-bottom: 20px;
+}
+
+.filters input, .filters select {
+    padding: 8px;
+    margin-right: 10px;
+}
+
+/* Paginación */
+.pagination {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.pagination a {
+    color: #0a2979;
+    padding: 8px 16px;
+    text-decoration: none;
+}
+
+.pagination a:hover {
+    background-color: #ddd;
 }

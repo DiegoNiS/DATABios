@@ -7,7 +7,7 @@ urlpatterns = [
     path('agregar/', agregar_usuario, name='agregar_usuario'),
     path('logout/', cerrar_sesion, name='logout'),
     path('home/', homeView, name='home'), # Max's Creations
-    path('max', loginView, name='login'),  # Login es la primera ruta
+    path('', loginView, name='login'),  # Login es la primera ruta
     path('logout/', logout, name='logout'),
 ]
 
