@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Agregar Venta</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/ventas/styles.css' %}">
+</head>
+<body>
+    <div class="sidebar">
+        <h2>LIBRERA STOCK</h2>
+        <ul>
+            <li><a href="#">Dashboard</a></li>
+            <li><a href="#">Pedidos</a></li>
+            <li><a href="#">Inventario</a></li>
+            <li><a href="#" class="active">Ventas</a></li>
+            <li><a href="#">Usuarios</a></li>
+            <li><a href="#">Proveedores</a></li>
+            <li><a href="#">Ajustes</a></li>
+            <li><a href="#">Salir</a></li>
+        </ul>
+    </div>
+    <div class="content">
+        <h1>Agregar Venta</h1>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn save-btn">Guardar</button>
+        </form>
+        <a href="{% url 'ventas_list' %}" class="btn cancel-btn">Cancelar</a>
+    </div>
+</body>
+</html>
