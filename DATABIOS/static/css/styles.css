@@ -1,10 +1,14 @@
 /* myapp/static/css/styles.css */
+
+/* Estilos generales */
 body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
+    background-color: #f0f0f0; /* Color de fondo general */
 }
 
+/* Estilos para el header */
 header {
     background-color: #333;
     color: white;
@@ -13,9 +17,10 @@ header {
     position: fixed;
     top: 0;
     width: 100%;
-    z-index: 1; /* Add this line to ensure the header appears above other elements */
+    z-index: 1000; /* Asegura que el header esté sobre otros elementos */
 }
 
+/* Estilos para el footer */
 footer {
     background-color: #333;
     color: white;
@@ -31,10 +36,13 @@ footer {
     height: 100%;
     width: 250px;
     position: fixed;
-    top: 0;
+    top: 60px; /* Ajuste para dejar espacio para el header */
     left: 0;
     background-color: #333;
     padding-top: 20px;
+    z-index: 900; /* Asegura que esté debajo del header pero sobre el contenido */
+    overflow-y: auto; /* Permite desplazamiento si hay muchos elementos */
+    transition: 0.3s; /* Transición suave para abrir y cerrar */
 }
 
 .sidenav a {
@@ -48,19 +56,34 @@ footer {
     background-color: #555;
 }
 
+/* Estilos para el contenido principal */
+.main-content {
+    margin-left: 250px; /* Deja espacio para la sidenav */
+    padding: 20px;
+    padding-top: 120px; /* Ajuste para el header */
+    min-height: calc(100vh - 120px); /* Ajuste para que ocupe el espacio restante */
+    box-sizing: border-box; /* Incluye el padding y border en el cálculo del tamaño */
+    color: black;
+    transition: margin-left 0.3s; /* Transición suave al abrir y cerrar la sidenav */
+}
+
+/* Ajuste para cuando la sidenav está abierta */
+.sidenav-open .main-content {
+    margin-left: 0;
+}
+
 /* Estilos para la barra de navegación superior */
 .topnav {
     overflow: hidden;
     background-color: #333;
     position: fixed;
-    width: calc(100% - 250px); /* Ajuste para que la topnav no quede debajo del sidenav */
-    left: 250px; /* Alineado con el sidenav */
+    width: 100%;
     top: 0;
+    z-index: 1100; /* Asegura que esté sobre todo */
 }
 
 .topnav-right {
     float: right;
-    display: block;
 }
 
 .topnav-right a, .topnav-right p {
@@ -72,15 +95,14 @@ footer {
 .topnav-right a:hover {
     background-color: #555;
 }
-/* Ajuste para el contenido principal */
-.main-content {
-    margin-left: 250px; /* Deja espacio para la sidenav */
-    padding: 20px;
-    padding-top: 180px; /* Ajuste para la topnav */
-    min-height: calc(100vh - 100px); /* Ajuste para que el contenido ocupe el espacio restante después de la topnav y footer */
-    box-sizing: border-box; /* Incluye el padding y border en el cálculo del tamaño */
-    color: black;
-    display: flex;
-    justify-content: center; /* Centrado horizontal */
-    align-items: center;     /* Centrado vertical */
+
+/* Estilos para el logo en el header */
+.header-logo {
+    max-width: 150px;
+    margin-top: -10px; /* Ajuste para centrar verticalmente */
+}
+
+/* Estilos para la transición suave del contenido */
+.transition-content {
+    transition: margin-left 0.3s; /* Transición suave al abrir y cerrar la sidenav */
 }
