@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'Usuario',
     'Inventario',
     'Core',
-    'Ventas',
+    'Ventas.apps.VentasConfig',
 ]
 
 MIDDLEWARE = [
