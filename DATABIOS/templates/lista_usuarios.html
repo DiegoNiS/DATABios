@@ -4,7 +4,25 @@
 <h1>Usuarios Registrados</h1>
 <ul>
     {% for usuario in usuarios %}
-        <li>{{ usuario.username }} - {{ usuario.email }} - {{ usuario.date_joined }}</li>
+        <li>{{ usuario.categoria }} | {{ usuario.nombre }} {{ usuario.apellido }} | Permisos | {{ usuario.fecha_creacion }} | Actions |</li>
+        <form method="POST" action="{% url 'eliminar_usuario' usuario.id %}" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit">Eliminar</button>
+        </form>
+        <!-- aqui mostrar todos los permisos con un simple toggle switch cada uno para saber que permisos tiene cada usuario -->
+        <div>
+            <!-- Mostrar SI o NO para cada permiso -->
+            <span>Pedidos Pendientes CUD: {% if usuario.id_permisos.pedidos_pen_CUD %}SI{% else %}NO{% endif %}</span>
+            <span>Pedidos Pendientes S: {% if usuario.id_permisos.pedidos_pen_S %}SI{% else %}NO{% endif %}</span>
+            <span>Pedidos Recibidos G: {% if usuario.id_permisos.pedidos_rec_G %}SI{% else %}NO{% endif %}</span>
+            <span>Inventario Categoría CUD: {% if usuario.id_permisos.inventario_cat_CUD %}SI{% else %}NO{% endif %}</span>
+            <br>
+            <span>Inventario Producto CUD: {% if usuario.id_permisos.inventario_pro_CUD %}SI{% else %}NO{% endif %}</span>
+            <span>Inventario Producto G: {% if usuario.id_permisos.inventario_pro_G %}SI{% else %}NO{% endif %}</span>
+            <span>Ventas CD: {% if usuario.id_permisos.ventas_CD %}SI{% else %}NO{% endif %}</span>
+            <span>Panel Admin: {% if usuario.id_permisos.panel_admin %}SI{% else %}NO{% endif %}</span>
+            <!-- Puedes agregar más permisos según necesites -->
+        </div>
     {% endfor %}
 </ul>
 <a href="{% url 'agregar_usuario' %}">Agregar Usuario</a>

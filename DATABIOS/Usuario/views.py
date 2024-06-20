@@ -1,19 +1,48 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from django.contrib.auth.models import User, auth, Group
+#from django.contrib.auth.models import User, auth, Group
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth import authenticate, login
 from .models import Usuario, ConjuntoPermisos
+from django.contrib.auth import get_user_model
+from django.contrib.auth import logout
+from django.urls import reverse
+
+from functools import wraps
+
+def permisos_para(permiso_check):
+    def check_permiso(user):
+        try:
+            return user.is_authenticated and permiso_check(user)
+        except Usuario.DoesNotExist:
+            return False
+
+    def decorator(view_func):
+        @wraps(view_func)
+        def wrapper(request, *args, **kwargs):
+            if check_permiso(request.user):
+                return view_func(request, *args, **kwargs)
+            else:
+                # Redireccionar a la página de permisos denegados
+                return render(request, 'permisos_denegados.html')
+
+        return wrapper
+
+    return decorator
 
 
+User = get_user_model()
+
+@login_required
 def list_usuarios(request):
     usuarios = User.objects.all()
     return render(request, 'lista_usuarios.html', {
-        'usuarios': usuarios
+        'usuarios': usuarios,
+        'nombre_usuario': request.user.username
     })
 
 @login_required
-@user_passes_test(lambda u: u.is_superuser)
+@permisos_para(lambda u: u.is_superuser)
 def agregar_usuario(request):
     if request.method == 'POST':
         username = request.POST['username']
@@ -22,19 +51,18 @@ def agregar_usuario(request):
         nombre = request.POST['nombre']
         apellido = request.POST['apellido']
         categoria = request.POST['categoria']
-        permisos = ConjuntoPermisos.objects.create()
-        user = Usuario.objects.create_user(
+
+        user = User.objects.create_user(
             username=username,
             email=email,
             password=password,
             nombre=nombre,
             apellido=apellido,
-            categoria=categoria,
-            id_permisos=permisos
+            categoria=categoria
         )
         login(request, user)
         return redirect('lista_usuarios')
-    return render(request, 'agregar_usuario.html')
+    return render(request, 'agregar_usuario.html', { 'nombre_usuario': request.user.username})
     # if request.method == "POST":
     #     form = UserCreationForm(request.POST)
     #     if form.is_valid():
@@ -46,6 +74,13 @@ def agregar_usuario(request):
     #     form = UserCreationForm()
     # return render(request, 'agregar_usuario.html', {'form': form})
 
+@login_required
+@permisos_para(lambda u: u.is_superuser)
+def eliminar_usuario(request, usuario_id): # TODO si uno es administrador puede eliminarse a si mismo ,y seo no edberia
+    usuario = get_object_or_404(Usuario, id=usuario_id)
+    usuario.delete()
+    return redirect('lista_usuarios')
+
 def inicio_sesion(request):
     if request.method == 'POST':
         username = request.POST['username']
@@ -55,21 +90,16 @@ def inicio_sesion(request):
             login(request, user)
             return redirect('lista_usuarios')  # Redirige a la lista de usuarios después de iniciar sesión
         else:
-            return render(request, 'login.html', {'error': 'Credenciales inválidas'})
+            return render(request, 'login.html', {'error': 'Credenciales inválidas', 'nombre_usuario': request.user.username})
     else:   
         return render(request, 'login.html')
 
+@login_required
 def cerrar_sesion(request):
     logout(request)
-    # Redirigir a la página de inicio o a donde desees después del cierre de sesión
-    return redirect('login')
+    return redirect(reverse('login'))
 
 # Max's Creations
-
-#Creacion de grupos
-def crear_grupos():
-    Group.objects.get_or_create(name='Administrador')
-    Group.objects.get_or_create(name='Vendedor')
     
 def is_admin(user):
     return user.groups.filter(name='Administrador').exists()
@@ -104,8 +134,3 @@ def homeView(request):
         'grupos_usuario': list(grupos_usuario)
     }
     return render(request, 'home.html', context)
-
-@login_required
-def logout(request):
-    auth.logout(request)
-    return redirect('/')
