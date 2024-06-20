@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Lista de Ventas
+{% endblock %}
+
+{% block content %}
+<div class="content">
+    <h1>Ventas</h1>
+    <div class="filter-bar">
+        <input type="date" id="fecha">
+        <select id="vendedor">
+            <option value="">Vendedor</option>
+            {% for vendedor in vendedores %}
+                <option value="{{ vendedor.id }}">{{ vendedor.nombre }} {{ vendedor.apellidos }}</option>
+            {% endfor %}
+        </select>
+        <button onclick="filtrar()">Filtrar</button>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th># Venta</th>
+                <th>Descripción</th>
+                <th>Vendedor</th>
+                <th>Fecha de Creación</th>
+                <th>Acción</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for venta in ventas %}
+                <tr>
+                    <td>{{ venta.id }}</td>
+                    <td>{{ venta.descripcion }}</td>
+                    <td>{{ venta.vendedor }}</td>
+                    <td>{{ venta.fecha_creacion }}</td>
+                    <td>
+                        <form action="{% url 'venta_delete' venta.id %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="delete-button">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="actions">
+        <a href="{% url 'export_to_excel' %}" class="btn export-btn">Crear Excel</a>
+        <a href="{% url 'venta_create' %}" class="btn add-btn">Agregar Venta</a>
+    </div>
+</div>
+{% endblock %}

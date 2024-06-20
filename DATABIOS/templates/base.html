@@ -12,11 +12,11 @@
 
 <body>
     <div class="sidenav">
-        <a href="#dashboard">Dashboard</a>
+        <a href="{% url 'home' %}">Dashboard</a>
         <a href="#pedidos">Pedidos</a>
         <a href="{% url 'listar_productos' %}">Inventario</a>
-        <a href="#ventas">Ventas</a>
-        <a href="#usuarios">Usuarios</a>
+        <a href="{% url 'ventas_list' %}">Ventas</a>
+        <a href="{% url 'lista_usuarios' %}">Usuarios</a>
     </div>
     <div class="topnav">
         {% if user.is_authenticated %}
