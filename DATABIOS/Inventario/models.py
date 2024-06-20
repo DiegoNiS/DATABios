@@ -3,6 +3,7 @@ from django.db import models
 # Create your models here.
 
 # Debe de estar Aplicacion Core por ahora en Inventario
+'''
 class Categoria(models.Model):
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField(max_length=500)
@@ -19,3 +20,4 @@ class Producto(models.Model):
 
     def __str__(self):
         return self.nombre
+'''

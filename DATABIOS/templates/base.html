@@ -1,34 +1,44 @@
-<!-- /templates/base.html -->
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Base HTML{% endblock %}</title>
+    <title>{% block title %}LIBRERA STOCK{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
-
 <body>
-    <div class="sidenav">
-        <a href="#dashboard">Dashboard</a>
+    <div id="mySidenav" class="sidenav">
+        <div class="logo">
+            <img src="{% static 'img/logo.png' %}" alt="LIBRERA STOCK">
+        </div>
+        <a href="{% url 'home' %}">Dashboard</a>
         <a href="#pedidos">Pedidos</a>
         <a href="{% url 'listar_productos' %}">Inventario</a>
-        <a href="#ventas">Ventas</a>
-        <a href="#usuarios">Usuarios</a>
+        <a href="">Ventas</a>
+        <a href="{% url 'lista_usuarios' %}">Usuarios</a>
+        <a href="#proveedores">Proveedores</a>
+        <a href="#ajustes">Ajustes</a>
+        <a href="{% url 'logout' %}">Salir</a>
     </div>
-    <div class="topnav">
-        <div class="topnav-right">
-            <p>Bienvenido {{ nombre_usuario }}</p>
-            <a href="{% url 'logout' %}">Logout</a>
+
+    <div id="main" class="main-content">
+        <div class="topnav">
+            <span style="font-size: 30px; cursor: pointer; color: white; margin-left: 10px;" onclick="toggleNav()">&#9776;</span>
+
+            <div class="topnav-right">
+                {% if user.is_authenticated %}
+                    <span>  {{ nombre_usuario }} | Administrador</span>
+                {% else %}
+                    <a href="{% url 'login' %}">Iniciar Sesión</a>
+                {% endif %}
+            </div>
         </div>
-    </div>
-    <div class="main-content">
+
         {% block content %}
         {% endblock %}
     </div>
-
+    
     <footer>
         <p>&copy; 2024 Django project</p>
     </footer>

@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Usuarios Registrados</h1>
+<ul>
+    {% for usuario in usuarios %}
+        <li>{{ usuario.username }} - {{ usuario.email }} - {{ usuario.date_joined }}</li>
+    {% endfor %}
+</ul>
+<a href="{% url 'agregar_usuario' %}">Agregar Usuario</a>
+{% endblock %}
