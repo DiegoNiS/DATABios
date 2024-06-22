@@ -9,6 +9,11 @@
             {% csrf_token %}
             <button type="submit">Eliminar</button>
         </form>
+
+        <form method="GET" action="{% url 'editar_permisos' usuario.id %}" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit">Editar Permisos</button>
+        </form>
         <!-- aqui mostrar todos los permisos con un simple toggle switch cada uno para saber que permisos tiene cada usuario -->
         <div>
             <!-- Mostrar SI o NO para cada permiso -->

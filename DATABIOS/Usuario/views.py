@@ -1,9 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-#from django.contrib.auth.models import User, auth, Group
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth import authenticate, login
-from .models import Usuario, ConjuntoPermisos
+from .models import Usuario
 from django.contrib.auth import get_user_model
 from django.contrib.auth import logout
 from django.urls import reverse
@@ -98,6 +97,31 @@ def inicio_sesion(request):
 def cerrar_sesion(request):
     logout(request)
     return redirect(reverse('login'))
+
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
+def editar_permisos(request, usuario_id):
+    usuario = get_object_or_404(Usuario, id=usuario_id)
+    permisos = usuario.id_permisos
+
+    if request.method == 'POST':
+        permisos.pedidos_pen_CUD = 'pedidos_pen_CUD' in request.POST
+        permisos.pedidos_pen_S = 'pedidos_pen_S' in request.POST
+        permisos.pedidos_rec_G = 'pedidos_rec_G' in request.POST
+        permisos.inventario_cat_CUD = 'inventario_cat_CUD' in request.POST
+        permisos.inventario_pro_CUD = 'inventario_pro_CUD' in request.POST
+        permisos.inventario_pro_G = 'inventario_pro_G' in request.POST
+        permisos.ventas_CD = 'ventas_CD' in request.POST
+        permisos.panel_admin = 'panel_admin' in request.POST
+        permisos.save()
+        return redirect('lista_usuarios')
+
+    return render(request, 'editar_permisos.html', {'usuario': usuario, 'permisos': permisos})
+
+
+
+
+
 
 # Max's Creations
     
