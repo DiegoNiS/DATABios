@@ -60,6 +60,8 @@ def agregar_usuario(request):
             categoria=categoria
         )
         login(request, user)
+
+        messages.success(request, "Usuario agregado correctamente.")
         return redirect('lista_usuarios')
     return render(request, 'agregar_usuario.html', { 'nombre_usuario': request.user.username})
     # if request.method == "POST":
@@ -77,7 +79,11 @@ def agregar_usuario(request):
 @permisos_para(lambda u: u.is_superuser)
 def eliminar_usuario(request, usuario_id): # TODO si uno es administrador puede eliminarse a si mismo ,y seo no edberia
     usuario = get_object_or_404(Usuario, id=usuario_id)
+    if request.user == usuario:
+        messages.error(request, "No puedes eliminar tu propio usuario.")
+        return redirect('lista_usuarios')
     usuario.delete()
+    messages.success(request, "Usuario eliminado correctamente.")
     return redirect('lista_usuarios')
 
 def inicio_sesion(request):
@@ -114,6 +120,7 @@ def editar_permisos(request, usuario_id):
         permisos.ventas_CD = 'ventas_CD' in request.POST
         permisos.panel_admin = 'panel_admin' in request.POST
         permisos.save()
+        messages.success(request, "permisos registrados correctamente.")
         return redirect('lista_usuarios')
 
     return render(request, 'editar_permisos.html', {'usuario': usuario, 'permisos': permisos})
