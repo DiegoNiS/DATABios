@@ -126,23 +126,23 @@ def is_admin(user):
     return user.groups.filter(name='Administrador').exists()
 
 # Login view
-def loginView(request):
-    crear_grupos()  # Crear grupos si no existen
-    if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
+# def loginView(request):
+#     crear_grupos()  # Crear grupos si no existen
+#     if request.method == 'POST':
+#         username = request.POST['username']
+#         password = request.POST['password']
 
-        user = auth.authenticate(username=username, password=password)
+#         user = auth.authenticate(username=username, password=password)
 
-        if user is not None:
-            auth.login(request, user)
-            return redirect('home')  # Redirigir al sistema
+#         if user is not None:
+#             auth.login(request, user)
+#             return redirect('home')  # Redirigir al sistema
 
-        else:
-            messages.error(request, 'Credenciales inválidas')
-            return redirect('/')
-    else:
-        return render(request, 'login.html')
+#         else:
+#             messages.error(request, 'Credenciales inválidas')
+#             return redirect('/')
+#     else:
+#         return render(request, 'login.html')
     
     
 # Vista de Home
