@@ -73,9 +73,22 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'DATABIOS.wsgi.application'
 
-LOGIN_REDIRECT_URL = '/usuarios/' #temp
-LOGOUT_REDIRECT_URL = '/usuarios/login/' #temp
-LOGIN_URL = '/usuarios/login/' #temp
+
+# Configuración de mensajes
+from django.contrib.messages import constants as messages    # added by Diego
+
+MESSAGE_TAGS = {                                             # added by Diego
+    messages.DEBUG: 'debug',
+    messages.INFO: 'info',
+    messages.SUCCESS: 'success',
+    messages.WARNING: 'warning',
+    messages.ERROR: 'danger',
+}
+
+AUTH_USER_MODEL = 'Core.Usuario'                            # added by Diego
+LOGIN_REDIRECT_URL = '/usuarios/'                           # added by Diego
+LOGOUT_REDIRECT_URL = '/usuarios/login/'                    # added by Diego
+LOGIN_URL = '/usuarios/login/'                              # added by Diego
 
 
 
