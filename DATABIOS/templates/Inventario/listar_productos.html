@@ -22,12 +22,26 @@ Lista de Productos
       {% for producto in productos %}
       <tr>
         <td>{{ producto.id }}</td>
-        <td>{{ producto.categorias }}</td>
+        <td>
+          <ul>
+          {% for categoria in producto.categorias.all %}
+            <li>{{categoria}}</li>
+          {% endfor%}
+          </ul>
+        </td>
         <td>{{ producto.nombre }}</td>
         <td>{{ producto.stock }}</td>
         <td>{{ producto.precio_compra }}</td>
         <td>{{ producto.precio_venta}}</td>
         <td>
+          <ul>
+            <li>
+              <a href="{% url 'modificar_producto' producto.id %}">Modificar Producto</a>
+            </li>
+            <li>
+              <a href="{% url 'eliminar_producto' producto.id %}">Eliminar Producto</a>
+            </li>
+          </ul>
           <!--
                     <form action="" method="post">
                         {% csrf_token %}

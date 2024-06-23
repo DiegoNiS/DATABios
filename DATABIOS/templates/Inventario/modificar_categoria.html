@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Modificar Categoria
+{% endblock %}
+{% block content %}
+<div class="content">
+    <h1>Modificar Categoria</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Guardar</button>
+    </form>
+    <a href="{% url 'listar_categorias' %}" class="btn cancel-btn">Volver</a>
+</div>
+{% endblock %}
