@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth import authenticate, login
-from .models import Usuario
+from Core.models import Usuario
 from django.contrib.auth import get_user_model
 from django.contrib.auth import logout
 from django.urls import reverse
@@ -59,22 +59,12 @@ def agregar_usuario(request):
             apellido=apellido,
             categoria=categoria
         )
-        login(request, user)
+        #login(request, user)
 
         messages.success(request, "Usuario agregado correctamente.")
         return redirect('lista_usuarios')
     return render(request, 'agregar_usuario.html', { 'nombre_usuario': request.user.username})
-    # if request.method == "POST":
-    #     form = UserCreationForm(request.POST)
-    #     if form.is_valid():
-    #         form.save()
-    #         return redirect('lista_usuarios')
-    #     else:
-    #         return render(request, 'agregar_usuario.html', {'form': form, 'error': 'Por favor corrige los errores abajo.'})
-    # else:
-    #     form = UserCreationForm()
-    # return render(request, 'agregar_usuario.html', {'form': form})
-
+    
 @login_required
 @permisos_para(lambda u: u.is_superuser)
 def eliminar_usuario(request, usuario_id): # TODO si uno es administrador puede eliminarse a si mismo ,y seo no edberia
@@ -105,7 +95,7 @@ def cerrar_sesion(request):
     return redirect(reverse('login'))
 
 @login_required
-@user_passes_test(lambda u: u.is_superuser)
+@permisos_para(lambda u: u.is_superuser)
 def editar_permisos(request, usuario_id):
     usuario = get_object_or_404(Usuario, id=usuario_id)
     permisos = usuario.id_permisos

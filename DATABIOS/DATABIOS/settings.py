@@ -85,7 +85,7 @@ MESSAGE_TAGS = {                                             # added by Diego
     messages.ERROR: 'danger',
 }
 
-AUTH_USER_MODEL = 'Usuario.Usuario'                         # added by Diego
+AUTH_USER_MODEL = 'Core.Usuario'                            # added by Diego
 LOGIN_REDIRECT_URL = '/usuarios/'                           # added by Diego
 LOGOUT_REDIRECT_URL = '/usuarios/login/'                    # added by Diego
 LOGIN_URL = '/usuarios/login/'                              # added by Diego
