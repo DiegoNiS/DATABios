@@ -1,33 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
 from Core.models import Usuario
 from django.contrib.auth import get_user_model
 from django.contrib.auth import logout
 from django.urls import reverse
-
-from functools import wraps
-
-def permisos_para(permiso_check):
-    def check_permiso(user):
-        try:
-            return user.is_authenticated and permiso_check(user)
-        except Usuario.DoesNotExist:
-            return False
-
-    def decorator(view_func):
-        @wraps(view_func)
-        def wrapper(request, *args, **kwargs):
-            if check_permiso(request.user):
-                return view_func(request, *args, **kwargs)
-            else:
-                # Redireccionar a la página de permisos denegados
-                return render(request, 'permisos_denegados.html')
-
-        return wrapper
-
-    return decorator
+from Core.decorators import permisos_para
 
 
 User = get_user_model()
@@ -40,7 +19,6 @@ def list_usuarios(request):
         'nombre_usuario': request.user.username
     })
 
-@login_required
 @permisos_para(lambda u: u.is_superuser)
 def agregar_usuario(request):
     if request.method == 'POST':
@@ -65,7 +43,6 @@ def agregar_usuario(request):
         return redirect('lista_usuarios')
     return render(request, 'agregar_usuario.html', { 'nombre_usuario': request.user.username})
     
-@login_required
 @permisos_para(lambda u: u.is_superuser)
 def eliminar_usuario(request, usuario_id): # TODO si uno es administrador puede eliminarse a si mismo ,y seo no edberia
     usuario = get_object_or_404(Usuario, id=usuario_id)
@@ -94,7 +71,6 @@ def cerrar_sesion(request):
     logout(request)
     return redirect(reverse('login'))
 
-@login_required
 @permisos_para(lambda u: u.is_superuser)
 def editar_permisos(request, usuario_id):
     usuario = get_object_or_404(Usuario, id=usuario_id)
