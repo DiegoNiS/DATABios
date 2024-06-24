@@ -6,6 +6,27 @@ Lista de Productos
 <div class="content">
   <a href="{% url 'home' %}"></a>
   <h1>Lista de Productos</h1>
+  <h3>Opciones de filtrado</h3>
+  <form method="post" action="{% url 'listar_productos' %}">
+    {% csrf_token %}
+    <select name="categoria_id" id="categoria">
+      <option value="">Categorias</option>
+      {% for categoria in categorias %}
+      <option value="{{ categoria.id }}" {% if categoria.id == categoria_id %}selected{% endif %}>
+        {{categoria.nombre}}
+      </option>
+      {% endfor %}
+    </select>
+
+    <label for="precio_min">Precio desde: </label>
+    <input type="number" name="precio_min" id="precio_min" {%if not mostrar_todos %}value="{{ precio_min }}"{% endif %}>
+    <label for="precio_min"> Hasta: </label>
+    <input type="number" name="precio_max" id="precio_max" {%if not mostrar_todos %}value="{{ precio_max }}"{% endif %}">
+    <label for="mostrar_todos">Mostrar Todos</label>
+    <input type="checkbox" name="mostrar_todos" id="mostrar_todos" {% if mostrar_todos %}checked{% endif %}>
+    <button type="submit">Filtrar</button>
+  </form>
+  <h4>Tabla de productos</h4>
   <table>
     <thead>
       <tr>
@@ -13,6 +34,7 @@ Lista de Productos
         <th>Categoria</th>
         <th>Nombre</th>
         <th>Stock</th>
+        <th>Stock Estado</th>
         <th>Precio de Compra</th>
         <th>Precio de Venta</th>
         <th>Acción</th>
@@ -24,13 +46,14 @@ Lista de Productos
         <td>{{ producto.id }}</td>
         <td>
           <ul>
-          {% for categoria in producto.categorias.all %}
+            {% for categoria in producto.categorias.all %}
             <li>{{categoria}}</li>
-          {% endfor%}
+            {% endfor%}
           </ul>
         </td>
         <td>{{ producto.nombre }}</td>
         <td>{{ producto.stock }}</td>
+        <td>Estado de stock</td>
         <td>{{ producto.precio_compra }}</td>
         <td>{{ producto.precio_venta}}</td>
         <td>

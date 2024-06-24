@@ -9,9 +9,33 @@ from .forms import ProductoForm, CategoriaForm
 @login_required
 def listar_productos(request):
     productos = Producto.objects.all()
-    return render(request, 'Inventario/listar_productos.html', {'productos': productos})
+    categoria_id = None
+    precio_min = None
+    precio_max = None
+    mostrar_todos = False
+    if request.method == 'POST':
+        categoria_id = request.POST.get('categoria_id')
+        precio_min = request.POST.get('precio_min')
+        precio_max = request.POST.get('precio_max')
+        mostrar_todos = request.POST.get('mostrar_todos') == 'on'
+        if not mostrar_todos: # Si mostrar todos no esta activo
+            if categoria_id:
+                productos = productos.filter(categorias = categoria_id)
+            if precio_min:
+                productos = productos.filter(precio_venta__gte=precio_min)
+            if precio_max:
+                productos = productos.filter(precio_venta__lte=precio_max)
+    categorias = Categoria.objects.all()
+    return render(request, 'Inventario/listar_productos.html', {
+        'productos': productos,
+        'categorias':categorias,
+        'categoria_id':categoria_id,
+        'precio_min': precio_min,
+        'precio_max': precio_max,
+        'mostrar_todos': mostrar_todos,
+        })
 
-# Vista para crear un nuevo producto
+# Vista para crear un nuevo producto 
 @login_required
 def crear_producto(request):
     if request.method == 'POST':
