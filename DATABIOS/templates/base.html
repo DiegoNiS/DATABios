@@ -16,7 +16,17 @@
             <img src="{% static 'img/logo.png' %}" alt="LIBRERA STOCK">
         </div>
         <a href="{% url 'home' %}">Dashboard</a>
-        <a href="#pedidos">Pedidos</a>
+        
+
+        <div id="pedidosContainer" class="hidden">
+            <a href="">Pedidos</a>
+            <div class="link">
+                <a href="{% url 'crear_pedidos' %}">Crear Pedido</a>
+                <a href="{% url 'listar_pedidos' %}">Lista Pedidos</a>
+            </div>
+            
+        </div>
+        
         <a href="{% url 'listar_productos' %}">Inventario</a>
         <a href="">Ventas</a>
         <a href="{% url 'lista_usuarios' %}">Usuarios</a>

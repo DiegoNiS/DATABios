@@ -86,3 +86,31 @@ class Producto(models.Model):
 
     def __str__(self):
         return self.nombre
+    
+
+class Pedido(models.Model):
+    productos = models.ManyToManyField(Producto, through='DetallePedido')
+    fecha_pedido = models.DateField(auto_now_add=True)
+    total = models.FloatField()
+
+    def _str_(self):
+        return f"Pedido {self.id}"
+
+    def obtener_detalles_productos(self):
+        detalles = []
+        for detalle in self.detallepedido_set.all():
+            detalles.append({
+                'nombre_producto': detalle.producto.nombre,
+                'stock_producto': detalle.producto.stock,
+                'precio_compra_producto': detalle.producto.precio_compra,
+                'nombre_categoria': detalle.producto.categorias.first().nombre  # Obtener el nombre de la primera categoría asociada
+            })
+        return detalles
+
+class DetallePedido(models.Model):
+    pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE)
+    producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
+    cantidad = models.IntegerField()
+
+    def _str_(self):
+        return f"Detalle de Pedido {self.pedido_id} - Producto {self.producto.nombre}"

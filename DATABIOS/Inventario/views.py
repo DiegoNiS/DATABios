@@ -2,7 +2,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from Core.models import Categoria, Producto
+from Core.models import Categoria, Producto, Pedido
 from .forms import ProductoForm, CategoriaForm
 
 # Vista para listar productos (para vendedor y administrador)
@@ -53,3 +53,12 @@ def crear_categoria(request):
         messages.error(request, 'No tiene permisos para crear categorías.')
         return redirect('listar_categorias')
     """
+@login_required
+def listar_pedidos(request):
+    listar_pedidos = Pedido.objects.all()
+    return render(request, 'listar_pedidos.html', {'listar_pedidos': listar_pedidos})
+
+@login_required
+def crear_pedidos(request):
+    crear_pedidos = Pedido.objects.all()
+    return render(request, 'crear_pedidos.html', {'crear_pedidos': crear_pedidos})

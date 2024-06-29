@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title%}
+Lista de Pedidos
+{% endblock %}
+{% block content %}
+
+<div class="content">
+    <a href="{% url 'home' %}"></a>
+    <h1>Lista de Pedidos</h1>
+    <table>
+      <thead>
+        <tr>
+          <th># Pedidos</th>
+          <th>fecha_pedido</th>
+          <th>total</th>
+          <th>Stock</th>
+          <th>Estado de Pedidos</th>
+          <th>Precio de Venta</th>
+          <th>Acción</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for producto in productos %}
+        <tr>
+          <td>{{ pedidos.id }}</td>
+          <td>{{ pedidos.productos }}</td>
+          <td>{{ pedidos.fecha_pedido }}</td>
+          <td>
+            <!--
+                      <form action="" method="post">
+                          {% csrf_token %}
+                          <button type="submit" class="delete-button">Eliminar</button>
+                      </form>
+                    -->
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <!--
+  <div class="actions">
+    <a href="" class="btn export-btn">Crear Excel</a>
+    <a href="" class="btn add-btn">Agregar Venta</a>
+  </div>
+  -->
+  <!--  <a href="{% url 'crear_producto' %}">Crear Producto</a>
+-->
+</div>
+
+{% endblock %}
