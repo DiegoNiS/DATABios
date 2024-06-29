@@ -84,6 +84,17 @@ class Producto(models.Model):
     stock = models.IntegerField()
     precio_compra = models.FloatField()
     precio_venta = models.FloatField()
+    stock_min = models.IntegerField(default=10)
+    stock_max = models.IntegerField(default=20)
+    
+    @property
+    def estado_stock(self):
+        if self.stock < self.stock_min:
+            return 'bajo'
+        elif self.stock > self.stock_max:
+            return 'alto'
+        else:
+            return 'normal'
 
     def __str__(self):
         return self.nombre
