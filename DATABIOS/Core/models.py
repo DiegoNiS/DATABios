@@ -89,28 +89,27 @@ class Producto(models.Model):
     
 
 class Pedido(models.Model):
-    productos = models.ManyToManyField(Producto, through='DetallePedido')
+    ESTADO_CHOICES = [
+        ('cancelado', 'Cancelado'),
+        ('en_proceso', 'En Proceso'),
+        ('entregado', 'Entregado'),
+    ]
+    id = models.AutoField(primary_key=True)
+    categoria = models.ForeignKey(Categoria,on_delete=models.CASCADE, default=None)
+    productos = models.CharField(max_length=100, default='Producto genérico')
+    cantidad = models.IntegerField(default=0)
+    precio_unitario = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    total = models.DecimalField(max_digits=10, decimal_places=2)
     fecha_pedido = models.DateField(auto_now_add=True)
-    total = models.FloatField()
+    estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='en_proceso')
 
     def _str_(self):
-        return f"Pedido {self.id}"
+        return f"Pedido {self.id}: Categoria {self.Categoria.nombre}, Producto {self.producto}, Cantidad {self.cantidad}, Total {self.total}, Precio Unitario {self.precio_unitario}, Fecha de Pedido {self.fecha_pedido}, Estado {self.estado}"
+    @property
+    def calcular_total(self):
+        return self.cantidad * self.precio_unitario
 
-    def obtener_detalles_productos(self):
-        detalles = []
-        for detalle in self.detallepedido_set.all():
-            detalles.append({
-                'nombre_producto': detalle.producto.nombre,
-                'stock_producto': detalle.producto.stock,
-                'precio_compra_producto': detalle.producto.precio_compra,
-                'nombre_categoria': detalle.producto.categorias.first().nombre  # Obtener el nombre de la primera categoría asociada
-            })
-        return detalles
-
-class DetallePedido(models.Model):
-    pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE)
-    producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
-    cantidad = models.IntegerField()
-
-    def _str_(self):
-        return f"Detalle de Pedido {self.pedido_id} - Producto {self.producto.nombre}"
+    def save(self, *args, **kwargs):
+        self.total = self.calcular_total
+        super().save(*args, **kwargs)
+    
