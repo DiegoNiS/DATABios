@@ -2,11 +2,15 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.template.loader import render_to_string
 from Core.models import Categoria, Producto
 from Core.decorators import permisos_para
 from .forms import ProductoForm, CategoriaForm
+# excel
+import openpyxl
+from io import BytesIO
+
 
 # Vista para listar productos (para vendedor y administrador)    
 @login_required
@@ -41,7 +45,7 @@ def filtrar_productos(request):
     context = {'productos': productos}
     html = render_to_string('Inventario/tabla_productos.html', context)
     return JsonResponse({'html': html})
-    
+# !!!!?
 @login_required
 def detalle_producto(request, pk):
     producto = get_object_or_404(Producto, id=pk)
@@ -89,6 +93,44 @@ def eliminar_producto(request, pk):
         messages.success(request, 'Producto eliminado exitosamente.')
         return redirect('listar_productos')
     return render(request, 'Inventario/eliminar_producto.html', {'producto': producto})
+
+# Exportar Excel de Productos
+@login_required
+def exportar_productos_excel(request):
+    productos = Producto.objects.all()
+    
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = 'Productos'
+    
+    encabezados = ['ID', 'Nombre', 'Categoria', 'Stock', 'Precio Compra', 'Precio Venta', 'Estado Stock']
+    ws.append(encabezados)
+    
+    # Escribir datos
+    for producto in productos:
+        categorias = ', '.join([str(c) for c in producto.categorias.all()])
+        ws.append([
+            producto.id,
+            producto.nombre,
+            categorias,
+            producto.stock,
+            producto.precio_compra,
+            producto.precio_venta,
+            producto.estado_stock
+        ])
+    
+    # Guardar el archivo en memoria
+    archivo = BytesIO()
+    wb.save(archivo)
+    archivo.seek(0)
+    
+    response = HttpResponse(
+        archivo,
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['Content-Disposition'] = 'attachment; filename=productos.xlsx'
+    return response
+
 
 # Vista para listar categorías (para vendedor y administrador)
 @login_required
