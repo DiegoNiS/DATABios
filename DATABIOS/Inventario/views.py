@@ -70,7 +70,7 @@ def crear_producto(request):
         form_crear_producto = ProductoForm()
     return render(request, 'Inventario/crear_producto.html', {'form_crear_producto': form_crear_producto})
 
-# Vista para modificar un producto
+# Vista para editar un producto
 @permisos_para(lambda u:u.id_permisos.inventario_pro_CUD)
 def editar_producto(request, pk):
     producto = get_object_or_404(Producto, pk=pk)
@@ -131,6 +131,7 @@ def exportar_productos_excel(request):
     response['Content-Disposition'] = 'attachment; filename=productos.xlsx'
     return response
 
+########### CATEGORIAS ##########
 
 # Vista para listar categorías (para vendedor y administrador)
 @login_required
@@ -151,9 +152,9 @@ def crear_categoria(request):
         form = CategoriaForm()
     return render(request, 'Inventario/crear_categoria.html', {'form': form})
 
-# Vista para modificar una categoría
+# Vista para editar una categoría
 @permisos_para(lambda u:u.id_permisos.inventario_cat_CUD)
-def modificar_categoria(request, pk):
+def editar_categoria(request, pk):
     categoria = get_object_or_404(Categoria, pk=pk)
     if request.method == 'POST':
         form = CategoriaForm(request.POST, instance=categoria)
@@ -163,7 +164,7 @@ def modificar_categoria(request, pk):
             return redirect('listar_categorias')
     else:
         form = CategoriaForm(instance=categoria)
-    return render(request, 'Inventario/modificar_categoria.html', {'form': form, 'categoria': categoria})
+    return render(request, 'Inventario/editar_categoria.html', {'form': form, 'categoria': categoria})
 
 # Vista para eliminar una categoría
 @permisos_para(lambda u:u.id_permisos.inventario_cat_CUD)
