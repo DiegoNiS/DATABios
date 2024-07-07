@@ -1,0 +1,55 @@
+<!-- Proyecto/inventario/templates/inventario/listar_categorias.html -->
+{% extends "base.html" %}
+{% block title%}
+Lista de Categorias
+{% endblock %}
+{% block content %}
+<div class="content">
+  <a href="{% url 'home' %}"></a>
+  <h1>Lista de Categorias</h1>
+  <table>
+    <thead>
+      <tr>
+        <th># Categoria</th>
+        <th>Categoria</th>
+        <th>Descripcion</th>
+        <th>Fecha de creacion</th>
+        <th>Accion</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for categoria in categorias %}
+      <tr>
+        <td>{{ categoria.id }}</td>
+        <td>{{ categoria.nombre }}</td>
+        <td>{{ categoria.descripcion }}</td>
+        <td>{{ categoria.created_at|date:"d M Y H:i" }}</td>
+        <td>
+          <ul>
+            <li>
+              <a href="{% url 'modificar_categoria' categoria.id %}">Modificar Categoria</a>
+            </li>
+            <li>
+              <a href="{% url 'eliminar_categoria' categoria.id %}">Eliminar Categoria</a>
+            </li>
+          </ul>
+          <!--
+                    <form action="" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="delete-button">Eliminar</button>
+                    </form>
+                  -->
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <!--
+<div class="actions">
+  <a href="" class="btn export-btn">Crear Excel</a>
+  <a href="" class="btn add-btn">Agregar Venta</a>
+</div>
+-->
+  <a href="{% url 'crear_categoria' %}">Crear Categoria</a>
+</div>
+{% endblock %}

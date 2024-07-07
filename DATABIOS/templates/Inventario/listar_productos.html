@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title%}
+Lista de Productos
+{% endblock %}
+
+{% block content %}
+<div class="content">
+  <a href="{% url 'home' %}">Dashboard</a>
+  <h1>Lista de Productos</h1>
+  <h3>Opciones de filtrado</h3>
+  <form id="form_filtro_productos" method="post" action="{% url 'filtrar_productos' %}">
+    {% csrf_token %}
+    <select name="filtro_categoria" id="filtro_categoria">
+      <option value="">Categorias</option>
+      {% for categoria in categorias %}
+      <option value="{{ categoria.id }}">
+        {{categoria.nombre}}
+      </option>
+      {% endfor %}
+    </select>
+
+    <label for="filtro_precio_min">Precio desde: </label>
+    <input type="number" name="filtro_precio_min" id="filtro_precio_min">
+    <label for="filtro_precio_min"> Hasta: </label>
+    <input type="number" name="filtro_precio_max" id="filtro_precio_max">
+
+    <select name="filtro_estado_stock" id="filtro_estado_stock">
+      <option value="">Todos los estados</option>
+      <option value="bajo">Bajo</option>
+      <option value="normal">Normal</option>
+      <option value="alto">Alto</option>
+    </select>
+
+    <label for="filtro_mostrar_todos">Mostrar Todos</label>
+    <input type="checkbox" name="filtro_mostrar_todos" id="filtro_mostrar_todos" {% if mostrar_todos %}checked{% endif %}>
+    <button type="submit">Filtrar</button>
+  </form>
+
+  <!-- Tabla de productos-->
+  <h4>Tabla de productos</h4>
+  <div id="tabla_productos">
+    {% include 'Inventario/tabla_productos.html' %}
+  </div>
+
+  <a href="{% url 'crear_producto' %}">Nuevo Producto</a>
+  <!-- Dialog crear_producto-->
+  <button id="btn_abrir_dialog_crear_producto">Crear Producto</button>
+  <dialog id="dialog_crear_producto">
+    <form action="{% url 'crear_producto' %}" method="post">
+      {% csrf_token %}
+      {{ form_crear_producto.as_p }}
+      <button type="submit">Crear Producto</button>
+    </form>
+    <button id="btn_cerrar_dialog_crear_producto">Salir</button>
+  </dialog>
+
+  <a href="{% url 'exportar_productos_excel' %}">Exportar Excel</a>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="{% static 'js/Inventario/filterTable.js' %}"></script>
+
+  <script src="{% static 'js/Inventario/dialogInventarioProducto.js' %}"></script>
+</div>
+{% endblock %}

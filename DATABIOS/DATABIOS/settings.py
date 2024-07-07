@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework',
+    #'rest_framework',
     'Usuario',
     'Inventario',
     'Core',
@@ -105,6 +105,11 @@ DATABASES = {
         'PORT': '5432',
     }
 }
+<<<<<<< Updated upstream
+=======
+<<<<<<< HEAD
+
+>>>>>>> Stashed changes
 '''
 
 DATABASES = {
@@ -114,6 +119,8 @@ DATABASES = {
     }
 }
 '''
+=======
+>>>>>>> c7398ef516c76b44ea2d2664c265df9257b2eeeb
 
 
 # Password validation
