@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from Core.models import Categoria, Producto, Pedido
-from .forms import ProductoForm, CategoriaForm
+from .forms import ProductoForm, CategoriaForm, PedidoForm
 
 # Vista para listar productos (para vendedor y administrador)
 @login_required
@@ -58,7 +58,31 @@ def listar_pedidos(request):
     listar_pedidos = Pedido.objects.all()
     return render(request, 'listar_pedidos.html', {'listar_pedidos': listar_pedidos})
 
+"""@login_required
+def crear_pedidos(request):
+    categoria = request.POST['txtCategoria']
+    productos = request.POST['txtProductos']
+    cantidad = request.POST['txtCantidad']
+    precio_unitario = request.POST['txtPrecio_Unitario']
+    total = request.POST['txtTotal']
+    estado = request.POST['txtEstado']
+
+    pedido = Pedido.objects.create(categoria=categoria, productos=productos, cantidad=cantidad, precio_unitario=precio_unitario, total=total, estado=estado)
+    
+    return render(request, 'crear_pedidos.html', {'crear_pedidos': crear_pedidos})
+    #return redirect('/')
+    """
 @login_required
 def crear_pedidos(request):
-    crear_pedidos = Pedido.objects.all()
-    return render(request, 'crear_pedidos.html', {'crear_pedidos': crear_pedidos})
+    if request.method == 'POST':
+        form = PedidoForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Pedido creado exitosamente.')
+            return redirect('listar_pedidos')
+        else:
+            messages.error(request, 'Por favor corrige los errores del formulario.')
+    else:
+        form = PedidoForm()
+    
+    return render(request, 'crear_pedidos.html', {'form': form})
