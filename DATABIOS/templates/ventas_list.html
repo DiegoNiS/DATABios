@@ -10,9 +10,9 @@ Lista de Ventas
     <div class="filter-bar">
         <input type="date" id="fecha">
         <select id="vendedor">
-            <option value="">Vendedor</option>
+            <option value="*">Todos</option>
             {% for vendedor in vendedores %}
-                <option value="{{ vendedor.id }}">{{ vendedor.nombre }} {{ vendedor.apellidos }}</option>
+                <option value="{{ vendedor.id }}">{{ vendedor.nombre }} {{ vendedor.apellido }}</option>
             {% endfor %}
         </select>
         <button onclick="filtrar()">Filtrar</button>
@@ -35,7 +35,7 @@ Lista de Ventas
                     <td>{{ venta.vendedor }}</td>
                     <td>{{ venta.fecha_creacion }}</td>
                     <td>
-                        <form action="{% url 'venta_delete' venta.id %}" method="post">
+                        <form action="{% url 'venta_delete' venta.id %}" method="GET">
                             {% csrf_token %}
                             <button type="submit" class="delete-button">Eliminar</button>
                         </form>
