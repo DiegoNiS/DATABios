@@ -1,30 +1,80 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from django.contrib.auth.models import User, auth, Group
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth import authenticate, login
-from django.contrib.auth.forms import UserCreationForm
+from Core.models import Usuario
+from django.contrib.auth import get_user_model
+from django.contrib.auth import logout
+from django.urls import reverse
+
+from functools import wraps
+
+def permisos_para(permiso_check):
+    def check_permiso(user):
+        try:
+            return user.is_authenticated and permiso_check(user)
+        except Usuario.DoesNotExist:
+            return False
+
+    def decorator(view_func):
+        @wraps(view_func)
+        def wrapper(request, *args, **kwargs):
+            if check_permiso(request.user):
+                return view_func(request, *args, **kwargs)
+            else:
+                # Redireccionar a la página de permisos denegados
+                return render(request, 'permisos_denegados.html')
+
+        return wrapper
+
+    return decorator
 
 
+User = get_user_model()
+
+@login_required
 def list_usuarios(request):
     usuarios = User.objects.all()
     return render(request, 'lista_usuarios.html', {
-        'usuarios': usuarios
+        'usuarios': usuarios,
+        'nombre_usuario': request.user.username
     })
 
 @login_required
-@user_passes_test(lambda u: u.is_superuser)
+@permisos_para(lambda u: u.is_superuser)
 def agregar_usuario(request):
-    if request.method == "POST":
-        form = UserCreationForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('lista_usuarios')
-        else:
-            return render(request, 'agregar_usuario.html', {'form': form, 'error': 'Por favor corrige los errores abajo.'})
-    else:
-        form = UserCreationForm()
-    return render(request, 'agregar_usuario.html', {'form': form})
+    if request.method == 'POST':
+        username = request.POST['username']
+        email = request.POST['email']
+        password = request.POST['password']
+        nombre = request.POST['nombre']
+        apellido = request.POST['apellido']
+        categoria = request.POST['categoria']
+
+        user = User.objects.create_user(
+            username=username,
+            email=email,
+            password=password,
+            nombre=nombre,
+            apellido=apellido,
+            categoria=categoria
+        )
+        #login(request, user)
+
+        messages.success(request, "Usuario agregado correctamente.")
+        return redirect('lista_usuarios')
+    return render(request, 'agregar_usuario.html', { 'nombre_usuario': request.user.username})
+    
+@login_required
+@permisos_para(lambda u: u.is_superuser)
+def eliminar_usuario(request, usuario_id): # TODO si uno es administrador puede eliminarse a si mismo ,y seo no edberia
+    usuario = get_object_or_404(Usuario, id=usuario_id)
+    if request.user == usuario:
+        messages.error(request, "No puedes eliminar tu propio usuario.")
+        return redirect('lista_usuarios')
+    usuario.delete()
+    messages.success(request, "Usuario eliminado correctamente.")
+    return redirect('lista_usuarios')
 
 def inicio_sesion(request):
     if request.method == 'POST':
@@ -35,21 +85,42 @@ def inicio_sesion(request):
             login(request, user)
             return redirect('lista_usuarios')  # Redirige a la lista de usuarios después de iniciar sesión
         else:
-            return render(request, 'usuarios/login.html', {'error': 'Credenciales inválidas'})
-    else:
+            return render(request, 'login.html', {'error': 'Credenciales inválidas', 'nombre_usuario': request.user.username})
+    else:   
         return render(request, 'login.html')
 
+@login_required
 def cerrar_sesion(request):
     logout(request)
-    # Redirigir a la página de inicio o a donde desees después del cierre de sesión
-    return redirect('login')
+    return redirect(reverse('login'))
+
+@login_required
+@permisos_para(lambda u: u.is_superuser)
+def editar_permisos(request, usuario_id):
+    usuario = get_object_or_404(Usuario, id=usuario_id)
+    permisos = usuario.id_permisos
+
+    if request.method == 'POST':
+        permisos.pedidos_pen_CUD = 'pedidos_pen_CUD' in request.POST
+        permisos.pedidos_pen_S = 'pedidos_pen_S' in request.POST
+        permisos.pedidos_rec_G = 'pedidos_rec_G' in request.POST
+        permisos.inventario_cat_CUD = 'inventario_cat_CUD' in request.POST
+        permisos.inventario_pro_CUD = 'inventario_pro_CUD' in request.POST
+        permisos.inventario_pro_G = 'inventario_pro_G' in request.POST
+        permisos.ventas_CD = 'ventas_CD' in request.POST
+        permisos.panel_admin = 'panel_admin' in request.POST
+        permisos.save()
+        messages.success(request, "permisos registrados correctamente.")
+        return redirect('lista_usuarios')
+
+    return render(request, 'editar_permisos.html', {'usuario': usuario, 'permisos': permisos})
+
+
+
+
+
 
 # Max's Creations
-
-#Creacion de grupos
-def crear_grupos():
-    Group.objects.get_or_create(name='Administrador')
-    Group.objects.get_or_create(name='Vendedor')
     
 def is_admin(user):
     return user.groups.filter(name='Administrador').exists()
@@ -84,8 +155,3 @@ def homeView(request):
         'grupos_usuario': list(grupos_usuario)
     }
     return render(request, 'home.html', context)
-
-@login_required
-def logout(request):
-    auth.logout(request)
-    return redirect('/')

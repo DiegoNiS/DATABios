@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}LIBRERA STOCK{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"> <!-- aded by Diego  -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>                                 <!-- aded by Diego  -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>      <!-- aded by Diego  -->
 </head>
 <body>
     <div id="mySidenav" class="sidenav">
@@ -21,6 +24,7 @@
         <a href="#ajustes">Ajustes</a>
         <a href="{% url 'logout' %}">Salir</a>
     </div>
+<<<<<<< HEAD
 
     <div id="main" class="main-content">
         <div class="topnav">
@@ -34,6 +38,38 @@
                 {% endif %}
             </div>
         </div>
+=======
+    <div class="topnav">
+        {% if user.is_authenticated %}
+        <div class="topnav-right">
+            <p>Bienvenido {{ nombre_usuario }}</p>
+            <a href="{% url 'logout' %}">Logout</a>
+            <a href="{% url 'lista_usuarios' %}">Lista de Usuarios</a>
+        </div>
+        {% else %}
+        <div class="topnav-right">
+            <a href="{% url 'login' %}">Iniciar Sesión</a>
+        </div>
+        {% endif %}
+    </div>
+    <div class="main-content">
+
+        <!-- Bloque para mostrar mensajes de Django como alertas -->
+    <div class="container mt-4">   <!-- aded by Diego  -->
+        {% if messages %}
+            <div class="alert-container">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>                  <!-- aded by Diego  -->
+>>>>>>> diego
 
         {% block content %}
         {% endblock %}
