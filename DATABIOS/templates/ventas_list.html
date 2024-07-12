@@ -8,14 +8,22 @@ Lista de Ventas
 <div class="content">
     <h1>Ventas</h1>
     <div class="filter-bar">
-        <input type="date" id="fecha">
-        <select id="vendedor">
-            <option value="*">Todos</option>
-            {% for vendedor in vendedores %}
-                <option value="{{ vendedor.id }}">{{ vendedor.nombre }} {{ vendedor.apellido }}</option>
-            {% endfor %}
-        </select>
-        <button onclick="filtrar()">Filtrar</button>
+        <form action="{% url 'ventas_list' %}" method="post">
+            {% csrf_token %}
+            <label for="fecha1">Ventas hechas desde</label>
+            <input type="date" id="fecha1" name="fecha1">
+            <label for="fecha2">hasta</label>
+            <input type="date" id="fecha2" name="fecha2">
+            <label for="vendedor">Ventas hechas por:</label>
+            <select id="vendedor" name="vendedor">
+                <option value="*">Todos</option>
+                {% for vendedor in vendedores %}
+                    <option value="{{ vendedor.id }}">{{ vendedor.username }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit">Filtrar</button>
+        </form>
+        <!--<button onclick="filtrar()">Filtrar</button> -->
     </div>
     <table>
         <thead>
@@ -40,6 +48,7 @@ Lista de Ventas
                             <button type="submit" class="delete-button">Eliminar</button>
                         </form>
                     </td>
+                    
                 </tr>
             {% endfor %}
         </tbody>

@@ -4,11 +4,27 @@ from django.http import HttpResponse
 from .models import Venta
 from Core.models import Usuario
 from django.contrib import messages
+from django.db.models import Q
 
 
 def ventas_list(request):
-    ventas = Venta.objects.all()
     vendedores = Usuario.objects.all()
+    ventas = Venta.objects.all().order_by('-id')
+    if request.method == 'POST':
+        fdesde = request.POST['fecha1']
+        fhasta = request.POST['fecha2']
+        vend = request.POST['vendedor']
+
+        filtros = Q()
+
+        if fdesde and fhasta:
+            filtros &= Q(fecha_creacion__range=[fdesde, fhasta])
+        if vend and vend != "*":
+            vendedor = get_object_or_404(Usuario, id=vend)
+            filtros &= Q(vendedor=vendedor)
+
+        if filtros:
+            ventas = Venta.objects.filter(filtros).order_by('-id')
     return render(request, 'ventas_list.html', {
         'ventas': ventas,
         'vendedores': vendedores
