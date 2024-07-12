@@ -10,20 +10,46 @@ from .forms import ProductoForm, CategoriaForm
 # excel
 import openpyxl
 from io import BytesIO
+import datetime
 
 
 # Vista para listar productos (para vendedor y administrador)    
 @login_required
 def listar_productos(request):
-    productos = Producto.objects.all()
-    categorias = Categoria.objects.all()            
-    # estado de stock de cada producto segun el filtro
+    productos = Producto.objects.all().order_by('id')
+    categorias = Categoria.objects.all()
+
+    # Obtener parámetros GET para filtrar
+    categoria_id = request.GET.get('filtro_categoria')
+    precio_min = request.GET.get('filtro_precio_min')
+    precio_max = request.GET.get('filtro_precio_max')
+    estado_stock = request.GET.get('filtro_estado_stock')
+    mostrar_todos = request.GET.get('filtro_mostrar_todos') == 'on'
+
+    if not mostrar_todos:  # Si mostrar todos no está activo
+        if categoria_id:
+            productos = productos.filter(categorias=categoria_id)
+        if precio_min:
+            productos = productos.filter(precio_venta__gte=precio_min)
+        if precio_max:
+            productos = productos.filter(precio_venta__lte=precio_max)
+        if estado_stock:
+            productos = [p for p in productos if p.estado_stock == estado_stock]
+
+    """
+    # Manejar la solicitud AJAX
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        context = {'productos': productos}
+        html = render_to_string('Inventario/tabla_productos.html', context)
+        return JsonResponse({'html': html})
+    """
     return render(request, 'Inventario/listar_productos.html', {
         'productos': productos,
-        'categorias':categorias,
-        })
-    
-@login_required
+        'categorias': categorias,
+    })
+"""
+por ahora se esta usando el metodo get
+@login_required 
 def filtrar_productos(request):
     productos = Producto.objects.all()
     categoria_id = request.POST.get('filtro_categoria')
@@ -45,6 +71,7 @@ def filtrar_productos(request):
     context = {'productos': productos}
     html = render_to_string('Inventario/tabla_productos.html', context)
     return JsonResponse({'html': html})
+"""
 # !!!!?
 @login_required
 def detalle_producto(request, pk):
@@ -97,46 +124,53 @@ def eliminar_producto(request, pk):
 # Exportar Excel de Productos
 @login_required
 def exportar_productos_excel(request):
-    productos = Producto.objects.all()
+    if request.method == 'POST':
+        producto_ids = request.POST.get('producto_ids').split(',')
+        productos = Producto.objects.order_by('id').filter(id__in=producto_ids)
     
-    wb = openpyxl.Workbook()
-    ws = wb.active
-    ws.title = 'Productos'
-    
-    encabezados = ['ID', 'Nombre', 'Categoria', 'Stock', 'Precio Compra', 'Precio Venta', 'Estado Stock']
-    ws.append(encabezados)
-    
-    # Escribir datos
-    for producto in productos:
-        categorias = ', '.join([str(c) for c in producto.categorias.all()])
-        ws.append([
-            producto.id,
-            producto.nombre,
-            categorias,
-            producto.stock,
-            producto.precio_compra,
-            producto.precio_venta,
-            producto.estado_stock
-        ])
-    
-    # Guardar el archivo en memoria
-    archivo = BytesIO()
-    wb.save(archivo)
-    archivo.seek(0)
-    
-    response = HttpResponse(
-        archivo,
-        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    )
-    response['Content-Disposition'] = 'attachment; filename=productos.xlsx'
-    return response
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = 'Productos'
+        
+        encabezados = ['ID', 'Nombre', 'Categoria', 'Stock', 'Precio Compra', 'Precio Venta', 'Estado Stock']
+        ws.append(encabezados)
+        
+        # Escribir datos
+        for producto in productos:
+            categorias = ', '.join([str(c) for c in producto.categorias.all()])
+            ws.append([
+                producto.id,
+                producto.nombre,
+                categorias,
+                producto.stock,
+                producto.precio_compra,
+                producto.precio_venta,
+                producto.estado_stock
+            ])
+        
+        # Guardar el archivo en memoria
+        archivo = BytesIO()
+        wb.save(archivo)
+        archivo.seek(0)
+        
+        now = datetime.datetime.now()
+        formatted_date = now.strftime("%Y%m%d_%H%M%S")
+        filename = f'productos_{formatted_date}.xlsx'
+        
+        response = HttpResponse(
+            archivo,
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response['Content-Disposition'] = f'attachment; filename={filename}.xlsx'
+        return response
+    return HttpResponse(status = 400)
 
 ########### CATEGORIAS ##########
 
 # Vista para listar categorías (para vendedor y administrador)
 @login_required
 def listar_categorias(request):
-    categorias = Categoria.objects.all()
+    categorias = Categoria.objects.all().order_by('id')
     return render(request, 'Inventario/listar_categorias.html', {'categorias': categorias})
 
 # Vista para crear una nueva categoría
