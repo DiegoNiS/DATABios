@@ -1,6 +1,5 @@
-# ventas/forms.py
 from django import forms
-from .models import Venta
+from .models import Venta, DetalleVenta
 
 class VentaForm(forms.ModelForm):
     class Meta:
