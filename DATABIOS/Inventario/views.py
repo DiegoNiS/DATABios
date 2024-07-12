@@ -15,14 +15,38 @@ from io import BytesIO
 # Vista para listar productos (para vendedor y administrador)    
 @login_required
 def listar_productos(request):
-    productos = Producto.objects.all()
-    categorias = Categoria.objects.all()            
-    # estado de stock de cada producto segun el filtro
+    productos = Producto.objects.all().order_by('id')
+    categorias = Categoria.objects.all()
+
+    # Obtener parámetros GET para filtrar
+    categoria_id = request.GET.get('filtro_categoria')
+    precio_min = request.GET.get('filtro_precio_min')
+    precio_max = request.GET.get('filtro_precio_max')
+    estado_stock = request.GET.get('filtro_estado_stock')
+    mostrar_todos = request.GET.get('filtro_mostrar_todos') == 'on'
+
+    if not mostrar_todos:  # Si mostrar todos no está activo
+        if categoria_id:
+            productos = productos.filter(categorias=categoria_id)
+        if precio_min:
+            productos = productos.filter(precio_venta__gte=precio_min)
+        if precio_max:
+            productos = productos.filter(precio_venta__lte=precio_max)
+        if estado_stock:
+            productos = [p for p in productos if p.estado_stock == estado_stock]
+
+    """
+    # Manejar la solicitud AJAX
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        context = {'productos': productos}
+        html = render_to_string('Inventario/tabla_productos.html', context)
+        return JsonResponse({'html': html})
+    """
     return render(request, 'Inventario/listar_productos.html', {
         'productos': productos,
-        'categorias':categorias,
-        })
-    
+        'categorias': categorias,
+    })
+"""
 @login_required
 def filtrar_productos(request):
     productos = Producto.objects.all()
@@ -45,6 +69,7 @@ def filtrar_productos(request):
     context = {'productos': productos}
     html = render_to_string('Inventario/tabla_productos.html', context)
     return JsonResponse({'html': html})
+"""
 # !!!!?
 @login_required
 def detalle_producto(request, pk):

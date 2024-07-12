@@ -9,7 +9,7 @@ Lista de Productos
   <a href="{% url 'home' %}">Dashboard</a>
   <h1>Lista de Productos</h1>
   <h3>Opciones de filtrado</h3>
-  <form id="form_filtro_productos" method="post" action="{% url 'filtrar_productos' %}">
+  <form id="form_filtro_productos" method="get" action="{% url 'listar_productos' %}">
     {% csrf_token %}
     <select name="filtro_categoria" id="filtro_categoria">
       <option value="">Categorias</option>
@@ -58,7 +58,7 @@ Lista de Productos
   <a href="{% url 'exportar_productos_excel' %}">Exportar Excel</a>
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="{% static 'js/Inventario/filterTable.js' %}"></script>
+  <!--<script src="{% static 'js/Inventario/filterTable.js' %}"></script> -->
 
   <script src="{% static 'js/Inventario/dialogInventarioProducto.js' %}"></script>
 </div>
