@@ -17,13 +17,45 @@
         </div>
         <a href="{% url 'home' %}">Dashboard</a>
         <a href="#pedidos">Pedidos</a>
-        <a href="#">Inventario</a>
+        <a href="#Inventario">Inventario</a>
         <a href="{% url 'ventas_list' %}">Ventas</a>
         <a href="{% url 'lista_usuarios' %}">Usuarios</a>
         <a href="#proveedores">Proveedores</a>
         <a href="#ajustes">Ajustes</a>
         <a href="{% url 'logout' %}">Salir</a>
     </div>
+<!--
+    <div class="topnav">
+        {% if user.is_authenticated %}
+        <div class="topnav-right">
+            <p>Bienvenido {{ nombre_usuario }}</p>
+            <a href="{% url 'logout' %}">Logout</a>
+            <a href="{% url 'lista_usuarios' %}">Lista de Usuarios</a>
+        </div>
+        {% else %}
+        <div class="topnav-right">
+            <a href="{% url 'login' %}">Iniciar Sesión</a>
+        </div>
+        {% endif %}
+    </div>
+    <div class="main-content">
+
+        <!-- Bloque para mostrar mensajes de Django como alertas 
+    <div class="container mt-4">   <!-- aded by Diego  
+        {% if messages %}
+            <div class="alert-container">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>                  <!-- aded by Diego  
+    -->
 
     <div id="main" class="main-content">
         <div class="topnav">
@@ -47,8 +79,7 @@
     </footer>
 
     <script src="{% static 'js/scripts.js' %}"></script>
+    <script src="{% static 'js/ventas/ventas.js' %}"></script>
 </body>
-
 </html>
 
-    
