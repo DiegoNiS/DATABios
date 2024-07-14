@@ -11,6 +11,8 @@ from .forms import ProductoForm, CategoriaForm
 import openpyxl
 from io import BytesIO
 import datetime
+# bd
+from django.db import transaction, IntegrityError, DatabaseError
 
 
 # Vista para listar productos (para vendedor y administrador)    
@@ -87,83 +89,155 @@ def detalle_producto(request, pk):
 # Vista para crear un nuevo producto 
 @permisos_para(lambda u:u.id_permisos.inventario_pro_CUD)
 def crear_producto(request):
+    categorias = Categoria.objects.all().order_by('id')
     if request.method == 'POST':
-        form = ProductoForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Producto creado exitosamente.')
-            return redirect('listar_productos')
+        nombre_Prod_C = request.POST.get('nombre_Prod_C')
+        categorias_ids_Prod_C = request.POST.getlist('categorias_Prod_C')
+        stock_Prod_C = request.POST.get('stock_Prod_C')
+        precio_compra_Prod_C = request.POST.get('precio_compra_Prod_C')
+        precio_venta_Prod_C = request.POST.get('precio_venta_Prod_C')
+        stock_min_Prod_C = request.POST.get('stock_min_Prod_C')
+        stock_max_Prod_C = request.POST.get('stock_max_Prod_C')
+        
+        # Validaciones manuales
+        errores = []
+        if not nombre_Prod_C:
+            errores.append('El campo nombre es obligatorio.')
+        if not categorias_ids_Prod_C:
+            errores.append('Debe seleccionar al menos una categoría.')
+        if not stock_Prod_C or int(stock_Prod_C) <= 0:
+            errores.append('El campo stock debe ser mayor que cero.')
+        if not precio_compra_Prod_C or float(precio_compra_Prod_C) <= 0:
+            errores.append('El campo precio de compra debe ser mayor que cero.')
+        if not precio_venta_Prod_C or float(precio_venta_Prod_C) <= 0:
+            errores.append('El campo precio de venta debe ser mayor que cero.')
+        if not stock_min_Prod_C or int(stock_min_Prod_C) <= 0:
+            errores.append('El campo stock mínimo debe ser mayor que cero.')
+        if not stock_max_Prod_C or int(stock_max_Prod_C) <= 0:
+            errores.append('El campo stock máximo debe ser mayor que cero.')
+        if stock_min_Prod_C and stock_max_Prod_C and int(stock_min_Prod_C) > int(stock_max_Prod_C):
+            errores.append('El campo stock mínimo no puede ser mayor que el stock máximo.')
+        
+        if nombre_Prod_C and categorias_ids_Prod_C and stock_Prod_C and precio_compra_Prod_C and precio_venta_Prod_C and precio_venta_Prod_C and stock_min_Prod_C and stock_max_Prod_C:
+            try:
+                with transaction.atomic():
+                    producto = Producto(
+                        nombre = nombre_Prod_C,
+                        stock = stock_Prod_C,
+                        precio_compra = precio_compra_Prod_C,
+                        precio_venta = precio_venta_Prod_C,
+                        stock_min = stock_min_Prod_C,
+                        stock_max = stock_max_Prod_C
+                    )
+                    producto.save()
+                    producto.categorias.set(categorias_ids_Prod_C)
+                    messages.success(request, 'Producto creado exitosamente.')
+                    return redirect('listar_productos')
+            except IntegrityError as e:
+                messages.error(request, f'Error de integridad: {e}')
+            except DatabaseError as e:
+                messages.error(request, f'Error de base de datos: {e}')
+            except Exception as e:
+                messages.error(request, f'Ocurrió un error inesperado: {e}')
+        else:
+            messages.error(request, 'Por favor, corrija los errores en el formulario.')
     else:
-        form_crear_producto = ProductoForm()
-    return render(request, 'Inventario/crear_producto.html', {'form_crear_producto': form_crear_producto})
+        form = ProductoForm()
+
+    return render(request, 'Inventario/crear_producto.html', {'categorias': categorias})
 
 # Vista para editar un producto
 @permisos_para(lambda u:u.id_permisos.inventario_pro_CUD)
 def editar_producto(request, pk):
-    producto = get_object_or_404(Producto, pk=pk)
-    if request.method == 'POST':
-        form = ProductoForm(request.POST, instance=producto)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Producto modificado exitosamente.')
-            return redirect('listar_productos')
-    else:
-        form = ProductoForm(instance=producto)
+    try:
+        producto = get_object_or_404(Producto, pk=pk)
+        if request.method == 'POST':
+            form = ProductoForm(request.POST, instance=producto)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Producto modificado exitosamente.')
+                return redirect('listar_productos')
+            else:
+                messages.error(request, 'Error en el formulario. Por favor, verifica los datos ingresados.')
+        else:
+            form = ProductoForm(instance=producto)
+    except Producto.DoesNotExist:
+        messages.error(request, 'El producto no existe.')
+        return redirect('listar_productos')
+    except Exception as e:
+        messages.error(request, f'Ha ocurrido un error: {str(e)}')
+        return redirect('listar_productos')
+    
     return render(request, 'Inventario/editar_producto.html', {'form': form, 'producto': producto})
 
 # Vista para eliminar un producto
 @permisos_para(lambda u:u.id_permisos.inventario_pro_CUD)
 def eliminar_producto(request, pk):    
-    producto = get_object_or_404(Producto, pk=pk)
-    if request.method == 'POST':
-        producto.delete()
-        messages.success(request, 'Producto eliminado exitosamente.')
+    try:
+        producto = get_object_or_404(Producto, pk=pk)
+        if request.method == 'POST':
+            producto.delete()
+            messages.success(request, 'Producto eliminado exitosamente.')
+            return redirect('listar_productos')
+    except Producto.DoesNotExist:
+        messages.error(request, 'El producto no existe.')
         return redirect('listar_productos')
+    except Exception as e:
+        messages.error(request, f'Ha ocurrido un error: {str(e)}')
+        return redirect('listar_productos')
+    
     return render(request, 'Inventario/eliminar_producto.html', {'producto': producto})
+
 
 # Exportar Excel de Productos
 @login_required
 def exportar_productos_excel(request):
-    if request.method == 'POST':
-        producto_ids = request.POST.get('producto_ids').split(',')
-        productos = Producto.objects.order_by('id').filter(id__in=producto_ids)
-    
-        wb = openpyxl.Workbook()
-        ws = wb.active
-        ws.title = 'Productos'
-        
-        encabezados = ['ID', 'Nombre', 'Categoria', 'Stock', 'Precio Compra', 'Precio Venta', 'Estado Stock']
-        ws.append(encabezados)
-        
-        # Escribir datos
-        for producto in productos:
-            categorias = ', '.join([str(c) for c in producto.categorias.all()])
-            ws.append([
-                producto.id,
-                producto.nombre,
-                categorias,
-                producto.stock,
-                producto.precio_compra,
-                producto.precio_venta,
-                producto.estado_stock
-            ])
-        
-        # Guardar el archivo en memoria
-        archivo = BytesIO()
-        wb.save(archivo)
-        archivo.seek(0)
-        
-        now = datetime.datetime.now()
-        formatted_date = now.strftime("%Y%m%d_%H%M%S")
-        filename = f'productos_{formatted_date}.xlsx'
-        
-        response = HttpResponse(
-            archivo,
-            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        )
-        response['Content-Disposition'] = f'attachment; filename={filename}.xlsx'
-        return response
-    return HttpResponse(status = 400)
+    try:
+        if request.method == 'POST':
+            producto_ids = request.POST.get('producto_ids').split(',')
+            productos = Producto.objects.order_by('id').filter(id__in=producto_ids)
+
+            wb = openpyxl.Workbook()
+            ws = wb.active
+            ws.title = 'Productos'
+
+            encabezados = ['ID', 'Nombre', 'Categoria', 'Stock', 'Precio Compra', 'Precio Venta', 'Estado Stock']
+            ws.append(encabezados)
+
+            # Escribir datos
+            for producto in productos:
+                categorias = ', '.join([str(c) for c in producto.categorias.all()])
+                ws.append([
+                    producto.id,
+                    producto.nombre,
+                    categorias,
+                    producto.stock,
+                    producto.precio_compra,
+                    producto.precio_venta,
+                    producto.estado_stock
+                ])
+
+            # Guardar el archivo en memoria
+            archivo = BytesIO()
+            wb.save(archivo)
+            archivo.seek(0)
+
+            now = datetime.datetime.now()
+            formatted_date = now.strftime("%Y%m%d_%H%M%S")
+            filename = f'productos_{formatted_date}.xlsx'
+
+            response = HttpResponse(
+                archivo,
+                content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            )
+            response['Content-Disposition'] = f'attachment; filename={filename}.xlsx'
+            return response
+    except Exception as e:
+        messages.error(request, f'Ha ocurrido un error al exportar: {str(e)}')
+        return redirect('listar_productos')
+
+    return HttpResponse(status=400)
+
 
 ########### CATEGORIAS ##########
 
