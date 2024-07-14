@@ -1,4 +1,5 @@
 # Proyecto/Inventario/views.py
+from django.forms import ValidationError
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -13,7 +14,6 @@ from io import BytesIO
 import datetime
 # bd
 from django.db import transaction, IntegrityError, DatabaseError
-
 
 # Vista para listar productos (para vendedor y administrador)    
 @login_required
@@ -38,42 +38,11 @@ def listar_productos(request):
         if estado_stock:
             productos = [p for p in productos if p.estado_stock == estado_stock]
 
-    """
-    # Manejar la solicitud AJAX
-    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        context = {'productos': productos}
-        html = render_to_string('Inventario/tabla_productos.html', context)
-        return JsonResponse({'html': html})
-    """
     return render(request, 'Inventario/listar_productos.html', {
         'productos': productos,
         'categorias': categorias,
     })
-"""
-por ahora se esta usando el metodo get
-@login_required 
-def filtrar_productos(request):
-    productos = Producto.objects.all()
-    categoria_id = request.POST.get('filtro_categoria')
-    precio_min = request.POST.get('filtro_precio_min')
-    precio_max = request.POST.get('filtro_precio_max')
-    estado_stock = request.POST.get('filtro_estado_stock')
-    mostrar_todos = request.POST.get('filtro_mostrar_todos') == 'on'
-    
-    if not mostrar_todos:  # Si mostrar todos no está activo
-        if categoria_id:
-            productos = productos.filter(categorias=categoria_id)
-        if precio_min:
-            productos = productos.filter(precio_venta__gte=precio_min)
-        if precio_max:
-            productos = productos.filter(precio_venta__lte=precio_max)
-        if estado_stock:
-            productos = [p for p in productos if p.estado_stock == estado_stock]
 
-    context = {'productos': productos}
-    html = render_to_string('Inventario/tabla_productos.html', context)
-    return JsonResponse({'html': html})
-"""
 # !!!!?
 @login_required
 def detalle_producto(request, pk):
@@ -85,6 +54,26 @@ def detalle_producto(request, pk):
         'precio_venta': producto.precio_venta,
     }
     return JsonResponse(data)
+# Validadar errores formulario producto
+def validar_datos_producto(nombre, categorias_ids, stock, precio_compra, precio_venta, stock_min, stock_max):
+    errores = []
+    if not nombre:
+        errores.append('El campo nombre es obligatorio.')
+    if not categorias_ids:
+        errores.append('Debe seleccionar al menos una categoría.')
+    if not stock or int(stock) <= 0:
+        errores.append('El campo stock debe ser mayor que cero.')
+    if not precio_compra or float(precio_compra) <= 0:
+        errores.append('El campo precio de compra debe ser mayor que cero.')
+    if not precio_venta or float(precio_venta) <= 0:
+        errores.append('El campo precio de venta debe ser mayor que cero.')
+    if not stock_min or int(stock_min) <= 0:
+        errores.append('El campo stock mínimo debe ser mayor que cero.')
+    if not stock_max or int(stock_max) <= 0:
+        errores.append('El campo stock máximo debe ser mayor que cero.')
+    if stock_min and stock_max and int(stock_min) > int(stock_max):
+        errores.append('El campo stock mínimo no puede ser mayor que el stock máximo.')
+    return errores
 
 # Vista para crear un nuevo producto 
 @permisos_para(lambda u:u.id_permisos.inventario_pro_CUD)
@@ -100,27 +89,11 @@ def crear_producto(request):
         stock_max_Prod_C = request.POST.get('stock_max_Prod_C')
         
         # Validaciones manuales
-        errores = []
-        if not nombre_Prod_C:
-            errores.append('El campo nombre es obligatorio.')
-        if not categorias_ids_Prod_C:
-            errores.append('Debe seleccionar al menos una categoría.')
-        if not stock_Prod_C or int(stock_Prod_C) <= 0:
-            errores.append('El campo stock debe ser mayor que cero.')
-        if not precio_compra_Prod_C or float(precio_compra_Prod_C) <= 0:
-            errores.append('El campo precio de compra debe ser mayor que cero.')
-        if not precio_venta_Prod_C or float(precio_venta_Prod_C) <= 0:
-            errores.append('El campo precio de venta debe ser mayor que cero.')
-        if not stock_min_Prod_C or int(stock_min_Prod_C) <= 0:
-            errores.append('El campo stock mínimo debe ser mayor que cero.')
-        if not stock_max_Prod_C or int(stock_max_Prod_C) <= 0:
-            errores.append('El campo stock máximo debe ser mayor que cero.')
-        if stock_min_Prod_C and stock_max_Prod_C and int(stock_min_Prod_C) > int(stock_max_Prod_C):
-            errores.append('El campo stock mínimo no puede ser mayor que el stock máximo.')
+        errores = validar_datos_producto(nombre_Prod_C, categorias_ids_Prod_C, stock_Prod_C, precio_compra_Prod_C, precio_venta_Prod_C, stock_min_Prod_C, stock_max_Prod_C)
         
-        if nombre_Prod_C and categorias_ids_Prod_C and stock_Prod_C and precio_compra_Prod_C and precio_venta_Prod_C and precio_venta_Prod_C and stock_min_Prod_C and stock_max_Prod_C:
+        if not errores:
             try:
-                with transaction.atomic():
+                with transaction.atomic(): # Agregar por transaccion
                     producto = Producto(
                         nombre = nombre_Prod_C,
                         stock = stock_Prod_C,
@@ -147,38 +120,79 @@ def crear_producto(request):
     return render(request, 'Inventario/crear_producto.html', {'categorias': categorias})
 
 # Vista para editar un producto
-@permisos_para(lambda u:u.id_permisos.inventario_pro_CUD)
+@permisos_para(lambda u: u.id_permisos.inventario_pro_CUD)
 def editar_producto(request, pk):
     try:
         producto = get_object_or_404(Producto, pk=pk)
+        categorias = Categoria.objects.all().order_by('id')
         if request.method == 'POST':
-            form = ProductoForm(request.POST, instance=producto)
-            if form.is_valid():
-                form.save()
-                messages.success(request, 'Producto modificado exitosamente.')
-                return redirect('listar_productos')
+            # Recuperar los datos enviados en el formulario
+            nombre_Prod_E = request.POST.get('nombre_Prod_E')
+            categorias_ids_Prod_E = request.POST.getlist('categorias_Prod_E')
+            stock_Prod_E = request.POST.get('stock_Prod_E')
+            precio_compra_Prod_E = request.POST.get('precio_compra_Prod_E')
+            precio_venta_Prod_E = request.POST.get('precio_venta_Prod_E')
+            stock_min_Prod_E = request.POST.get('stock_min_Prod_E')
+            stock_max_Prod_E = request.POST.get('stock_max_Prod_E')
+
+            # Validar los datos
+            errores = validar_datos_producto(nombre_Prod_E, categorias_ids_Prod_E, stock_Prod_E, precio_compra_Prod_E, precio_venta_Prod_E, stock_min_Prod_E, stock_max_Prod_E)
+
+            if not errores:
+                try:
+                    with transaction.atomic():
+                        producto.nombre = nombre_Prod_E
+                        producto.stock = stock_Prod_E  # Cambiado para corregir la asignación
+                        producto.precio_compra = precio_compra_Prod_E
+                        producto.precio_venta = precio_venta_Prod_E
+                        producto.stock_min = stock_min_Prod_E
+                        producto.stock_max = stock_max_Prod_E
+                        producto.clean()  # Llamar a las validaciones del modelo
+                        producto.save()
+                        producto.categorias.set(categorias_ids_Prod_E)
+                        messages.success(request, 'Producto modificado exitosamente.')
+                        return redirect('listar_productos')
+                except ValidationError as e:
+                    messages.error(request, f'Error de validación: {e}')
+                except IntegrityError as e:
+                    messages.error(request, f'Error de integridad: {e}')
+                except DatabaseError as e:
+                    messages.error(request, f'Error de base de datos: {e}')
+                except Exception as e:
+                    messages.error(request, f'Ocurrió un error inesperado: {e}')
             else:
-                messages.error(request, 'Error en el formulario. Por favor, verifica los datos ingresados.')
-        else:
-            form = ProductoForm(instance=producto)
+                for error in errores:
+                    messages.error(request, error)
+        else:            
+            form = {
+                'categorias': producto.categorias.values_list('id', flat=True),
+            }
+            
     except Producto.DoesNotExist:
         messages.error(request, 'El producto no existe.')
         return redirect('listar_productos')
     except Exception as e:
         messages.error(request, f'Ha ocurrido un error: {str(e)}')
         return redirect('listar_productos')
-    
-    return render(request, 'Inventario/editar_producto.html', {'form': form, 'producto': producto})
+    return render(request, 'Inventario/editar_producto.html', {'form': form, 'producto': producto, 'categorias': categorias})
+
 
 # Vista para eliminar un producto
-@permisos_para(lambda u:u.id_permisos.inventario_pro_CUD)
+@permisos_para(lambda u: u.id_permisos.inventario_pro_CUD)
 def eliminar_producto(request, pk):    
     try:
         producto = get_object_or_404(Producto, pk=pk)
         if request.method == 'POST':
-            producto.delete()
-            messages.success(request, 'Producto eliminado exitosamente.')
-            return redirect('listar_productos')
+            try:
+                producto.delete()
+                messages.success(request, 'Producto eliminado exitosamente.')
+                return redirect('listar_productos')
+            except IntegrityError as e:
+                messages.error(request, f'Error de integridad: {e}')
+            except DatabaseError as e:
+                messages.error(request, f'Error de base de datos: {e}')
+            except Exception as e:
+                messages.error(request, f'Ocurrió un error inesperado: {e}')
     except Producto.DoesNotExist:
         messages.error(request, 'El producto no existe.')
         return redirect('listar_productos')
@@ -248,38 +262,82 @@ def listar_categorias(request):
     return render(request, 'Inventario/listar_categorias.html', {'categorias': categorias})
 
 # Vista para crear una nueva categoría
-@permisos_para(lambda u:u.id_permisos.inventario_cat_CUD)
+@permisos_para(lambda u: u.id_permisos.inventario_cat_CUD)
 def crear_categoria(request):
     if request.method == 'POST':
-        form = CategoriaForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Categoría creada exitosamente.')
-            return redirect('listar_categorias')
-    else:
-        form = CategoriaForm()
-    return render(request, 'Inventario/crear_categoria.html', {'form': form})
+        nombre_Cat_C = request.POST.get('nombre_Cat_C')
+        descripcion_Cat_C = request.POST.get('descripcion_Cat_C')
+
+        try:
+            with transaction.atomic():
+                categoria = Categoria(
+                    nombre=nombre_Cat_C, 
+                    descripcion=descripcion_Cat_C
+                )
+                categoria.save()
+                messages.success(request, 'Categoría creada exitosamente.')
+                return redirect('listar_categorias')
+        except ValidationError as e:
+            messages.error(request, f'Error de validación al crear la categoría: {e}')
+        except IntegrityError as e:
+            messages.error(request, f'Error de integridad al crear la categoría: {e}')
+        except DatabaseError as e:
+            messages.error(request, f'Error de base de datos al crear la categoría: {e}')
+        except Exception as e:
+            messages.error(request, f'Ocurrió un error inesperado al crear la categoría: {e}')
+
+    return render(request, 'Inventario/crear_categoria.html')
 
 # Vista para editar una categoría
 @permisos_para(lambda u:u.id_permisos.inventario_cat_CUD)
 def editar_categoria(request, pk):
-    categoria = get_object_or_404(Categoria, pk=pk)
-    if request.method == 'POST':
-        form = CategoriaForm(request.POST, instance=categoria)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Categoría modificada exitosamente.')
-            return redirect('listar_categorias')
-    else:
-        form = CategoriaForm(instance=categoria)
-    return render(request, 'Inventario/editar_categoria.html', {'form': form, 'categoria': categoria})
+    try:
+        categoria = get_object_or_404(Categoria, pk=pk)
+
+        if request.method == 'POST':
+            nombre_Cat_E = request.POST.get('nombre_Cat_E')
+            descripcion_Cat_E = request.POST.get('descripcion_Cat_E')
+
+            try:
+                with transaction.atomic():
+                    categoria.nombre = nombre_Cat_E
+                    categoria.descripcion = descripcion_Cat_E
+                    categoria.save()
+                    messages.success(request, 'Categoría modificada exitosamente.')
+                    return redirect('listar_categorias')
+            except ValidationError as e:
+                messages.error(request, f'Error de validación al modificar la categoría: {e}')
+            except IntegrityError as e:
+                messages.error(request, f'Error de integridad al modificar la categoría: {e}')
+            except DatabaseError as e:
+                messages.error(request, f'Error de base de datos al modificar la categoría: {e}')
+            except Exception as e:
+                messages.error(request, f'Ocurrió un error inesperado al modificar la categoría: {e}')
+        else:
+            form = {
+                "nombre": categoria.nombre,
+                "descripcion": categoria.descripcion            
+            }
+    except Categoria.DoesNotExist:
+        messages.error(request, 'El producto no existe.')
+        return redirect('listar_categorias')
+    except Exception as e:
+        messages.error(request, f'Ha ocurrido un error: {str(e)}')
+        return redirect('listar_categorias')
+    return render(request, 'Inventario/editar_categoria.html', {'categoria': categoria})
 
 # Vista para eliminar una categoría
-@permisos_para(lambda u:u.id_permisos.inventario_cat_CUD)
+@permisos_para(lambda u: u.id_permisos.inventario_cat_CUD)
 def eliminar_categoria(request, pk):
     categoria = get_object_or_404(Categoria, pk=pk)
+
     if request.method == 'POST':
-        categoria.delete()
-        messages.success(request, 'Categoría eliminada exitosamente.')
-        return redirect('listar_categorias')
+        try:
+            with transaction.atomic():
+                categoria.delete()
+                messages.success(request, 'Categoría eliminada exitosamente.')
+                return redirect('listar_categorias')
+        except Exception as e:
+            messages.error(request, f'Ocurrió un error al eliminar la categoría: {e}')
+
     return render(request, 'Inventario/eliminar_categoria.html', {'categoria': categoria})
