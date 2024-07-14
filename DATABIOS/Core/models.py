@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.forms import ValidationError
 from django.utils import timezone  # Importar timezone
 
 class ConjuntoPermisos(models.Model):                       # added by Diego
@@ -96,5 +97,20 @@ class Producto(models.Model):
         else:
             return 'normal'
 
+    def clean(self):
+        super().clean()
+        if self.stock <= 0:
+            raise ValidationError({'stock': 'El valor de stock debe ser mayor que cero.'})
+        if self.precio_compra <= 0:
+            raise ValidationError({'precio_compra': 'El precio de compra debe ser mayor que cero.'})
+        if self.precio_venta <= 0:
+            raise ValidationError({'precio_venta': 'El precio de venta debe ser mayor que cero.'})
+        if self.stock_min <= 0:
+            raise ValidationError({'stock_min': 'El valor de stock mínimo debe ser mayor que cero.'})
+        if self.stock_max <= 0:
+            raise ValidationError({'stock_max': 'El valor de stock máximo debe ser mayor que cero.'})
+        if self.stock_min > self.stock_max:
+            raise ValidationError({'stock_min': 'El valor de stock mínimo no puede ser mayor que el stock máximo.'})
+        
     def __str__(self):
         return self.nombre
