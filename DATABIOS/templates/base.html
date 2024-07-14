@@ -18,7 +18,7 @@
         <a href="{% url 'home' %}">Dashboard</a>
         <a href="#pedidos">Pedidos</a>
         <a href="{% url 'listar_productos' %}">Inventario</a>
-        <a href="">Ventas</a>
+        <a href="{% url 'ventas_list' %}">Ventas</a>
         <a href="{% url 'lista_usuarios' %}">Usuarios</a>
         <a href="#proveedores">Proveedores</a>
         <a href="#ajustes">Ajustes</a>
@@ -79,6 +79,7 @@
     </footer>
 
     <script src="{% static 'js/scripts.js' %}"></script>
+    <script src="{% static 'js/ventas/ventas.js' %}"></script>
 </body>
-
 </html>
+

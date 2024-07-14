@@ -4,7 +4,11 @@ from . import views
 
 urlpatterns = [
     path('productos/', views.listar_productos, name='listar_productos'),
+<<<<<<< HEAD
     #path('productos/filtrar/', views.filtrar_productos, name='filtrar_productos'),
+=======
+    path('productos/filtrar/', views.filtrar_productos, name='filtrar_productos'),
+>>>>>>> Ower-Rama
     path('productos/exportar_excel/', views.exportar_productos_excel, name='exportar_productos_excel'),
     path('productos/nuevo/', views.crear_producto, name='crear_producto'),
     path('productos/detalle/<int:pk>', views.detalle_producto, name='detalle_producto'),
@@ -15,4 +19,8 @@ urlpatterns = [
     path('categorias/editar/<int:pk>/', views.editar_categoria, name='modificar_categoria'),
     path('categorias/eliminar/<int:pk>/', views.eliminar_categoria, name='eliminar_categoria'),
 
+<<<<<<< HEAD
 ]
+=======
+]
+>>>>>>> Ower-Rama
