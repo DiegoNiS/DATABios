@@ -33,6 +33,14 @@ Lista de Pedidos
                 <td>{{ pedido.estado }}</td>
                 <td>{{ pedido.fecha_pedido }}</td>
                 <td>{{ pedido.hora }}</td>
+                <td>
+                    <form method="post" action="{% url 'listar_pedidos' %}">
+                        {% csrf_token %}
+                        {{ form.estado }}
+                        <input type="hidden" name="pedido_id" value="{{ pedido.id }}">
+                        <button type="submit" class="btn btn-primary">Actualizar</button>
+                    </form>
+                </td>
             </tr>
             {% endfor %}
         </tbody>

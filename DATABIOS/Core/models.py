@@ -103,7 +103,6 @@ class Pedido(models.Model):
     total = models.DecimalField(max_digits=10, decimal_places=2)
     fecha_pedido = models.DateField(auto_now_add=True)
     hora = models.TimeField(auto_now_add=True)
-    #hora = models.TimeField(default=timezone.now)
     estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='en_proceso')
 
     def _str_(self):

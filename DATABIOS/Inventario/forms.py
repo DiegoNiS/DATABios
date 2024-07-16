@@ -46,3 +46,11 @@ class PedidoForm(forms.ModelForm):
         if precio_unitario <= 0:
             raise ValidationError('El precio unitario debe ser mayor a 0.00.')
         return precio_unitario
+    
+class ActualizarEstadoPedidoForm(forms.ModelForm):
+    class Meta:
+        model = Pedido
+        fields = ['estado']
+        widgets = {
+            'estado': forms.Select(attrs={'class': 'form-control'})
+        }
