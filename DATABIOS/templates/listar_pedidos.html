@@ -17,6 +17,8 @@ Lista de Pedidos
                 <th>Precio Unitario</th>
                 <th>Total</th>
                 <th>Estado</th>
+                <th>Fecha</th>
+                <th>Hora</th>
             </tr>
         </thead>
         <tbody>
@@ -29,6 +31,8 @@ Lista de Pedidos
                 <td>{{ pedido.precio_unitario }}</td>
                 <td>{{ pedido.total }}</td>
                 <td>{{ pedido.estado }}</td>
+                <td>{{ pedido.fecha_pedido }}</td>
+                <td>{{ pedido.hora }}</td>
             </tr>
             {% endfor %}
         </tbody>

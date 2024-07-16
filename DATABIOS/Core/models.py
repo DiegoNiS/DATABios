@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.utils import timezone  # Importar timezone
 
+
 class ConjuntoPermisos(models.Model):                       # added by Diego
     pedidos_pen_CUD = models.BooleanField(default=False)
     pedidos_pen_S = models.BooleanField(default=False)
@@ -101,10 +102,12 @@ class Pedido(models.Model):
     precio_unitario = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     total = models.DecimalField(max_digits=10, decimal_places=2)
     fecha_pedido = models.DateField(auto_now_add=True)
+    hora = models.TimeField(auto_now_add=True)
+    #hora = models.TimeField(default=timezone.now)
     estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='en_proceso')
 
     def _str_(self):
-        return f"Pedido {self.id}: Categoria {self.Categoria.nombre}, Producto {self.producto}, Cantidad {self.cantidad}, Total {self.total}, Precio Unitario {self.precio_unitario}, Fecha de Pedido {self.fecha_pedido}, Estado {self.estado}"
+        return f"Pedido {self.id}: Categoria {self.Categoria.nombre}, Producto {self.producto}, Cantidad {self.cantidad}, Total {self.total}, Precio Unitario {self.precio_unitario}, Fecha de Pedido {self.fecha_pedido}, Hora {self.hora}, Estado {self.estado}"
     @property
     def calcular_total(self):
         return self.cantidad * self.precio_unitario
