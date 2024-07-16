@@ -20,14 +20,15 @@ class CategoriaForm(forms.ModelForm):
 class PedidoForm(forms.ModelForm):
     class Meta:
         model = Pedido
-        fields = ['categoria', 'productos', 'cantidad', 'precio_unitario', 'estado']
+        fields = ['categoria', 'productos', 'cantidad', 'precio_unitario', 'descripcion']
         widgets = {
             #'categoria': forms.TextInput(attrs={'class': 'form-control'}),
             'productos': forms.TextInput(attrs={'class': 'form-control'}),
             'cantidad': forms.NumberInput(attrs={'class': 'form-control'}),
             'precio_unitario': forms.NumberInput(attrs={'class': 'form-control'}),
             'total': forms.NumberInput(attrs={'class': 'form-control'}),
-            'estado': forms.TextInput(attrs={'class': 'form-control'}),
+            #'estado': forms.TextInput(attrs={'class': 'form-control'}),
+            'descripcion': forms.TextInput(attrs={'class': 'form-control'}),
         }
 
     categoria = forms.ModelChoiceField(

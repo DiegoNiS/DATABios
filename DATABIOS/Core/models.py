@@ -104,9 +104,10 @@ class Pedido(models.Model):
     fecha_pedido = models.DateField(auto_now_add=True)
     hora = models.TimeField(auto_now_add=True)
     estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='en_proceso')
+    descripcion = models.CharField(max_length=200, default='Ninguno')
 
     def _str_(self):
-        return f"Pedido {self.id}: Categoria {self.Categoria.nombre}, Producto {self.producto}, Cantidad {self.cantidad}, Total {self.total}, Precio Unitario {self.precio_unitario}, Fecha de Pedido {self.fecha_pedido}, Hora {self.hora}, Estado {self.estado}"
+        return f"Pedido {self.id}: Categoria {self.Categoria.nombre}, Producto {self.producto}, Cantidad {self.cantidad}, Total {self.total}, Precio Unitario {self.precio_unitario}, Fecha de Pedido {self.fecha_pedido}, Hora {self.hora}, Estado {self.estado}, Descripcion {self.descripcion}"
     @property
     def calcular_total(self):
         return self.cantidad * self.precio_unitario
