@@ -5,13 +5,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}LIBRERA STOCK{% endblock %}</title>
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"> <!-- aded by Diego  -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>                                 <!-- aded by Diego  -->
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>      <!-- aded by Diego  -->
+    <link rel="stylesheet" href="{% static 'css/slidebar.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">  <!-- Librería CSS de logos -->
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <!--<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">--> <!-- aded by Diego  -->
+                                  <!-- aded by Diego  -->
+    <!--<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>-->      <!-- aded by Diego  -->
 </head>
 <body>
-    <div id="mySidenav" class="sidenav">
+
+    <!--<div id="mySidenav" class="sidenav">
         <div class="logo">
             <img src="{% static 'img/logo.png' %}" alt="LIBRERA STOCK">
         </div>
@@ -23,7 +26,129 @@
         <a href="#proveedores">Proveedores</a>
         <a href="#ajustes">Ajustes</a>
         <a href="{% url 'logout' %}">Salir</a>
+    </div>-->
+
+    <!--SlideBar Creation-->
+    <div class="container">
+        <div class="slidebar">
+            <div class="head">
+                <div class="logo_img">
+                    <img src="{% static 'img/logosolo.png' %}" alt="Darabios Logo">
+                </div>
+                <div class="logo_description">
+                    <p class="tittle">Databios</p>
+                </div>
+            </div>
+            <div class="nav">
+                <div class="menu">
+                    <p class="tittle">Menu</p>
+                    <ul>
+                        <li>
+                            <a href="{% url 'home' %}" class="principal">
+                                <i class="fas fa-chart-line"></i>
+                                <span class="text">Dashboard</span>
+                            </a>
+                        </li>
+                    </ul>
+                    <ul>
+                        <li>
+                            <a href="#Pedidos" class="principal">
+                                <i class="fas fa-truck"></i>
+                                <span class="text">Pedidos</span>
+                                <i class="fas fa-chevron-down arrow"></i>
+                            </a>
+                            <ul class="sub_menu">
+                                <li>
+                                    <a href="{% url 'home' %}">
+                                        <span class="text">Pendientes</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'home' %}">
+                                        <span class="text">Registro</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <ul>
+                        <li>
+                            <a href="#Inventario" class="principal">
+                                <i class="fas fa-boxes"></i>
+                                <span class="text">Inventario</span>
+                                <i class="fas fa-chevron-down arrow"></i>
+                            </a>
+                            <ul class="sub_menu">
+                                <li>
+                                    <a href="{% url 'home' %}">
+                                        <span class="text">Categorías</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'home' %}">
+                                        <span class="text">Productos</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <ul>
+                        <li>
+                            <a href="{% url 'home' %}" class="principal">
+                                <i class="fas fa-tag"></i>
+                                <span class="text">Ventas</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="menu">
+                    <p class="tittle">Panel Administrador</p>
+                    <ul>
+                        <li>
+                            <a href="{% url 'home' %}" class="principal">
+                                <i class="fas fa-users"></i>
+                                <span class="text">Usuarios</span>
+                            </a>
+                        </li>
+                    </ul>
+                    <ul>
+                        <li>
+                            <a href="{% url 'home' %}" class="principal">
+                                <i class="fas fa-briefcase"></i>
+                                <span class="text">Proveedores</span>
+                            </a>
+                        </li>
+                    </ul>
+                    <ul>
+                        <li>
+                            <a href="{% url 'home' %}" class="principal">
+                                <i class="fas fa-cog"></i>
+                                <span class="text">Ajustes</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="menu">
+                <p class="tittle">Cuenta</p>
+                <ul>
+                    <li>
+                        <a href="#" class="principal">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span class="text">Logout</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="design_space">
+            {% block content %}
+            {% endblock %}
+        </div>
+
     </div>
+
+
 <!--
     <div class="topnav">
         {% if user.is_authenticated %}
@@ -56,7 +181,7 @@
         {% endif %}
     </div>                  <!-- aded by Diego  
     -->
-
+<!--
     <div id="main" class="main-content">
         <div class="topnav">
             <span style="font-size: 30px; cursor: pointer; color: white; margin-left: 10px;" onclick="toggleNav()">&#9776;</span>
@@ -70,16 +195,17 @@
             </div>
         </div>
 
-        {% block content %}
-        {% endblock %}
+
     </div>
     
     <footer>
         <p>&copy; 2024 Django project</p>
     </footer>
-
-    <script src="{% static 'js/scripts.js' %}"></script>
-    <script src="{% static 'js/ventas/ventas.js' %}"></script>
+-->
+    <!--<script src="{% static 'js/scripts.js' %}"></script>-->
+    <script src="{% static 'js/slidebar.js' %}"></script>
+    
+    <!--<script src="{% static 'js/ventas/ventas.js' %}"></script>-->
 </body>
 </html>
 
