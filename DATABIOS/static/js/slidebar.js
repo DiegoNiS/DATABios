@@ -35,6 +35,12 @@ $(document).ready(function() {
 
         ul.addClass("active");
         ul.find("ul").slideDown();
+
+        row_position = 1;
+        father_row = 0;
+
+        localStorage.setItem('row_position', row_position);
+        localStorage.setItem('father_row', father_row);
     }
 });
 
