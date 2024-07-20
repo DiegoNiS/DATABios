@@ -3,8 +3,8 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
-from Core.models import Categoria, Producto, Pedido
-from .forms import ProductoForm, CategoriaForm, PedidoForm, ActualizarEstadoPedidoForm
+from Core.models import Categoria, Producto, Pedido, Proveedores
+from .forms import ProductoForm, CategoriaForm, PedidoForm, ActualizarEstadoPedidoForm, ProveedoresForm
 
 # Vista para listar productos (para vendedor y administrador)
 @login_required
@@ -90,3 +90,26 @@ def crear_pedidos(request):
         form = PedidoForm()
     
     return render(request, 'crear_pedidos.html', {'form': form})
+
+
+@login_required
+def crear_proveedores(request):
+    if request.method == 'POST':
+        form = ProveedoresForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Proveedor creado exitosamente.')
+            return redirect('listar_proveedores')
+        else:
+            messages.error(request, 'Por favor corrige los errores del formulario.')
+    else:
+        form = ProveedoresForm()
+    
+    return render(request, 'crear_proveedores.html', {'form': form})
+
+
+@login_required
+def listar_proveedores(request):
+    listar_proveedores = Proveedores.objects.all()
+    form = ProveedoresForm()
+    return render(request, 'listar_proveedores.html', {'listar_proveedores': listar_proveedores, 'form': form})

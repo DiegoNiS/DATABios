@@ -2,7 +2,7 @@
 
 from django import forms
 from django.core.exceptions import ValidationError
-from Core.models import Producto, Categoria, Pedido
+from Core.models import Producto, Categoria, Pedido, Proveedores
 
 class ProductoForm(forms.ModelForm):
     class Meta:
@@ -18,10 +18,20 @@ class CategoriaForm(forms.ModelForm):
         fields = ['nombre', 'descripcion']
     
 class PedidoForm(forms.ModelForm):
-    class Meta:
-        model = Pedido
-        fields = ['categoria', 'productos', 'cantidad', 'precio_unitario', 'descripcion']
-        widgets = {
+        proveedores = forms.ModelMultipleChoiceField(
+        queryset=None,
+        widget=forms.CheckboxSelectMultiple,
+        required=False
+        )
+        categoria = forms.ModelChoiceField(
+        queryset=Categoria.objects.all(),
+        widget=forms.Select(attrs={'class': 'form-control'})
+        )
+    
+        class Meta:
+            model = Pedido
+            fields = ['categoria', 'productos', 'cantidad', 'precio_unitario', 'descripcion']
+            widgets = {
             #'categoria': forms.TextInput(attrs={'class': 'form-control'}),
             'productos': forms.TextInput(attrs={'class': 'form-control'}),
             'cantidad': forms.NumberInput(attrs={'class': 'form-control'}),
@@ -30,23 +40,44 @@ class PedidoForm(forms.ModelForm):
             #'estado': forms.TextInput(attrs={'class': 'form-control'}),
             'descripcion': forms.TextInput(attrs={'class': 'form-control'}),
         }
+        
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            if self.instance.pk:
+                self.fields['proveedores'].queryset = self.obtener_proveedores()
 
-    categoria = forms.ModelChoiceField(
-        queryset=Categoria.objects.all(),
-        widget=forms.Select(attrs={'class': 'form-control'})
-    )
+        #def obtener_proveedores(self):
+         #   proveedores = set()
+          #  for producto in self.instance.productos.all():
+           #     proveedores.add(producto.proveedor)
+            #return proveedores
+        #def obtener_proveedores(self):
+         #   proveedores = Proveedores.objects.filter(producto__pedido=self.instance).distinct()
+          #  return proveedores
+        def obtener_proveedores(self):
+            if self.instance.pk:
+                return Proveedores.objects.filter(producto__pedido=self.instance).distinct()
+            return Proveedores.objects.none()
 
-    def clean_cantidad(self):
-        cantidad = self.cleaned_data.get('cantidad')
-        if cantidad <= 0:
-            raise ValidationError('La cantidad no puede ser cero o menor.')
-        return cantidad
+        def save(self, commit=True):
+            pedido = super().save(commit=False)
+            if commit:
+                pedido.save()
+                self.save_m2m()  # Guardar relaciones ManyToMany
+            return pedido
+        
+        
+        def clean_cantidad(self):
+            cantidad = self.cleaned_data.get('cantidad')
+            if cantidad <= 0:
+                raise ValidationError('La cantidad no puede ser cero o menor.')
+            return cantidad
     
-    def clean_precio_unitario(self):
-        precio_unitario = self.cleaned_data.get('precio_unitario')
-        if precio_unitario <= 0:
-            raise ValidationError('El precio unitario debe ser mayor a 0.00.')
-        return precio_unitario
+        def clean_precio_unitario(self):
+            precio_unitario = self.cleaned_data.get('precio_unitario')
+            if precio_unitario <= 0:
+                raise ValidationError('El precio unitario debe ser mayor a 0.00.')
+            return precio_unitario
     
 class ActualizarEstadoPedidoForm(forms.ModelForm):
     class Meta:
@@ -54,4 +85,16 @@ class ActualizarEstadoPedidoForm(forms.ModelForm):
         fields = ['estado']
         widgets = {
             'estado': forms.Select(attrs={'class': 'form-control'})
+        }
+
+class ProveedoresForm(forms.ModelForm):
+    class Meta:
+        model = Proveedores
+        fields = ['nombre', 'ruc', 'telefono']
+        widgets = {
+            
+            'nombre': forms.TextInput(attrs={'class': 'form-control'}),
+            'ruc': forms.TextInput(attrs={'class': 'form-control'}),
+            'telefono': forms.TextInput(attrs={'class': 'form-control'}),
+            
         }

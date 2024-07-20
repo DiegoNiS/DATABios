@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.utils import timezone  # Importar timezone
+from django.forms import ValidationError
 
 
 class ConjuntoPermisos(models.Model):                       # added by Diego
@@ -78,16 +79,57 @@ class Categoria(models.Model):
     def __str__(self):
         return self.nombre
 
+class Proveedores(models.Model):
+    id = models.AutoField(primary_key=True)
+    nombre = models.CharField(max_length=100, default='No Especificado')
+    ruc = models.CharField(max_length=9)
+    telefono = models.CharField(max_length=9, default='Sin Número') 
+    fecha_creacion = models.DateField(auto_now_add=True)
+    #producto = models.ForeignKey(Producto,on_delete=models.CASCADE, default=None)
+
+    def _str_(self):
+        #return f"Proveedores {self.id}: Nombre {self.nombre}, Ruc {self.ruc}, telefono {self.telefono}, Fecha Creación {self.fecha_creacion}"
+        return self.nombre
+
 class Producto(models.Model):
     categorias = models.ManyToManyField(Categoria)
+    proveedor = models.ForeignKey(Proveedores, on_delete=models.CASCADE, default = 1)
     nombre = models.CharField(max_length=100)
     stock = models.IntegerField()
     precio_compra = models.FloatField()
     precio_venta = models.FloatField()
-
-    def __str__(self):
-        return self.nombre
+    stock_min = models.IntegerField(default=10)
+    stock_max = models.IntegerField(default=20)
     
+    @property
+    def estado_stock(self):
+        if self.stock < self.stock_min:
+            return 'bajo'
+        elif self.stock > self.stock_max:
+            return 'alto'
+        else:
+            return 'normal'
+
+    def clean(self):
+        super().clean()
+        if self.stock <= 0:
+            raise ValidationError({'stock': 'El valor de stock debe ser mayor que cero.'})
+        if self.precio_compra <= 0:
+            raise ValidationError({'precio_compra': 'El precio de compra debe ser mayor que cero.'})
+        if self.precio_venta <= 0:
+            raise ValidationError({'precio_venta': 'El precio de venta debe ser mayor que cero.'})
+        if self.stock_min <= 0:
+            raise ValidationError({'stock_min': 'El valor de stock mínimo debe ser mayor que cero.'})
+        if self.stock_max <= 0:
+            raise ValidationError({'stock_max': 'El valor de stock máximo debe ser mayor que cero.'})
+        if self.stock_min > self.stock_max:
+            raise ValidationError({'stock_min': 'El valor de stock mínimo no puede ser mayor que el stock máximo.'})
+        
+    def _str_(self):
+        return self.nombre
+
+
+
 
 class Pedido(models.Model):
     ESTADO_CHOICES = [
@@ -97,7 +139,9 @@ class Pedido(models.Model):
     ]
     id = models.AutoField(primary_key=True)
     categoria = models.ForeignKey(Categoria,on_delete=models.CASCADE, default=None)
-    productos = models.CharField(max_length=100, default='Producto genérico')
+    proveedor = models.ForeignKey(Proveedores,on_delete=models.CASCADE, null = False)
+    productos = models.ManyToManyField(Producto)
+    #productos = models.CharField(max_length=100, default='Producto genérico')
     cantidad = models.IntegerField(default=0)
     precio_unitario = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     total = models.DecimalField(max_digits=10, decimal_places=2)
@@ -107,7 +151,8 @@ class Pedido(models.Model):
     descripcion = models.CharField(max_length=200, default='Ninguno')
 
     def _str_(self):
-        return f"Pedido {self.id}: Categoria {self.Categoria.nombre}, Producto {self.producto}, Cantidad {self.cantidad}, Total {self.total}, Precio Unitario {self.precio_unitario}, Fecha de Pedido {self.fecha_pedido}, Hora {self.hora}, Estado {self.estado}, Descripcion {self.descripcion}"
+        return f"Pedido {self.id}: Categoria {self.Categoria.nombre}, Proveedor {self.Proveedores.nombre}, Producto {self.producto}, Cantidad {self.cantidad}, Total {self.total}, Precio Unitario {self.precio_unitario}, Fecha de Pedido {self.fecha_pedido}, Hora {self.hora}, Estado {self.estado}, Descripcion {self.descripcion}"
+
     @property
     def calcular_total(self):
         return self.cantidad * self.precio_unitario
@@ -116,3 +161,11 @@ class Pedido(models.Model):
         self.total = self.calcular_total
         super().save(*args, **kwargs)
     
+    #def obtener_proveedores(self): 
+     #   Proveedor = [] 
+      #  for producto in self.productos.all(): 
+       #     if producto.proveedor not in Proveedores:
+        #Proveedor.append(producto.proveedor) 
+        #return Proveedores
+    
+
