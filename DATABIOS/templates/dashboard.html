@@ -7,6 +7,9 @@
 <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
 {% endblock %}
 {% block content %}
+<p class="hi_user">
+  Bienvenido <strong>{{ user.username |upper }}</strong>
+</h1>
 <div class="alerts">
     <div class="left">
         <div class="head_alerts">

@@ -35,22 +35,6 @@ document.addEventListener('DOMContentLoaded', function() {
     let month_data = [20, 30, 50, 10, 15, 34, 25];
     let update_months = months;
     let update_month_data =month_data;
-    const mesesDict = {
-        'Ene': 1,
-        'Feb': 2,
-        'Mar': 3,
-        'Abr': 4,
-        'May': 5,
-        'Jun': 6,
-        'Jul': 7,
-        /*
-        'Ago': 8,
-        'Sep': 9,
-        'Oct': 10,
-        'Nov': 11,
-        'Dic': 12
-        */
-    };
 
     const selectFrom = document.getElementById('lineaVentasDesde');
     const selectTo = document.getElementById('lineaVentasHasta');
@@ -113,7 +97,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 update_month_data[j] = month_data[i-1];
                 j++;
             }
-            console.log(update_months, update_month_data);
             myChart2.data.labels = update_months; // Actualiza las etiquetas (labels)
             myChart2.data.datasets[0].data = update_month_data; // Actualiza los datos del dataset
             myChart2.update();
