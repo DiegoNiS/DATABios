@@ -51,6 +51,7 @@ class PedidoForm(forms.ModelForm):
             widgets = {
             #'categoria': forms.TextInput(attrs={'class': 'form-control'}),
             #'productos': forms.TextInput(attrs={'class': 'form-control'}),
+            'productos': forms.CheckboxSelectMultiple(attrs={'class': 'form-check-input'}),
             'cantidad': forms.NumberInput(attrs={'class': 'form-control'}),
             'precio_unitario': forms.NumberInput(attrs={'class': 'form-control'}),
             'total': forms.NumberInput(attrs={'class': 'form-control'}),
