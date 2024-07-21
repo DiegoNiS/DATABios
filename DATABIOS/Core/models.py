@@ -88,12 +88,12 @@ class Proveedores(models.Model):
     #producto = models.ForeignKey(Producto,on_delete=models.CASCADE, default=None)
 
     def _str_(self):
-        #return f"Proveedores {self.id}: Nombre {self.nombre}, Ruc {self.ruc}, telefono {self.telefono}, Fecha Creación {self.fecha_creacion}"
+     #   return f"Proveedores {self.id}: Nombre {self.nombre}, Ruc {self.ruc}, telefono {self.telefono}, Fecha Creación {self.fecha_creacion}"
         return self.nombre
 
 class Producto(models.Model):
     categorias = models.ManyToManyField(Categoria)
-    proveedor = models.ForeignKey(Proveedores, on_delete=models.CASCADE, default = 1)
+    proveedor = models.ForeignKey(Proveedores, on_delete=models.CASCADE, default=1)
     nombre = models.CharField(max_length=100)
     stock = models.IntegerField()
     precio_compra = models.FloatField()
@@ -139,7 +139,7 @@ class Pedido(models.Model):
     ]
     id = models.AutoField(primary_key=True)
     categoria = models.ForeignKey(Categoria,on_delete=models.CASCADE, default=None)
-    proveedor = models.ForeignKey(Proveedores,on_delete=models.CASCADE, null = False)
+    proveedor = models.ForeignKey(Proveedores,on_delete=models.CASCADE)
     productos = models.ManyToManyField(Producto)
     #productos = models.CharField(max_length=100, default='Producto genérico')
     cantidad = models.IntegerField(default=0)

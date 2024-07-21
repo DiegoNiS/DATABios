@@ -75,7 +75,7 @@ def listar_pedidos(request):
     
     listar_pedidos = Pedido.objects.all()
     return render(request, 'listar_pedidos.html', {'listar_pedidos': listar_pedidos, 'form': form})
-
+"""""
 @login_required
 def crear_pedidos(request):
     if request.method == 'POST':
@@ -90,7 +90,23 @@ def crear_pedidos(request):
         form = PedidoForm()
     
     return render(request, 'crear_pedidos.html', {'form': form})
-
+"""
+def crear_pedidos(request):
+    if request.method == 'POST':
+        form = PedidoForm(request.POST)
+        if form.is_valid():
+            pedido = form.save(commit=False)
+            pedido.total = pedido.cantidad * pedido.precio_unitario
+            pedido.save()
+            form.save_m2m()  # Guardar relaciones ManyToMany
+            messages.success(request, 'Pedido creado exitosamente.')
+            return redirect('listar_pedidos')
+        else:
+            messages.error(request, 'Por favor corrige los errores del formulario.')
+    else:
+        form = PedidoForm()
+    
+    return render(request, 'crear_pedidos.html', {'form': form})
 
 @login_required
 def crear_proveedores(request):
