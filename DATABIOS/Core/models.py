@@ -99,18 +99,42 @@ class Producto(models.Model):
 
     def clean(self):
         super().clean()
-        if self.stock <= 0:
-            raise ValidationError({'stock': 'El valor de stock debe ser mayor que cero.'})
-        if self.precio_compra <= 0:
-            raise ValidationError({'precio_compra': 'El precio de compra debe ser mayor que cero.'})
-        if self.precio_venta <= 0:
-            raise ValidationError({'precio_venta': 'El precio de venta debe ser mayor que cero.'})
-        if self.stock_min <= 0:
-            raise ValidationError({'stock_min': 'El valor de stock mínimo debe ser mayor que cero.'})
-        if self.stock_max <= 0:
-            raise ValidationError({'stock_max': 'El valor de stock máximo debe ser mayor que cero.'})
-        if self.stock_min > self.stock_max:
-            raise ValidationError({'stock_min': 'El valor de stock mínimo no puede ser mayor que el stock máximo.'})
+        print("Ejecutando clean() en Producto")
+        
+        try:
+            # Convertir valores a los tipos adecuados
+            stock = int(self.stock)
+            precio_compra = float(self.precio_compra)
+            precio_venta = float(self.precio_venta)
+            stock_min = int(self.stock_min)
+            stock_max = int(self.stock_max)
+
+            if stock < 0:
+                print("Error: El valor de stock debe ser mayor o igual que cero.")
+                raise ValidationError({'stock': 'El valor de stock debe ser mayor o igual que cero.'})
+            if precio_compra <= 0:
+                print("Error: El precio de compra debe ser mayor que cero.")
+                raise ValidationError({'precio_compra': 'El precio de compra debe ser mayor que cero.'})
+            if precio_venta <= 0:
+                print("Error: El precio de venta debe ser mayor que cero.")
+                raise ValidationError({'precio_venta': 'El precio de venta debe ser mayor que cero.'})
+            if stock_min <= 0:
+                print("Error: El valor de stock mínimo debe ser mayor que cero.")
+                raise ValidationError({'stock_min': 'El valor de stock mínimo debe ser mayor que cero.'})
+            if stock_max <= 0:
+                print("Error: El valor de stock máximo debe ser mayor que cero.")
+                raise ValidationError({'stock_max': 'El valor de stock máximo debe ser mayor que cero.'})
+            if stock_min > stock_max:
+                print("Error: El valor de stock mínimo no puede ser mayor que el stock máximo.")
+                raise ValidationError({'stock_min': 'El valor de stock mínimo no puede ser mayor que el stock máximo.'})
+        except ValidationError as e:
+            print(f"ValidationError: {e}")
+            raise
+        except Exception as e:
+            print(f"Ocurrió un error inesperado en clean: {e}")
+            raise
+        
+        print("Fin clean()")
         
     def __str__(self):
         return self.nombre

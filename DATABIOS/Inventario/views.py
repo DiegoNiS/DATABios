@@ -147,26 +147,33 @@ def editar_producto(request, pk):
                         producto.precio_venta = precio_venta_Prod_E
                         producto.stock_min = stock_min_Prod_E
                         producto.stock_max = stock_max_Prod_E
+                        print(producto.nombre)
+                        print("antes de clean")
                         producto.clean()  # Llamar a las validaciones del modelo
+                        print("Despues del clean")
                         producto.save()
                         producto.categorias.set(categorias_ids_Prod_E)
                         messages.success(request, 'Producto modificado exitosamente.')
                         return redirect('listar_productos')
                 except ValidationError as e:
                     messages.error(request, f'Error de validación: {e}')
+                    print("Error de validadcion")
                 except IntegrityError as e:
                     messages.error(request, f'Error de integridad: {e}')
+                    print("Error de Integridad")
                 except DatabaseError as e:
                     messages.error(request, f'Error de base de datos: {e}')
+                    print("Error de base de datos")
                 except Exception as e:
                     messages.error(request, f'Ocurrió un error inesperado: {e}')
+                    print("Otro error")
             else:
                 for error in errores:
                     messages.error(request, error)
-        else:            
-            form = {
-                'categorias': producto.categorias.values_list('id', flat=True),
-            }
+                    
+        form = {
+            'categorias': producto.categorias.values_list('id', flat=True),
+        }
             
     except Producto.DoesNotExist:
         messages.error(request, 'El producto no existe.')
