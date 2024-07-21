@@ -5,10 +5,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}LIBRERA STOCK{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">  <!-- Librería CSS de logos -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.0.8/css/dataTables.dataTables.css" />
     <link rel="stylesheet" href="{% static 'css/slidebar.css' %}">
     <link rel="stylesheet" href="{% static 'css/content.css' %}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">  <!-- Librería CSS de logos -->
-    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    {% block extra_css %}
+    {% endblock %}
     <!--<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">--> <!-- aded by Diego  -->
                                   <!-- aded by Diego  -->
     <!--<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>-->      <!-- aded by Diego  -->
@@ -45,7 +47,7 @@
                     <p class="tittle">Menu</p>
                     <ul>
                         <li>
-                            <a href="{% url 'home' %}" class="principal">
+                            <a href="{% url 'dashboard' %}" class="principal">
                                 <i class="fas fa-chart-line"></i>
                                 <span class="text">Dashboard</span>
                             </a>
@@ -103,12 +105,12 @@
                     </ul>
                 </div>
                 
-                {# if 'Administrador' in grupos_usuario #}
+                {# if 'Administrador' == grupos_usuario #}
                 <div class="menu">
                     <p class="tittle">Panel Administrador</p>
                     <ul>
                         <li>
-                            <a href="{% url 'home' %}" class="principal">
+                            <a href="{% url 'lista_usuarios' %}" class="principal">
                                 <i class="fas fa-users"></i>
                                 <span class="text">Usuarios</span>
                             </a>
@@ -151,47 +153,13 @@
                     {% if user.is_authenticated %}
                     <div class="user_connect"></div>
                     <i class="fas fa-user"></i>
-                    <p>Bienvenido <strong>{{ nombre_usuario|upper }}</strong></p>
+                    <p>Bienvenido <strong>{{ user.username |upper }}</strong></p>
                     {% endif %}
                 </div>
             </div>
             <div class="content">
                 {% block content %}
                 {% endblock %}
-                <h1>HOLA</h1>
-                <h1>HOLA</h1>
-                <h1>HOLA</h1>
-                <h1>HOLA</h1>
-                <h1>HOLA</h1>
-                <h1>HOLA</h1>
-                <h1>HOLA</h1>
-                <h1>HOLA</h1>
-                <h1>HOLA</h1>
-                <h1>HOLA</h1>
-                <h1>HOLA</h1>
-                <h1>HOLA</h1>
-                <h1>HOLA</h1>
-                <h1>HOLA</h1>
-                <h1>HOLA</h1>
-                <h1>HOLA</h1>
-                <h1>HOLA</h1>
-                <h1>HOLA</h1>
-                <h1>HOLA</h1>
-                <h1>HOLA</h1>
-                <h1>HOLA</h1>
-                <h1>HOLA</h1>
-                <h1>HOLA</h1>
-                <h1>HOLA</h1>
-                <h1>HOLA</h1>
-                <h1>HOLA</h1>
-                <h1>HOLA</h1>
-                <h1>HOLA</h1>
-                <h1>HOLA</h1>
-                <h1>HOLA</h1>
-                <h1>HOLA</h1>
-                <h1>HOLA</h1>
-                <h1>HOLA</h1>
-                <h1>HOLA</h1>
             </div>
         </div>
     </div>
@@ -250,10 +218,17 @@
         <p>&copy; 2024 Django project</p>
     </footer>
 -->
+    <script type="text/javascript">
+        let gruposUsuario = "{{ grupos_usuario }}";
+    </script>
+    <!--<script src="https://cdn.datatables.net/2.0.8/js/dataTables.js"></script>-->
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{% static 'js/scripts.js' %}"></script>
     <script src="{% static 'js/slidebar.js' %}"></script>
-    
-    <script src="{% static 'js/ventas/ventas.js' %}"></script>
+    <!--<script src="{% static 'js/ventas/ventas.js' %}"></script>-->
+    {% block scripts %}
+    {% endblock %}
 </body>
 </html>
 

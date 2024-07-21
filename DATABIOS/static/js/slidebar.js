@@ -1,13 +1,16 @@
 let row_position, father_row;
 
+console.log(gruposUsuario);
+
 $(document).ready(function() {
 
     $(".nav .menu > ul").click(function (e) {
         row_position = $(this).index();
-        father_row = $(this).parent().index();
+        father_row = $(this).parent().index();  
 
         localStorage.setItem('row_position', row_position);
         localStorage.setItem('father_row', father_row);
+        //localStorage.setItem('esAdmin', esAdmin);
 
         //console.log(row_position, father_row);
 
@@ -36,11 +39,11 @@ $(document).ready(function() {
         ul.addClass("active");
         ul.find("ul").slideDown();
 
-        row_position = 1;
-        father_row = 0;
+        //row_position = 1;
+        //father_row = 0;
 
-        localStorage.setItem('row_position', row_position);
-        localStorage.setItem('father_row', father_row);
+        //localStorage.setItem('row_position', row_position);
+        //localStorage.setItem('father_row', father_row);
     }
 });
 
