@@ -125,7 +125,7 @@ class Producto(models.Model):
         if self.stock_min > self.stock_max:
             raise ValidationError({'stock_min': 'El valor de stock mínimo no puede ser mayor que el stock máximo.'})
         
-    def _str_(self):
+    def __str__(self):
         return self.nombre
 
 
@@ -150,7 +150,7 @@ class Pedido(models.Model):
     estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='en_proceso')
     descripcion = models.CharField(max_length=200, default='Ninguno')
 
-    def _str_(self):
+    def __str__(self):
         return f"Pedido {self.id}: Categoria {self.Categoria.nombre}, Proveedor {self.Proveedores.nombre}, Producto {self.producto}, Cantidad {self.cantidad}, Total {self.total}, Precio Unitario {self.precio_unitario}, Fecha de Pedido {self.fecha_pedido}, Hora {self.hora}, Estado {self.estado}, Descripcion {self.descripcion}"
 
     @property

@@ -15,5 +15,25 @@ Lista de Pedidos
             <input type="submit" class="btn btn-success btn-block text-white" value="Guardar">
         </div>
     </form>
+    <!-- 
+    <script type="text/javascript">
+        function actualizar_productos() {
+            var proveedor_id = $('#id_proveedor').val();
+            $.ajax({
+                url: '/actualizar_productos/',  // URL para la vista que actualiza los productos
+                data: {
+                    'proveedor_id': proveedor_id
+                },
+                dataType: 'json',
+                success: function(data) {
+                    $('#id_productos').empty();
+                    $.each(data.productos, function(id, nombre) {
+                        $('#id_productos').append($('<option></option>').attr('value', id).text(nombre));
+                    });
+                }
+            });
+        }
+    </script>
+    -->
 </div>
 {% endblock %}

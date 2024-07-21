@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from Core.models import Categoria, Producto, Pedido, Proveedores
 from .forms import ProductoForm, CategoriaForm, PedidoForm, ActualizarEstadoPedidoForm, ProveedoresForm
+#from django.http import JsonResponse
 
 # Vista para listar productos (para vendedor y administrador)
 @login_required
@@ -75,7 +76,7 @@ def listar_pedidos(request):
     
     listar_pedidos = Pedido.objects.all()
     return render(request, 'listar_pedidos.html', {'listar_pedidos': listar_pedidos, 'form': form})
-"""""
+
 @login_required
 def crear_pedidos(request):
     if request.method == 'POST':
@@ -91,22 +92,12 @@ def crear_pedidos(request):
     
     return render(request, 'crear_pedidos.html', {'form': form})
 """
-def crear_pedidos(request):
-    if request.method == 'POST':
-        form = PedidoForm(request.POST)
-        if form.is_valid():
-            pedido = form.save(commit=False)
-            pedido.total = pedido.cantidad * pedido.precio_unitario
-            pedido.save()
-            form.save_m2m()  # Guardar relaciones ManyToMany
-            messages.success(request, 'Pedido creado exitosamente.')
-            return redirect('listar_pedidos')
-        else:
-            messages.error(request, 'Por favor corrige los errores del formulario.')
-    else:
-        form = PedidoForm()
-    
-    return render(request, 'crear_pedidos.html', {'form': form})
+def actualizar_productos(request):
+    proveedor_id = request.GET.get('proveedor_id')
+    productos = Producto.objects.filter(proveedor_id=proveedor_id).values_list('id', 'nombre')
+    productos_dict = dict(productos)
+    return JsonResponse({'productos': productos_dict})
+"""
 
 @login_required
 def crear_proveedores(request):
