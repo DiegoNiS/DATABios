@@ -45,6 +45,7 @@ class PedidoForm(forms.ModelForm):
         required=False
     )
     
+
     class Meta:
             model = Pedido
             fields = ['categoria', 'proveedor', 'productos', 'cantidad', 'precio_unitario', 'descripcion']
@@ -59,8 +60,9 @@ class PedidoForm(forms.ModelForm):
             'descripcion': forms.TextInput(attrs={'class': 'form-control'}),
         }
         
-    def _init_(self, *args, **kwargs):
-        super()._init_(*args, **kwargs)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['proveedor'].label_from_instance = lambda obj: obj.nombre if obj else ''
         if 'proveedor' in self.data:
             try:
                 proveedor_id = int(self.data.get('proveedor'))

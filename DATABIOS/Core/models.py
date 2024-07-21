@@ -87,7 +87,7 @@ class Proveedores(models.Model):
     fecha_creacion = models.DateField(auto_now_add=True)
     #producto = models.ForeignKey(Producto,on_delete=models.CASCADE, default=None)
 
-    def _str_(self):
+    def __str__(self):
      #   return f"Proveedores {self.id}: Nombre {self.nombre}, Ruc {self.ruc}, telefono {self.telefono}, Fecha Creación {self.fecha_creacion}"
         return self.nombre
 
