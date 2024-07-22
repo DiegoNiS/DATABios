@@ -12,6 +12,7 @@ Lista de Pedidos
             <tr>
                 <th>id</th>
                 <th>Categoria</th>
+                <th>Proveedores</th>
                 <th>Productos</th>
                 <th>Cantidad</th>
                 <th>Precio Unitario</th>
@@ -26,7 +27,14 @@ Lista de Pedidos
             <tr>
                 <td>{{ pedido.id }}</td>
                 <td>{{ pedido.categoria }}</td>
-                <td>{{ pedido.productos }}</td>
+                <td>{{ pedido.proveedor }}</td>
+                <td>
+                    <ul>
+                        {% for producto in pedido.productos.all %}
+                        <li>{{ producto.nombre }}</li>
+                        {% endfor %}
+                    </ul>
+                </td>
                 <td>{{ pedido.cantidad }}</td>
                 <td>{{ pedido.precio_unitario }}</td>
                 <td>{{ pedido.total }}</td>

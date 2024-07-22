@@ -85,10 +85,8 @@ class Proveedores(models.Model):
     ruc = models.CharField(max_length=9)
     telefono = models.CharField(max_length=9, default='Sin Número') 
     fecha_creacion = models.DateField(auto_now_add=True)
-    #producto = models.ForeignKey(Producto,on_delete=models.CASCADE, default=None)
-
+    
     def __str__(self):
-     #   return f"Proveedores {self.id}: Nombre {self.nombre}, Ruc {self.ruc}, telefono {self.telefono}, Fecha Creación {self.fecha_creacion}"
         return self.nombre
 
 class Producto(models.Model):
@@ -141,7 +139,6 @@ class Pedido(models.Model):
     categoria = models.ForeignKey(Categoria,on_delete=models.CASCADE, default=None)
     proveedor = models.ForeignKey(Proveedores,on_delete=models.CASCADE)
     productos = models.ManyToManyField(Producto)
-    #productos = models.CharField(max_length=100, default='Producto genérico')
     cantidad = models.IntegerField(default=0)
     precio_unitario = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     total = models.DecimalField(max_digits=10, decimal_places=2)
@@ -149,7 +146,7 @@ class Pedido(models.Model):
     hora = models.TimeField(auto_now_add=True)
     estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='en_proceso')
     descripcion = models.CharField(max_length=200, default='Ninguno')
-
+    
     def __str__(self):
         return f"Pedido {self.id}: Categoria {self.Categoria.nombre}, Proveedor {self.Proveedores.nombre}, Producto {self.producto}, Cantidad {self.cantidad}, Total {self.total}, Precio Unitario {self.precio_unitario}, Fecha de Pedido {self.fecha_pedido}, Hora {self.hora}, Estado {self.estado}, Descripcion {self.descripcion}"
 
@@ -160,12 +157,3 @@ class Pedido(models.Model):
     def save(self, *args, **kwargs):
         self.total = self.calcular_total
         super().save(*args, **kwargs)
-    
-    #def obtener_proveedores(self): 
-     #   Proveedor = [] 
-      #  for producto in self.productos.all(): 
-       #     if producto.proveedor not in Proveedores:
-        #Proveedor.append(producto.proveedor) 
-        #return Proveedores
-    
-

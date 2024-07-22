@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from Core.models import Categoria, Producto, Pedido, Proveedores
 from .forms import ProductoForm, CategoriaForm, PedidoForm, ActualizarEstadoPedidoForm, ProveedoresForm
-#from django.http import JsonResponse
+
 
 # Vista para listar productos (para vendedor y administrador)
 @login_required
@@ -16,7 +16,6 @@ def listar_productos(request):
 # Vista para crear un nuevo producto (solo para administrador)
 @login_required
 def crear_producto(request):
-    #if request.user.groups.filter(name='Administrador').exists():
     if request.method == 'POST':
         form = ProductoForm(request.POST)
         if form.is_valid():
@@ -26,11 +25,7 @@ def crear_producto(request):
     else:
         form = ProductoForm()
     return render(request, 'crear_producto.html', {'form': form})
-    '''
-    else:
-        messages.error(request, 'No tiene permisos para crear productos.')
-        return redirect('listar_productos')
-    '''
+
 # Vista para listar categorías (para vendedor y administrador)
 @login_required
 def listar_categorias(request):
@@ -55,12 +50,7 @@ def crear_categoria(request):
         messages.error(request, 'No tiene permisos para crear categorías.')
         return redirect('listar_categorias')
     """
-"""
-@login_required
-def listar_pedidos(request):
-    listar_pedidos = Pedido.objects.all()
-    return render(request, 'listar_pedidos.html', {'listar_pedidos': listar_pedidos})
-"""
+
 @login_required
 def listar_pedidos(request):
     if request.method == 'POST':
@@ -91,13 +81,6 @@ def crear_pedidos(request):
         form = PedidoForm()
     
     return render(request, 'crear_pedidos.html', {'form': form})
-"""
-def actualizar_productos(request):
-    proveedor_id = request.GET.get('proveedor_id')
-    productos = Producto.objects.filter(proveedor_id=proveedor_id).values_list('id', 'nombre')
-    productos_dict = dict(productos)
-    return JsonResponse({'productos': productos_dict})
-"""
 
 @login_required
 def crear_proveedores(request):

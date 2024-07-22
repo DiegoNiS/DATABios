@@ -24,56 +24,28 @@ class ProveedorSelect(forms.Select):
         return super().create_option(name, value, label, selected, index, subindex, attrs)
     
 class PedidoForm(forms.ModelForm):
-    """
     proveedor = forms.ModelChoiceField(
         queryset=Proveedores.objects.all(),
-        widget=forms.Select(attrs={'class': 'form-control'}),
-        required=True,
-        empty_label=None  # Esto evitará que aparezca una opción vacía en el desplegable
-    
-    )"""
-
-    proveedor = forms.ModelChoiceField(
-        queryset=Proveedores.objects.all(),
-        #widget=ProveedorSelect(attrs={'class': 'form-control', 'onchange': 'actualizar_productos();'}),
         widget=ProveedorSelect(attrs={'class': 'form-control'}),
         empty_label='Seleccione un proveedor'  # Texto opcional para el primer option
     )
     
     productos = forms.ModelMultipleChoiceField(
         queryset=Producto.objects.none(),
-        #widget=forms.SelectMultiple(attrs={'class': 'form-control', 'id': 'id_productos'}),
         widget=forms.SelectMultiple(attrs={'class': 'form-control'}),
         required=False
     )
-    
+    #nombre_producto = forms.CharField(max_length=100, required=False, widget=forms.TextInput(attrs={'class': 'form-control'}))
 
     class Meta:
             model = Pedido
             fields = ['categoria', 'proveedor', 'productos', 'cantidad', 'precio_unitario', 'descripcion']
             widgets = {
-            #'categoria': forms.TextInput(attrs={'class': 'form-control'}),
-            #'productos': forms.TextInput(attrs={'class': 'form-control'}),
-            #'productos': forms.CheckboxSelectMultiple(attrs={'class': 'form-check-input'}),
             'cantidad': forms.NumberInput(attrs={'class': 'form-control'}),
             'precio_unitario': forms.NumberInput(attrs={'class': 'form-control'}),
             'total': forms.NumberInput(attrs={'class': 'form-control'}),
-            #'estado': forms.TextInput(attrs={'class': 'form-control'}),
             'descripcion': forms.TextInput(attrs={'class': 'form-control'}),
         }
-    """    
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['proveedor'].label_from_instance = lambda obj: obj.nombre if obj else ''
-        if 'proveedor' in self.data:
-            try:
-                proveedor_id = int(self.data.get('proveedor'))
-                self.fields['productos'].queryset = Producto.objects.filter(proveedor__id=proveedor_id)
-            except (ValueError, TypeError):
-                pass
-        elif self.instance.pk:
-            self.fields['productos'].queryset = self.instance.productos.all()
-    """
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -85,84 +57,12 @@ class PedidoForm(forms.ModelForm):
         elif self.instance.pk and self.instance.proveedor:
             self.fields['productos'].queryset = self.instance.productos.all()
     
-    """
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['proveedor'].label_from_instance = lambda obj: obj.nombre if obj else ''
-
-        # Debug: Imprimir el proveedor seleccionado y el queryset de productos
-        print(f"Proveedor seleccionado: {self.initial.get('proveedor')}")
-        print(f"Data del formulario: {self.data}")
-        print(f"Instance: {self.instance}")
-
-        if 'proveedor' in self.data:
-            proveedor_id = int(self.data['proveedor'])
-            self.fields['productos'].queryset = Producto.objects.filter(proveedor_id=proveedor_id)
-            print(f"Queryset actualizado desde data: {self.fields['productos'].queryset}")
-        elif self.instance.pk and self.instance.proveedor:
-            self.fields['productos'].queryset = Producto.objects.filter(proveedor=self.instance.proveedor)
-            print(f"Queryset actualizado desde instance: {self.fields['productos'].queryset}")
-    """
-
-    """
-    def clean(self):
-        cleaned_data = super().clean()
-        proveedor = cleaned_data.get('proveedor')
-        if proveedor:
-            productos_seleccionados = cleaned_data.get('productos')
-            if productos_seleccionados:
-                for producto in productos_seleccionados:
-                    if producto.proveedor != proveedor:
-                        raise forms.ValidationError(f'El producto "{producto}" no pertenece al proveedor seleccionado.')
-        return cleaned_data
-    """
-
     def clean(self):
         cleaned_data = super().clean()
         proveedor = cleaned_data.get('proveedor')
         if proveedor:
             self.fields['productos'].queryset = Producto.objects.filter(proveedor=proveedor)
         return cleaned_data
-        """
-        if proveedor and productos_seleccionados:
-            for producto in productos_seleccionados:
-                if producto.proveedor != proveedor:
-                    raise forms.ValidationError(f'El producto "{producto}" no pertenece al proveedor seleccionado.')
-        """
-
-    """
-    def save(self, commit=True):
-        pedido = super().save(commit=False)
-        if commit:
-            pedido.save()
-            self.save_m2m()
-        return pedido
-    """
-        #def __init__(self, *args, **kwargs):
-         #   super().__init__(*args, **kwargs)
-          #  if self.instance.pk:
-           #     self.fields['proveedores'].queryset = self.obtener_proveedores()
-
-        #def obtener_proveedores(self):
-         #   proveedores = set()
-          #  for producto in self.instance.productos.all():
-           #     proveedores.add(producto.proveedor)
-            #return proveedores
-        #def obtener_proveedores(self):
-         #   proveedores = Proveedores.objects.filter(producto__pedido=self.instance).distinct()
-          #  return proveedores
-      #  def obtener_proveedores(self):
-       #     if self.instance.pk:
-        #        return Proveedores.objects.filter(pedido=self.instance).distinct()
-         #   return Proveedores.objects.none()
-
-        #def save(self, commit=True):
-         #   pedido = super().save(commit=False)
-          #  if commit:
-           #     pedido.save()
-            #    self.save_m2m()  # Guardar relaciones ManyToMany
-            #return pedido
-        
         
     def clean_cantidad(self):
             cantidad = self.cleaned_data.get('cantidad')
