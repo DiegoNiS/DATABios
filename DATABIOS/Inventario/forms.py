@@ -35,8 +35,7 @@ class PedidoForm(forms.ModelForm):
         widget=forms.SelectMultiple(attrs={'class': 'form-control'}),
         required=False
     )
-    #nombre_producto = forms.CharField(max_length=100, required=False, widget=forms.TextInput(attrs={'class': 'form-control'}))
-
+    
     class Meta:
             model = Pedido
             fields = ['categoria', 'proveedor', 'productos', 'cantidad', 'precio_unitario', 'descripcion']

@@ -35,7 +35,6 @@ def listar_categorias(request):
 # Vista para crear una nueva categoría (solo para administrador)
 @login_required
 def crear_categoria(request):
-    #if request.user.groups.filter(name='Administrador').exists():
     if request.method == 'POST':
         form = CategoriaForm(request.POST)
         if form.is_valid():
@@ -45,12 +44,7 @@ def crear_categoria(request):
     else:
         form = CategoriaForm()
     return render(request, 'crear_categoria.html', {'form': form})
-    """
-    else:
-        messages.error(request, 'No tiene permisos para crear categorías.')
-        return redirect('listar_categorias')
-    """
-
+    
 @login_required
 def listar_pedidos(request):
     if request.method == 'POST':
