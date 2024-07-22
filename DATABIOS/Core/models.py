@@ -1,7 +1,9 @@
-from django.db import models
+from django.db import models, transaction
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.utils import timezone  # Importar timezone
 from django.forms import ValidationError
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 
 class ConjuntoPermisos(models.Model):                       # added by Diego
@@ -157,3 +159,16 @@ class Pedido(models.Model):
     def save(self, *args, **kwargs):
         self.total = self.calcular_total
         super().save(*args, **kwargs)
+
+    def actualizar_stock_productos(self):
+        # Solo actualiza el stock si el pedido está marcado como entregado
+        if self.estado == 'entregado':
+            with transaction.atomic():
+                for producto in self.productos.all():
+                    producto.stock += self.cantidad
+                    producto.save()
+
+@receiver(post_save, sender=Pedido)
+def actualizar_stock(sender, instance, **kwargs):
+    # Llamar al método actualizar_stock_productos después de guardar un pedido
+    instance.actualizar_stock_productos()
