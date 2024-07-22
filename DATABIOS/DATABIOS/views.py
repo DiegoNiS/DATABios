@@ -3,4 +3,7 @@
 from django.shortcuts import render
 
 def home(request):
-    return render(request, 'base.html')
+    return render(request, 'base.html', {'grupos_usuario': request.user.categoria})
+
+def dashboard(request):
+    return render(request, 'dashboard.html')

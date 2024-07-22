@@ -1,23 +1,73 @@
 {% extends 'base.html' %}
 
-{% block content %}
-<h1>Usuarios Registrados</h1>
-<ul>
-    {% for usuario in usuarios %}
-        <li>{{ usuario.categoria }} | {{ usuario.nombre }} {{ usuario.apellido }} | Permisos | {{ usuario.fecha_creacion }} | Actions |</li>
-        <form method="POST" action="{% url 'eliminar_usuario' usuario.id %}" style="display:inline;">
-            {% csrf_token %}
-            <button type="submit">Eliminar</button>
-        </form>
+{% load static %}
 
-        <form method="GET" action="{% url 'editar_permisos' usuario.id %}" style="display:inline;">
-            {% csrf_token %}
-            <button type="submit">Editar Permisos</button>
-        </form>
+{% block title %}Usuarios{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/formFilter.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="form_filter box__shadow">
+        <select name="name" id="">
+            <option value="#">Nombre</option>
+        </select>
+        <select name="categories" id="">
+            <option value="#">Categoría</option>
+        </select>
+        <input type="checkbox" id="show_all" name="show_all" value="show_all">
+        <label for="show_all"> Mostrar todos.</label>
+        <button class="filter_btn box__shadow">
+            <i class="fas fa-filter"></i>
+            <span>Filtrar</span>
+        </button>
+    </div>
+    <table  id="myTable" class="table table-responsive">
+        <thead>
+            <tr>
+                <th>Categoría</th>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Permisos</th>
+                <th>Created at</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for usuario in usuarios %}
+            <tr>
+                <th>{{ usuario.categoria }}</th>
+                <th>{{ usuario.nombre }}</th>
+                <th>{{ usuario.apellido }}</th>
+                <th>Permisos</th>
+                <th>{{ usuario.fecha_creacion }}</th>
+                <th>
+                    <form method="POST" action="{% url 'eliminar_usuario' usuario.id %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </form>        
+                    <form method="GET" action="{% url 'editar_permisos' usuario.id %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit">
+                            <i class="fas fa-pencil-alt"></i>
+                        </button>
+                    </form>
+                </th>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+
+        
+
         <!-- aqui mostrar todos los permisos con un simple toggle switch cada uno para saber que permisos tiene cada usuario -->
         <div>
             <!-- Mostrar SI o NO para cada permiso -->
-            <span>Pedidos Pendientes CUD: {% if usuario.id_permisos.pedidos_pen_CUD %}SI{% else %}NO{% endif %}</span>
+            <!--<span>Pedidos Pendientes CUD: {% if usuario.id_permisos.pedidos_pen_CUD %}SI{% else %}NO{% endif %}</span>
             <span>Pedidos Pendientes S: {% if usuario.id_permisos.pedidos_pen_S %}SI{% else %}NO{% endif %}</span>
             <span>Pedidos Recibidos G: {% if usuario.id_permisos.pedidos_rec_G %}SI{% else %}NO{% endif %}</span>
             <span>Inventario Categoría CUD: {% if usuario.id_permisos.inventario_cat_CUD %}SI{% else %}NO{% endif %}</span>
@@ -25,10 +75,15 @@
             <span>Inventario Producto CUD: {% if usuario.id_permisos.inventario_pro_CUD %}SI{% else %}NO{% endif %}</span>
             <span>Inventario Producto G: {% if usuario.id_permisos.inventario_pro_G %}SI{% else %}NO{% endif %}</span>
             <span>Ventas CD: {% if usuario.id_permisos.ventas_CD %}SI{% else %}NO{% endif %}</span>
-            <span>Panel Admin: {% if usuario.id_permisos.panel_admin %}SI{% else %}NO{% endif %}</span>
+            <span>Panel Admin: {% if usuario.id_permisos.panel_admin %}SI{% else %}NO{% endif %}</span>-->
             <!-- Puedes agregar más permisos según necesites -->
+
+            <!-- Botones -->
         </div>
-    {% endfor %}
-</ul>
+
 <a href="{% url 'agregar_usuario' %}">Agregar Usuario</a>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{% static 'js/table.js' %}"></script>
 {% endblock %}

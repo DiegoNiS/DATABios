@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.forms import ValidationError
 from django.utils import timezone  # Importar timezone
 
 class ConjuntoPermisos(models.Model):                       # added by Diego
@@ -73,6 +74,7 @@ class Usuario(AbstractBaseUser, PermissionsMixin):          # added by Diego
 class Categoria(models.Model):
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField(max_length=500)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.nombre
@@ -83,6 +85,32 @@ class Producto(models.Model):
     stock = models.IntegerField()
     precio_compra = models.FloatField()
     precio_venta = models.FloatField()
+    stock_min = models.IntegerField(default=10)
+    stock_max = models.IntegerField(default=20)
+    
+    @property
+    def estado_stock(self):
+        if self.stock < self.stock_min:
+            return 'bajo'
+        elif self.stock > self.stock_max:
+            return 'alto'
+        else:
+            return 'normal'
 
+    def clean(self):
+        super().clean()
+        if self.stock <= 0:
+            raise ValidationError({'stock': 'El valor de stock debe ser mayor que cero.'})
+        if self.precio_compra <= 0:
+            raise ValidationError({'precio_compra': 'El precio de compra debe ser mayor que cero.'})
+        if self.precio_venta <= 0:
+            raise ValidationError({'precio_venta': 'El precio de venta debe ser mayor que cero.'})
+        if self.stock_min <= 0:
+            raise ValidationError({'stock_min': 'El valor de stock mínimo debe ser mayor que cero.'})
+        if self.stock_max <= 0:
+            raise ValidationError({'stock_max': 'El valor de stock máximo debe ser mayor que cero.'})
+        if self.stock_min > self.stock_max:
+            raise ValidationError({'stock_min': 'El valor de stock mínimo no puede ser mayor que el stock máximo.'})
+        
     def __str__(self):
         return self.nombre

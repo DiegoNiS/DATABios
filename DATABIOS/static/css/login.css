@@ -8,7 +8,7 @@ body {
 }
 
 div.login-container {
-    background-color: #000A7B;
+    background-color: #00044a;
     width: 55%;
     height: 45%;
     box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.5);
@@ -23,7 +23,7 @@ div.login-container div.logo-container {
     width: 40%;
     height: 100%;
 
-    background-color: #000A7B;
+    background-color: #00044a;
 }
 
 div.login-container div.form-container {
@@ -54,12 +54,12 @@ div.login-container div.form-container div.title-container{
 }
 
 div.login-container div.form-container h1.tittle-form{
-    color: #000A7B;
+    color: #00044a;
     font-family: 'Roboto', sans-serif;
 }
 
 div.login-container div.form-container div.title-container hr.line-form{
-    background-color: #000A7B;
+    background-color: #00044a;
     width: 95%;
     height: 3px;
 }
@@ -85,18 +85,19 @@ div.login-container div.form-container div.content-container div {
 }
 
 div.login-container div.form-container div.content-container div i{
-    color: #000A7B;
+    color: #00044a;
+    font-size: 18px;
 }
 
 div.login-container div.form-container div.content-container div input.ipt-form{
-    color: #000A7B;
+    color: #00044a;
 
     width: 90%;
     height: 30%;
 
     padding: 5px;
     border: none;
-    border-bottom: 3px solid #000A7B;
+    border-bottom: 3px solid #00044a;
     transition: border-bottom 0.2s ease-in-out; 
     transition: background-color 0.2s ease; 
 
@@ -121,7 +122,7 @@ div.login-container div.form-container div.content-container div input.ipt-form:
 }
 
 div.login-container div.form-container div.button-container {
-    color: #000A7B;
+    color: #00044a;
     width: 90%;
     height: 25%;
 
@@ -137,7 +138,7 @@ div.login-container div.form-container div.button-container button {
     font-family: 'Roboto', sans-serif;
     font-size: 16px;
     color: white;
-    background-color: #000A7B;
+    background-color: #00044a;
     border: none;
     box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.5);
     cursor: pointer;
@@ -147,7 +148,7 @@ div.login-container div.form-container div.button-container button {
 }
 
 div.login-container div.form-container div.button-container button:hover {
-    color: #000A7B;
+    color: #00044a;
     background-color: white;
 }
 
