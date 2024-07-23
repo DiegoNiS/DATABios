@@ -1,14 +1,14 @@
 $(document).ready(function() {
     // Inicializar DataTables
-    let table = $('#myTable').DataTable({
+    const table = $('#myTable').DataTable({
         "paging": true,     
         "lengthChange": true,   
         "searching": true,      
         "ordering": true,   
         "info": true,
         "language": {
-            url: "//cdn.datatables.net/plug-ins/2.1.0/i18n/es-MX.json",
-        },
+            "url": "https://cdn.datatables.net/plug-ins/1.10.24/i18n/Spanish.json"
+        }
     });
 
     // Filtro personalizado para categorías

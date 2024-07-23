@@ -241,6 +241,14 @@
         <p>&copy; 2024 Django project</p>
     </footer>
 -->
+{% if messages %}
+<div id="message-container" style="display: none;">
+    {% for message in messages %}
+        <div data-tag="{{ message.tags }}" data-text="{{ message }}"></div>
+    {% endfor %}
+</div>
+{% endif %}
+
     <script type="text/javascript">
         let gruposUsuario = "{{ grupos_usuario }}";
     </script>
@@ -249,7 +257,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{% static 'js/scripts.js' %}"></script>
     <script src="{% static 'js/slidebar.js' %}"></script>
-    <!--<script src="{% static 'js/ventas/ventas.js' %}"></script>-->
+    <script src="{% static 'js/myMessages.js' %}"></script>
     {% block scripts %}
     {% endblock %}
 </body>

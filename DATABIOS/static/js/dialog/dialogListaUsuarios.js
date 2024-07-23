@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', function() {
     closeEditForm.addEventListener('click', function() {
         EditForm.close();
     });
-    
+
     cancelButtonEdit.addEventListener('click', function() {
         EditForm.close();
     });
@@ -109,39 +109,54 @@ document.addEventListener('DOMContentLoaded', function() {
     /* VIEW PERMISOS dialog */ 
     openViewButtons.forEach(button => {
         button.addEventListener('click', function() {
-            DialogView.showModal();
+            const userId = this.getAttribute('data-usuario-id');
+            console.log(userId);
+            fetch(`/editar_permisos/${userId}/`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log(data);
+                const contPerm = document.getElementById('viewPermisos_content');
+                const enabled = `<div class="enabled confirm_estate"><i class="fas fa-check"></i></div>`
+                const disabled = `<div class="disabled confirm_estate"><i class="fas fa-times"></i></div>`
+                const myPerms = `
+                <div class="PermissionsRow">
+                    <span>Pedidos Pendientes CUD:</span>${data.pedidos_pen_CUD ? enabled : disabled}
+                </div>
+                <div class="PermissionsRow">
+                    <span>Pedidos Pendientes S:</span>${data.pedidos_pen_S ? enabled : disabled}
+                </div>
+                <div class="PermissionsRow">
+                    <span>Pedidos Recibidos G:</span>${data.pedidos_rec_G ? enabled : disabled}  
+                </div>
+                <div class="PermissionsRow">
+                    <span>Inventario Categoría CUD:</span>${data.inventario_cat_CUD ? enabled : disabled}  
+                </div>
+                <div class="PermissionsRow">
+                    <span>Inventario Producto CUD:</span>${data.inventario_pro_CUD ? enabled : disabled}  
+                </div>
+                <div class="PermissionsRow">
+                    <span>Inventario Producto G:</span>${data.inventario_pro_G ? enabled : disabled}  
+                </div>
+                <div class="PermissionsRow">
+                    <span>Ventas CD:</span>${data.ventas_CD ? enabled : disabled}  
+                </div>
+                <div class="PermissionsRow">
+                    <span>Panel Admin:</span>${data.panel_admin ? enabled : disabled}  
+                </div>
+            `;
+                contPerm.innerHTML = myPerms;
+                DialogView.showModal();
+            })
+            .catch(error => console.error('Error:', error));
         });
     });
     
     closeView.addEventListener('click', function() {
         DialogView.close();
     });
-
-
-    /*MESSAGES*/
-    const messageContainer = document.getElementById('message-container');
-    if (messageContainer && messageContainer.children.length > 0) {
-        const messages = Array.from(messageContainer.children).map(div => ({
-            tag: div.getAttribute('data-tag'),
-            text: div.getAttribute('data-text')
-        }));
-
-        messages.forEach(message => {
-            Swal.fire({
-                toast: true,
-                position: 'top-end',
-                icon: message.tag.includes('success') ? 'success' :
-                      message.tag.includes('error') ? 'error' :
-                      message.tag.includes('warning') ? 'warning' : 'info',
-                title: message.text,
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true,
-                didOpen: (toast) => {
-                    toast.addEventListener('mouseenter', Swal.stopTimer);
-                    toast.addEventListener('mouseleave', Swal.resumeTimer);
-                }
-            });
-        });
-    }
 });

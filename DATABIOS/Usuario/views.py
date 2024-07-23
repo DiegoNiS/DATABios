@@ -15,7 +15,7 @@ User = get_user_model()
 #@permisos_para(lambda u: u.is_superuser)
 @permisos_para(lambda u: u.categoria == 'Administrador' or u.is_superuser)
 def list_usuarios(request):
-    usuarios = User.objects.all()
+    usuarios = User.objects.all().order_by('id')
     return render(request, 'lista_usuarios.html', {
         'usuarios': usuarios,
         'nombre_usuario': request.user.username, 
