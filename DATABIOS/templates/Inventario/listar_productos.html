@@ -43,12 +43,10 @@ Lista de Productos
     {% include 'Inventario/tabla_productos.html' %}
   </div>
 
-  <a href="{% url 'crear_producto' %}">Nuevo Producto</a>
-  <!-- Dialog crear_producto-->
-
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <!--<script src="{% static 'js/Inventario/filterTable.js' %}"></script> -->
-
-  <script src="{% static 'js/Inventario/dialogInventarioProducto.js' %}"></script>
+{% endblock %}
+{% block scripts %}
+<script src="{% static 'js/Inventario/dialogInventarioProducto.js' %}"></script>
 </div>
 {% endblock %}
