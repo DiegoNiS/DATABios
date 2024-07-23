@@ -31,7 +31,7 @@
             <th>Categoría</th>
             <th>Nombre</th>
             <th>Apellido</th>
-            <th>Permiso</th>
+            <th>Permisos</th>
             <th>Created at</th>
             <th>Acciones</th>
         </tr>
@@ -42,7 +42,11 @@
             <td><strong>{{ usuario.categoria }}</strong></td>
             <td>{{ usuario.nombre }}</td>
             <td>{{ usuario.apellido }}</td>
-            <td class="permisos"><button class="openPermisos"><i class="fas fa-lock"></i></button></td>
+            <td class="permisos">
+                <button class="openPermisos" data-usuario-id="{{ usuario.id }}">
+                    <i class="fas fa-lock"></i>
+                </button>
+            </td>
             <td>{{ usuario.fecha_creacion }}</td>
             <td>
                 <button type="button" class="delete_button" data-usuario-id="{{ usuario.id }}">
@@ -177,52 +181,17 @@
     </div>
 </dialog>
 
-<!-- Añadir clase adicional a los div para sobreescribir los dialog (class = Overwrite)-->
 <dialog id="viewPermisos"> <!-- CAMBIAR ID DEL DIALOG -->
-    <div class="top_bar_myDialog" style="width: 500px;"> <!-- CAMBIAR STYLE (solo el width) -->
-        <span class="tittle"></span> <!-- INSERTAR TITULO AQUI -->
+    <div class="top_bar_myDialog" style="width: 550px;"> <!-- CAMBIAR STYLE (solo el width) -->
+        <span class="tittle">
+            <i class="fas fa-lock"></i>
+            Permisos del usuario
+        </span> <!-- INSERTAR TITULO AQUI -->
         <i class="fas fa-times close_myDialog" id="closeViewPermisos"></i> <!-- BOTON DE CERRADO, CAMBIAR ID -->
     </div>
-    <div class="content_myDialog" style="width: 500px;height: 40vh;">  <!-- CAMBIAR STYLE (width y height (en vh)) -->
-        <h1>Hola</h1>
-        <h1>Hola</h1>
-        <h1>Hola</h1>
-        <h1>Hola</h1>
-        <h1>Hola</h1>
-        <h1>Hola</h1>
-        <h1>Hola</h1>
-        <h1>Hola</h1>
-        <h1>Hola</h1>
-        <h1>Hola</h1>
-        <h1>Hola</h1>
-        <h1>Hola</h1>
-        <h1>Hola</h1>
-        <h1>Hola</h1>
-        <h1>Hola</h1>
-        <h1>Hola</h1>
-        <h1>Hola</h1>
-        <h1>Hola</h1>
-        <h1>Hola</h1>
-        <h1>Hola</h1>
-        <h1>Hola</h1>
-        <h1>Hola</h1>
-        <h1>Hola</h1>
-        <h1>Hola</h1>
-        <h1>Hola</h1>
-        <h1>Hola</h1>
-        <h1>Hola</h1>
-
+    <div class="content_myDialog overwrite" style="width: 550px;height: 40vh;" id="viewPermisos_content">  <!-- CAMBIAR STYLE (width y height (en vh)) -->
     </div>
 </dialog>
-
-{% if messages %}
-<div id="message-container" style="display: none;">
-    {% for message in messages %}
-        <div data-tag="{{ message.tags }}" data-text="{{ message }}"></div>
-    {% endfor %}
-</div>
-{% endif %}
-
 {% endblock %}
 
 {% block scripts %}

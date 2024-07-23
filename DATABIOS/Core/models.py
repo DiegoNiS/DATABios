@@ -95,7 +95,7 @@ class Proveedores(models.Model):
 
 class Producto(models.Model):
     categorias = models.ManyToManyField(Categoria)
-    proveedor = models.ForeignKey(Proveedores, on_delete=models.CASCADE, default=1)
+    proveedor = models.ForeignKey(Proveedores, on_delete=models.CASCADE)
     nombre = models.CharField(max_length=100)
     stock = models.IntegerField()
     precio_compra = models.FloatField()

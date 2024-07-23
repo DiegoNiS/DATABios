@@ -1,13 +1,13 @@
 $(document).ready(function() {
     // Inicializar DataTables
-    let table = $('#myTable').DataTable({
+    const table = $('#myTable').DataTable({
         "paging": true,     
         "lengthChange": true,   
         "searching": true,      
         "ordering": true,   
         "info": true,
         "language": {
-            "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Spanish.json" // Traducción al español
+            "url": "https://cdn.datatables.net/plug-ins/1.10.24/i18n/Spanish.json"
         }
     });
 
