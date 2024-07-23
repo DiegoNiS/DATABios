@@ -13,7 +13,7 @@
   </thead>
   <tbody>
     {% for producto in productos %}
-    <tr>
+    <tr data-producto-id = "{{ producto.id }}">
       <td>{{ producto.id }}</td>
       <td>
         <ul>
@@ -40,11 +40,26 @@
     {% endfor %}
   </tbody>
 </table>
-<!-- Dialog modificar y eliminar-->
+<form id="exportarForm" method="post" action="{% url 'exportar_productos_excel' %}">
+  {% csrf_token %}
+  <input type="hidden" name="producto_ids" id="productoIds">
+  <button type="submit">Exportar Excel</button>
+</form>
+
+<script>
+  document.getElementById('exportarForm').addEventListener('submit', function(event) {
+      var productoIds = [];
+      var rows = document.querySelectorAll('tbody tr');
+      rows.forEach(function(row) {
+          productoIds.push(row.getAttribute('data-producto-id'));
+      });
+      document.getElementById('productoIds').value = productoIds.join(',');
+  });
+</script>
+<!--
 <dialog id="editarProductoDialog">
   <form method="dialog">
       <h2>Editar Producto</h2>
-      <!-- Campos de edición -->
       <label for="editarNombreProducto">Nombre:</label>
       <input type="text" id="editarNombreProducto">
       <label for="editarStockProducto">Stock:</label>
@@ -67,3 +82,4 @@
       <button type="button" id="cancelarEliminarProducto">Cancelar</button>
   </form>
 </dialog>
+-->

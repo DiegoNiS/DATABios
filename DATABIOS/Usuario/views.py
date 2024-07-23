@@ -11,15 +11,17 @@ from Core.decorators import permisos_para
 
 User = get_user_model()
 
-@login_required
+#@permisos_para(lambda u: u.is_superuser)
+@permisos_para(lambda u: u.categoria == 'Administrador')
 def list_usuarios(request):
     usuarios = User.objects.all()
     return render(request, 'lista_usuarios.html', {
         'usuarios': usuarios,
-        'nombre_usuario': request.user.username
+        'nombre_usuario': request.user.username, 
+        'grupos_usuario': request.user.categoria
     })
 
-@permisos_para(lambda u: u.is_superuser)
+@permisos_para(lambda u: u.categoria == 'Administrador')
 def agregar_usuario(request):
     if request.method == 'POST':
         username = request.POST['username']

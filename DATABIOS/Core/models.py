@@ -1,5 +1,6 @@
 from django.db import models, transaction
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.forms import ValidationError
 from django.utils import timezone  # Importar timezone
 from django.forms import ValidationError
 from django.db.models.signals import post_save
@@ -77,6 +78,7 @@ class Usuario(AbstractBaseUser, PermissionsMixin):          # added by Diego
 class Categoria(models.Model):
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField(max_length=500)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.nombre

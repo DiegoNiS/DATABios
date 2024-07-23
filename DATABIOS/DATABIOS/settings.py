@@ -33,14 +33,15 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
-    'django.contrib.contenttypes',
+    'django.contrib.contenttypes',  
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework',
+    'Core',
     'Usuario',
     'Inventario',
-    'Core',
+    'Ventas.apps.VentasConfig',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -105,15 +106,6 @@ DATABASES = {
         'PORT': '5432',
     }
 }
-'''
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-'''
 
 
 # Password validation

@@ -1,4 +1,4 @@
-# Proyecto/inventario/forms.py
+# Proyecto/Inventario/forms.py
 
 from django import forms
 from django.core.exceptions import ValidationError
@@ -7,7 +7,7 @@ from Core.models import Producto, Categoria, Pedido, Proveedores
 class ProductoForm(forms.ModelForm):
     class Meta:
         model = Producto
-        fields = ['categorias', 'nombre', 'stock', 'precio_compra', 'precio_venta']
+        fields = ['categorias', 'nombre', 'stock', 'precio_compra', 'precio_venta', 'stock_min', 'stock_max']
         widgets = {
             'categorias': forms.CheckboxSelectMultiple(),
         }
