@@ -1,5 +1,5 @@
 // myapp/static/js/scripts.js
-document.addEventListener('DOMContentLoaded', function() {
+/*document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM fully loaded and parsed');
     const dialog = document.getElementById('mydialog');
     const buttonDialog = document.getElementById('openDialog');
@@ -12,3 +12,4 @@ document.addEventListener('DOMContentLoaded', function() {
         dialog.close();
     });
 });
+*/

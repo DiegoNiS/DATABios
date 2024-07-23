@@ -103,7 +103,7 @@ def editar_permisos(request, usuario_id):
         permisos.ventas_CD = 'ventas_CD' in request.POST
         permisos.panel_admin = 'panel_admin' in request.POST
         permisos.save()
-        messages.success(request, "permisos registrados correctamente.")
+        messages.success(request, "Cambios realizados correctamente.")
         return redirect('lista_usuarios')
     
     if request.method == 'GET':
