@@ -346,5 +346,5 @@ def eliminar_categoria(request, pk):
                 return redirect('listar_categorias')
         except Exception as e:
             messages.error(request, f'Ocurrió un error al eliminar la categoría: {e}')
-
-    return render(request, 'Inventario/eliminar_categoria.html', {'categoria': categoria})
+    return redirect('eliminar_categoria')
+    #return render(request, 'Inventario/eliminar_categoria.html', {'categoria': categoria})
