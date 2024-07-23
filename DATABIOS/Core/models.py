@@ -1,7 +1,11 @@
-from django.db import models
+from django.db import models, transaction
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.forms import ValidationError
 from django.utils import timezone  # Importar timezone
+from django.forms import ValidationError
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
 
 class ConjuntoPermisos(models.Model):                       # added by Diego
     pedidos_pen_CUD = models.BooleanField(default=False)
@@ -79,8 +83,19 @@ class Categoria(models.Model):
     def __str__(self):
         return self.nombre
 
+class Proveedores(models.Model):
+    id = models.AutoField(primary_key=True)
+    nombre = models.CharField(max_length=100, default='No Especificado')
+    ruc = models.CharField(max_length=9)
+    telefono = models.CharField(max_length=9, default='Sin Número') 
+    fecha_creacion = models.DateField(auto_now_add=True)
+    
+    def __str__(self):
+        return self.nombre
+
 class Producto(models.Model):
     categorias = models.ManyToManyField(Categoria)
+    proveedor = models.ForeignKey(Proveedores, on_delete=models.CASCADE, default=1)
     nombre = models.CharField(max_length=100)
     stock = models.IntegerField()
     precio_compra = models.FloatField()
@@ -114,3 +129,48 @@ class Producto(models.Model):
         
     def __str__(self):
         return self.nombre
+
+
+
+
+class Pedido(models.Model):
+    ESTADO_CHOICES = [
+        ('cancelado', 'Cancelado'),
+        ('en_proceso', 'En Proceso'),
+        ('entregado', 'Entregado'),
+    ]
+    id = models.AutoField(primary_key=True)
+    categoria = models.ForeignKey(Categoria,on_delete=models.CASCADE, default=None)
+    proveedor = models.ForeignKey(Proveedores,on_delete=models.CASCADE)
+    productos = models.ManyToManyField(Producto)
+    cantidad = models.IntegerField(default=0)
+    precio_unitario = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    total = models.DecimalField(max_digits=10, decimal_places=2)
+    fecha_pedido = models.DateField(auto_now_add=True)
+    hora = models.TimeField(auto_now_add=True)
+    estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='en_proceso')
+    descripcion = models.CharField(max_length=200, default='Ninguno')
+    
+    def __str__(self):
+        return f"Pedido {self.id}: Categoria {self.Categoria.nombre}, Proveedor {self.Proveedores.nombre}, Producto {self.producto}, Cantidad {self.cantidad}, Total {self.total}, Precio Unitario {self.precio_unitario}, Fecha de Pedido {self.fecha_pedido}, Hora {self.hora}, Estado {self.estado}, Descripcion {self.descripcion}"
+
+    @property
+    def calcular_total(self):
+        return self.cantidad * self.precio_unitario
+
+    def save(self, *args, **kwargs):
+        self.total = self.calcular_total
+        super().save(*args, **kwargs)
+
+    def actualizar_stock_productos(self):
+        # Solo actualiza el stock si el pedido está marcado como entregado
+        if self.estado == 'entregado':
+            with transaction.atomic():
+                for producto in self.productos.all():
+                    producto.stock += self.cantidad
+                    producto.save()
+
+@receiver(post_save, sender=Pedido)
+def actualizar_stock(sender, instance, **kwargs):
+    # Llamar al método actualizar_stock_productos después de guardar un pedido
+    instance.actualizar_stock_productos()
