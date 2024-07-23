@@ -68,5 +68,15 @@ dialog::backdrop {
 .content_myDialog {
     width: 720px;
     height: 460px;
-    padding: 1rem; 
+    padding: 1rem;
+    overflow: auto;
+}
+.content_myDialog::-webkit-scrollbar {
+    width: 13px;
+}
+.content_myDialog::-webkit-scrollbar-thumb {
+    background-color: #00044a; 
+}
+.content_myDialog::-webkit-scrollbar-track {
+    background-color: #00044a6e; 
 }
