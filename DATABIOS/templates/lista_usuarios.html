@@ -13,85 +13,66 @@
 <p class="page_tittle">
     Gestión de Usuarios
 </p>
-    <div class="form_filter" id="my_form_filter">
-        <label for="categories">Categoría: </label>
-        <select name="categories" id="categoryFilter">
-            <option value="">Todos</option>
-            <option value="Administrador">Administrador</option>
-            <option value="Vendedor">Vendedor</option>
-        </select>
-        <button class="addButton" id="openAddForm">
-            <i class="fas fa-plus-circle"></i>
-            <span>Agregar usuario.</span>
-        </button>
-    </div>
-    <table id="myTable" class="table display">
-        <thead>
-            <tr>
-                <th>Categoría</th>
-                <th>Nombre</th>
-                <th>Apellido</th>
-                <th>Permisos</th>
-                <th>Created at</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for usuario in usuarios %}
-            <tr>
-                <td><strong>{{ usuario.categoria }}</strong></td>
-                <td>{{ usuario.nombre }}</td>
-                <td>{{ usuario.apellido }}</td>
-                <td class="Permisos">{{ usuario.pedidos_pen_CUD }}</td>
-                <td>{{ usuario.fecha_creacion }}</td>
-                <td>
-                    <button type="button" class="delete_button" data-usuario-id="{{ usuario.id }}">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                    <!-- FORM OCULTO PARA BORRAR USUARIO -->
-                    <form method="POST" action="" id="deleteForm">
-                        {% csrf_token %}
-                    </form>
-                    <!-- FORM OCULTO PARA BORRAR USUARIO -->
+<div class="form_filter" id="my_form_filter">
+    <label for="categories">Categoría: </label>
+    <select name="categories" id="categoryFilter">
+        <option value="">Todos</option>
+        <option value="Administrador">Administrador</option>
+        <option value="Vendedor">Vendedor</option>
+    </select>
+    <button class="addButton" id="openAddForm">
+        <i class="fas fa-plus-circle"></i>
+        <span>Agregar usuario.</span>
+    </button>
+</div>
+<table id="myTable" class="table display">
+    <thead>
+        <tr>
+            <th>Categoría</th>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>Permiso</th>
+            <th>Created at</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for usuario in usuarios %}
+        <tr>
+            <td><strong>{{ usuario.categoria }}</strong></td>
+            <td>{{ usuario.nombre }}</td>
+            <td>{{ usuario.apellido }}</td>
+            <td class="permisos"><button class="openPermisos"><i class="fas fa-lock"></i></button></td>
+            <td>{{ usuario.fecha_creacion }}</td>
+            <td>
+                <button type="button" class="delete_button" data-usuario-id="{{ usuario.id }}">
+                    <i class="fas fa-trash"></i>
+                </button>
 
-                    <div class="separator" ></div>
-                    <!--<form method="GET" action="{% url 'editar_permisos' usuario.id %}" style="display:inline;">
-                        {% csrf_token %}
-                    </form>-->
-                    <button type="button" class="edit_button" 
-                    data-usuario-id="{{ usuario.id }}"
-                    data-usuario-username="{{ usuario.username }}"
-                    data-usuario-email="{{ usuario.email }}"
-                    data-usuario-nombre="{{ usuario.nombre }}"
-                    data-usuario-apellido="{{ usuario.apellido }}"
-                    data-usuario-categoria="{{ usuario.categoria }}">
-                        <i class="fas fa-pencil-alt"></i>
-                    </button>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+                <div class="separator" ></div>
+                <!--<form method="GET" action="{% url 'editar_permisos' usuario.id %}" style="display:inline;">
+                    {% csrf_token %}
+                </form>-->
+                <button type="button" class="edit_button" 
+                data-usuario-id="{{ usuario.id }}"
+                data-usuario-username="{{ usuario.username }}"
+                data-usuario-email="{{ usuario.email }}"
+                data-usuario-nombre="{{ usuario.nombre }}"
+                data-usuario-apellido="{{ usuario.apellido }}"
+                data-usuario-categoria="{{ usuario.categoria }}">
+                    <i class="fas fa-pencil-alt"></i>
+                </button>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 
-
-        
-
-        <!-- aqui mostrar todos los permisos con un simple toggle switch cada uno para saber que permisos tiene cada usuario -->
-        <div>
-            <!-- Mostrar SI o NO para cada permiso -->
-            <!--<span>Pedidos Pendientes CUD: {% if usuario.id_permisos.pedidos_pen_CUD %}SI{% else %}NO{% endif %}</span>
-            <span>Pedidos Pendientes S: {% if usuario.id_permisos.pedidos_pen_S %}SI{% else %}NO{% endif %}</span>
-            <span>Pedidos Recibidos G: {% if usuario.id_permisos.pedidos_rec_G %}SI{% else %}NO{% endif %}</span>
-            <span>Inventario Categoría CUD: {% if usuario.id_permisos.inventario_cat_CUD %}SI{% else %}NO{% endif %}</span>
-            <br>
-            <span>Inventario Producto CUD: {% if usuario.id_permisos.inventario_pro_CUD %}SI{% else %}NO{% endif %}</span>
-            <span>Inventario Producto G: {% if usuario.id_permisos.inventario_pro_G %}SI{% else %}NO{% endif %}</span>
-            <span>Ventas CD: {% if usuario.id_permisos.ventas_CD %}SI{% else %}NO{% endif %}</span>
-            <span>Panel Admin: {% if usuario.id_permisos.panel_admin %}SI{% else %}NO{% endif %}</span>-->
-            <!-- Puedes agregar más permisos según necesites -->
-
-            <!-- Botones -->
-        </div>
+<!-- FORM OCULTO PARA BORRAR USUARIO -->
+<form method="POST" action="" id="deleteForm">
+    {% csrf_token %}
+</form>
+<!-- FORM OCULTO PARA BORRAR USUARIO -->
 
 <!-- El diálogo -->
 <dialog id="AddForm">
@@ -195,6 +176,53 @@
         </form>
     </div>
 </dialog>
+
+<!-- Añadir clase adicional a los div para sobreescribir los dialog (class = Overwrite)-->
+<dialog id="viewPermisos"> <!-- CAMBIAR ID DEL DIALOG -->
+    <div class="top_bar_myDialog" style="width: 500px;"> <!-- CAMBIAR STYLE (solo el width) -->
+        <span class="tittle"></span> <!-- INSERTAR TITULO AQUI -->
+        <i class="fas fa-times close_myDialog" id="closeViewPermisos"></i> <!-- BOTON DE CERRADO, CAMBIAR ID -->
+    </div>
+    <div class="content_myDialog" style="width: 500px;height: 40vh;">  <!-- CAMBIAR STYLE (width y height (en vh)) -->
+        <h1>Hola</h1>
+        <h1>Hola</h1>
+        <h1>Hola</h1>
+        <h1>Hola</h1>
+        <h1>Hola</h1>
+        <h1>Hola</h1>
+        <h1>Hola</h1>
+        <h1>Hola</h1>
+        <h1>Hola</h1>
+        <h1>Hola</h1>
+        <h1>Hola</h1>
+        <h1>Hola</h1>
+        <h1>Hola</h1>
+        <h1>Hola</h1>
+        <h1>Hola</h1>
+        <h1>Hola</h1>
+        <h1>Hola</h1>
+        <h1>Hola</h1>
+        <h1>Hola</h1>
+        <h1>Hola</h1>
+        <h1>Hola</h1>
+        <h1>Hola</h1>
+        <h1>Hola</h1>
+        <h1>Hola</h1>
+        <h1>Hola</h1>
+        <h1>Hola</h1>
+        <h1>Hola</h1>
+
+    </div>
+</dialog>
+
+{% if messages %}
+<div id="message-container" style="display: none;">
+    {% for message in messages %}
+        <div data-tag="{{ message.tags }}" data-text="{{ message }}"></div>
+    {% endfor %}
+</div>
+{% endif %}
+
 {% endblock %}
 
 {% block scripts %}

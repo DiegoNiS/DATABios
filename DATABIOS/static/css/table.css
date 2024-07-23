@@ -17,7 +17,7 @@
 }
 th {
     padding: 12px;
-    text-align: center;
+    text-align: center !important;
     border-bottom: 2px solid rgb(156, 156, 156);
     border-top: 2px solid rgb(156, 156, 156);
     background-color: #00044a;
@@ -25,13 +25,13 @@ th {
     font-weight: 500 !important;
 }
 td {
-    text-align: left;
+    text-align: left !important;
     border-bottom: 0.5px solid rgba(156, 156, 156, 0.589);
     font-weight: 400;
     font-size: 15px;
 }
-.Permisos {
-    text-align: center;
+td.permisos {
+    text-align: center !important;
 }
 td:last-child {
     display: flex;
@@ -52,7 +52,8 @@ tbody tr:nth-child(even) {
     width: 10%;
 }
 .delete_button,
-.edit_button {
+.edit_button,
+.openPermisos {
     width: 40px;
     height: 30px;
     box-shadow: rgba(0, 0, 0, 0.07) 0px 1px 2px, rgba(0, 0, 0, 0.07) 0px 2px 4px, rgba(0, 0, 0, 0.07) 0px 4px 8px, rgba(0, 0, 0, 0.07) 0px 8px 16px, rgba(0, 0, 0, 0.07) 0px 16px 32px, rgba(0, 0, 0, 0.07) 0px 32px 64px;
@@ -62,7 +63,8 @@ tbody tr:nth-child(even) {
     transition: all 0.2s;
 }
 .delete_button i,
-.edit_button i {
+.edit_button i,
+.openPermisos i {
     color: #ffffff;
 }
 .delete_button {
@@ -71,13 +73,18 @@ tbody tr:nth-child(even) {
 .edit_button {
     background-color: rgb(255, 187, 0);
 }
+.openPermisos {
+    background-color: #00BFFF;
+}
 .delete_button:hover,
-.edit_button:hover {
+.edit_button:hover,
+.openPermisos:hover {
     background-color: white;
     box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
 }
 .delete_button:hover i,
-.edit_button:hover i {
+.edit_button:hover i,
+.openPermisos:hover i {
     color: #00044a;
 }
 .dt-layout-row {

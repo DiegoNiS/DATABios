@@ -18,6 +18,31 @@
     <!--<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>-->      <!-- aded by Diego  -->
 </head>
 <body>
+
+    <!--<div id="mySidenav" class="sidenav">
+        <div class="logo">
+            <img src="{% static 'img/logo.png' %}" alt="LIBRERA STOCK">
+        </div>
+        <a href="{% url 'home' %}">Dashboard</a>
+        
+
+        <div id="pedidosContainer" class="hidden">
+            <a href="">Pedidos</a>
+            <div class="link">
+                <a href="{% url 'crear_pedidos' %}">Crear Pedido</a>
+                <a href="{% url 'listar_pedidos' %}">Lista Pedidos</a>
+            </div>
+            
+        </div>
+        
+        <a href="{% url 'listar_productos' %}">Inventario</a>
+        <a href="{% url 'ventas_list' %}">Ventas</a>
+        <a href="{% url 'lista_usuarios' %}">Usuarios</a>
+        <a href="{% url 'listar_proveedores' %}">Listar Proveedores</a>
+        <a href="#ajustes">Ajustes</a>
+        <a href="{% url 'logout' %}">Salir</a>
+    </div>-->
+
     <!--SlideBar Creation-->
     <div class="container">
         <div class="slidebar">
@@ -49,12 +74,12 @@
                             </a>
                             <ul class="sub_menu">
                                 <li>
-                                    <a href="{% url 'home' %}">
+                                    <a href="{% url 'listar_pedidos' %}">
                                         <span class="text">Pendientes</span>
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="{% url 'home' %}">
+                                    <a href="{% url 'crear_pedidos' %}">
                                         <span class="text">Registro</span>
                                     </a>
                                 </li>
@@ -105,7 +130,7 @@
                     </ul>
                     <ul>
                         <li>
-                            <a href="{% url 'home' %}" class="principal">
+                            <a href="{% url 'listar_proveedores' %}" class="principal">
                                 <i class="fas fa-briefcase"></i>
                                 <span class="text">Proveedores</span>
                             </a>
@@ -219,7 +244,7 @@
     <script type="text/javascript">
         let gruposUsuario = "{{ grupos_usuario }}";
     </script>
-        <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
     <script src="https://cdn.datatables.net/2.0.8/js/dataTables.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{% static 'js/scripts.js' %}"></script>

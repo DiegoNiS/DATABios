@@ -36,3 +36,47 @@ dialog:not([open]) {
 dialog::backdrop {
   backdrop-filter: blur(0.25rem);
 }
+/*Dialog Genérico*/
+.top_bar_myDialog {
+    height: 4.44vh;
+    background-color: #00044a;
+    display: flex;
+    align-items: center;
+    color: #ffffff;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+.top_bar_myDialog .tittle {
+    flex: 1;
+    text-align: center;
+    font-size: 1rem;
+}
+.top_bar_myDialog .close_myDialog {
+    cursor: pointer;
+    font-size: 1.3rem;
+    transition: all 0.3s ease;
+}
+.top_bar_myDialog {
+    height: 4.44vh;
+    background-color: #00044a;
+    display: flex;
+    align-items: center;
+    color: #ffffff;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+.content_myDialog {
+    width: 720px;
+    height: 460px;
+    padding: 1rem;
+    overflow: auto;
+}
+.content_myDialog::-webkit-scrollbar {
+    width: 13px;
+}
+.content_myDialog::-webkit-scrollbar-thumb {
+    background-color: #00044a; 
+}
+.content_myDialog::-webkit-scrollbar-track {
+    background-color: #00044a6e; 
+}

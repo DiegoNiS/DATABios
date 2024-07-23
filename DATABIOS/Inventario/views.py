@@ -1,13 +1,14 @@
 # Proyecto/Inventario/views.py
 from django.forms import ValidationError
-from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse, HttpResponse
 from django.template.loader import render_to_string
-from Core.models import Categoria, Producto
+from django.shortcuts import render, redirect, get_object_or_404
+from Core.models import Categoria, Producto, Pedido, Proveedores
 from Core.decorators import permisos_para
-from .forms import ProductoForm, CategoriaForm
+from .forms import ProductoForm, CategoriaForm, PedidoForm, ActualizarEstadoPedidoForm, ProveedoresForm
+
 # excel
 import openpyxl
 from io import BytesIO
@@ -348,3 +349,56 @@ def eliminar_categoria(request, pk):
             messages.error(request, f'Ocurrió un error al eliminar la categoría: {e}')
     return redirect('eliminar_categoria')
     #return render(request, 'Inventario/eliminar_categoria.html', {'categoria': categoria})
+
+@login_required
+def listar_pedidos(request):
+    if request.method == 'POST':
+        form = ActualizarEstadoPedidoForm(request.POST)
+        if form.is_valid():
+            pedido_id = request.POST.get('pedido_id')
+            pedido = get_object_or_404(Pedido, id=pedido_id)
+            pedido.estado = form.cleaned_data['estado']
+            pedido.save()
+            return redirect('listar_pedidos')  # Asegúrate de que el nombre de tu URL coincida
+    else:
+        form = ActualizarEstadoPedidoForm()
+    
+    listar_pedidos = Pedido.objects.all()
+    return render(request, 'listar_pedidos.html', {'listar_pedidos': listar_pedidos, 'form': form})
+
+#@login_required
+def crear_pedidos(request):
+    if request.method == 'POST':
+        form = PedidoForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Pedido creado exitosamente.')
+            return redirect('listar_pedidos')
+        else:
+            messages.error(request, 'Por favor corrige los errores del formulario.')
+    else:
+        form = PedidoForm()
+    
+    return render(request, 'crear_pedidos.html', {'form': form})
+
+@login_required
+def crear_proveedores(request):
+    if request.method == 'POST':
+        form = ProveedoresForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Proveedor creado exitosamente.')
+            return redirect('listar_proveedores')
+        else:
+            messages.error(request, 'Por favor corrige los errores del formulario.')
+    else:
+        form = ProveedoresForm()
+    
+    return render(request, 'crear_proveedores.html', {'form': form})
+
+
+@login_required
+def listar_proveedores(request):
+    listar_proveedores = Proveedores.objects.all()
+    form = ProveedoresForm()
+    return render(request, 'listar_proveedores.html', {'listar_proveedores': listar_proveedores, 'form': form})

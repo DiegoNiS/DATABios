@@ -8,10 +8,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const editButtons  = document.querySelectorAll('.edit_button');
     const closeEditForm = document.getElementById('closeEditForm');
     const cancelButtonEdit = document.getElementById('cancelButtonEdit');
-    const myEditForm = document.getElementById('Edit__Form');
+    const myEditForm = document.getElementById('Edit__Form'); // Formilario editar
     
     const deleteButtons = document.querySelectorAll('.delete_button');
 
+    const openViewButtons  = document.querySelectorAll('.openPermisos');
+    const DialogView = document.getElementById('viewPermisos');
+    const closeView = document.getElementById('viewPermisos');
+
+
+    /* ADD dialog */ 
     openAddForm.addEventListener('click', function() {
         AddForm.showModal();
     });
@@ -23,6 +29,7 @@ document.addEventListener('DOMContentLoaded', function() {
         AddForm.close();
     });
 
+    /* All delete buttons */ 
     deleteButtons.forEach(button => {
         button.addEventListener('click', function() {
             const userIdDel = this.getAttribute('data-usuario-id');
@@ -47,6 +54,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    /* EDIT dialog */ 
     editButtons.forEach(button => {
         button.addEventListener('click', function() {
             const userId = this.getAttribute('data-usuario-id');
@@ -55,6 +63,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const nombre = this.getAttribute('data-usuario-nombre');
             const apellido = this.getAttribute('data-usuario-apellido');
             const categoria = this.getAttribute('data-usuario-categoria');
+
+            console.log(userId);
 
             // Solicitar permisos del usuario, mediante Ajax
             fetch(`/editar_permisos/${userId}/`)
@@ -81,6 +91,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 $('#categoriaEdit').val(categoria);
 
                 myEditForm.action = `/editar_permisos/${userId}/`;
+                console.log(myEditForm.action);
                 EditForm.showModal();
             })
             .catch(error => console.error('Error:', error));
@@ -90,7 +101,47 @@ document.addEventListener('DOMContentLoaded', function() {
     closeEditForm.addEventListener('click', function() {
         EditForm.close();
     });
+    
     cancelButtonEdit.addEventListener('click', function() {
         EditForm.close();
     });
+
+    /* VIEW PERMISOS dialog */ 
+    openViewButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            DialogView.showModal();
+        });
+    });
+    
+    closeView.addEventListener('click', function() {
+        DialogView.close();
+    });
+
+
+    /*MESSAGES*/
+    const messageContainer = document.getElementById('message-container');
+    if (messageContainer && messageContainer.children.length > 0) {
+        const messages = Array.from(messageContainer.children).map(div => ({
+            tag: div.getAttribute('data-tag'),
+            text: div.getAttribute('data-text')
+        }));
+
+        messages.forEach(message => {
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: message.tag.includes('success') ? 'success' :
+                      message.tag.includes('error') ? 'error' :
+                      message.tag.includes('warning') ? 'warning' : 'info',
+                title: message.text,
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer);
+                    toast.addEventListener('mouseleave', Swal.resumeTimer);
+                }
+            });
+        });
+    }
 });
