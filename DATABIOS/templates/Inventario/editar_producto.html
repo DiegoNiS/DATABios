@@ -8,11 +8,23 @@
     <label for="nombre_Prod_E">Nombre:</label>
     <input type="text" id="nombre_Prod_E" name="nombre_Prod_E" value="{{ producto.nombre }}" required><br>
 
-    <label for="categorias_Prod_E">Categorías:</label> <br>
-    {% for categoria in categorias %}
-    <input type="checkbox" id="categoria_{{ categoria.id }}" name="categorias_Prod_E" value="{{ categoria.id }}" {% if categoria.id in form.categorias %}checked{% endif %}>
-    <label for="categoria_{{ categoria.id }}">{{ categoria.nombre }}</label><br>
-    {% endfor %}
+    <label for="categorias_Prod_E">Categorías:</label>
+    <select id="categorias_Prod_E" name="categorias_Prod_E" multiple required>
+        {% for categoria in categorias %}
+            <option value="{{ categoria.id }}" {% if categoria in producto.categorias.all %}selected{% endif %}>
+                {{ categoria.nombre }}
+            </option>
+        {% endfor %}
+    </select><br>
+
+    <label for="proveedor_Prod_E">Proveedor:</label>
+    <select id="proveedor_Prod_E" name="proveedor_Prod_E" required>
+        {% for proveedor in proveedores %}
+            <option value="{{ proveedor.id }}" {% if proveedor == producto.proveedor %}selected{% endif %}>
+                {{ proveedor.nombre }}
+            </option>
+        {% endfor %}
+    </select><br>
 
     <label for="stock_Prod_E">Stock:</label>
     <input type="number" id="stock_Prod_E" name="stock_Prod_E" value="{{ producto.stock }}" required><br>

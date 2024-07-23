@@ -7,8 +7,8 @@ $(document).ready(function() {
         "ordering": true,   
         "info": true,
         "language": {
-            "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Spanish.json" // Traducción al español
-        }
+            url: "//cdn.datatables.net/plug-ins/2.1.0/i18n/es-MX.json",
+        },
     });
 
     // Filtro personalizado para categorías

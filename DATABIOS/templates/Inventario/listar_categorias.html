@@ -53,12 +53,22 @@ Lista de Categorias
 -->
 </div>
 <!-- Dialog para Crear Categorias -->
-<dialog id="DiaInvCatCrear">
-  <div class="top_edit_from_bar">
-    <span>Crear Categoria</span>
-    <i class="fas fa-times" id="closeInvCatCrear"></i>
+<!-- Platilla de los dialogs -->
+<dialog id="viewPermisos"> <!-- CAMBIAR ID DEL DIALOG -->
+  <div class="top_bar_myDialog" style="width: 500px;"> <!-- CAMBIAR STYLE (solo el width) -->
+      <span class="tittle"></span> <!-- INSERTAR TITULO AQUI -->
+      <i class="fas fa-times close_myDialog" id="closeViewPermisos"></i> <!-- BOTON DE CERRADO, CAMBIAR ID -->
   </div>
-  <div class="top_edit_from_bar">
+  <div class="content_myDialog" style="width: 500px;height: 40vh;">  <!-- CAMBIAR STYLE (width y height (en vh)) -->
+
+  </div>
+</dialog>
+<dialog id="DiaInvCatCrear">
+  <div class="top_bar_myDialog" style="width: 500px;">
+    <span class="tittle">Crear Categoria</span>
+    <i class="fas fa-times close_myDialog" id="closeInvCatCrear"></i>
+  </div>
+  <div class="content_myDialog" style="width: 500px;height: 40vh;">
     <form method="post" action="{% url 'crear_categoria' %}">
       {% csrf_token %}
       <label for="nombre_Cat_C">Nombre:</label>
@@ -76,11 +86,11 @@ Lista de Categorias
 </dialog>
 <!-- Dialog para editar Categorias-->
 <dialog id="DiaInvCatEdit">
-  <div class="top_edit_from_bar">
-    <span>Editar Categoria</span>
-    <i class="fas fa-times" id="closeInvCatEdit"></i>
+  <div class="top_bar_myDialog" style="width: 600px;">
+    <span class="tittle">Editar Categoria</span>
+    <i class="fas fa-times close_myDialog" id="closeInvCatEdit"></i>
   </div>
-  <div class="top_edit_from_bar">
+  <div class="content_myDialog" style="width: 500px;height: 40vh;">
     <form id="editarCatPro__Form" method="post" action="">
       {% csrf_token %}
       <label for="nombre_Cat_E">Nombre:</label>
