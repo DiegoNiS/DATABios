@@ -1,11 +1,12 @@
 <!-- Proyecto/inventario/templates/inventario/listar_categorias.html -->
 {% extends "base.html" %}
+{% load static %}
 {% block title%}
 Lista de Categorias
 {% endblock %}
 {% block content %}
 <div class="content">
-  <a href="{% url 'home' %}"></a>
+  <button type="button" id="openInvCatCrear">Crear Categoria</button>
   <h1>Lista de Categorias</h1>
   <table>
     <thead>
@@ -25,31 +26,90 @@ Lista de Categorias
         <td>{{ categoria.descripcion }}</td>
         <td>{{ categoria.created_at|date:"d M Y H:i" }}</td>
         <td>
-          <ul>
-            <li>
-              <a href="{% url 'modificar_categoria' categoria.id %}">Modificar Categoria</a>
-            </li>
-            <li>
-              <a href="{% url 'eliminar_categoria' categoria.id %}">Eliminar Categoria</a>
-            </li>
-          </ul>
-          <!--
-                    <form action="" method="post">
-                        {% csrf_token %}
-                        <button type="submit" class="delete-button">Eliminar</button>
-                    </form>
-                  -->
+          <button type="button" class="deleteCatPro-button" data-categoria-id="{{ categoria.id }}">
+            <i class="fas fa-trash"></i>
+          </button>
+          <!-- Form oculto ?-->
+          <form method="POST" action="" id="deleteCatForm">
+            {% csrf_token %}
+          </form>
+          <!-- Form oculto para eliminar categorias -->
+          <div class="separator"></div>
+          <button type="button" class="editCatPro-button" data-categoria-id="{{ categoria.id }}"
+            data-categoria-nombre="{{ categoria.nombre }}" data-categoria-descripcion="{{ categoria.descripcion }}">
+            <i class="fas fa-pencil-alt"></i>
+          </button>
         </td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
+
   <!--
 <div class="actions">
   <a href="" class="btn export-btn">Crear Excel</a>
   <a href="" class="btn add-btn">Agregar Venta</a>
 </div>
 -->
-  <a href="{% url 'crear_categoria' %}">Crear Categoria</a>
 </div>
+<!-- Dialog para Crear Categorias -->
+<!-- Platilla de los dialogs -->
+<dialog id="viewPermisos"> <!-- CAMBIAR ID DEL DIALOG -->
+  <div class="top_bar_myDialog" style="width: 500px;"> <!-- CAMBIAR STYLE (solo el width) -->
+      <span class="tittle"></span> <!-- INSERTAR TITULO AQUI -->
+      <i class="fas fa-times close_myDialog" id="closeViewPermisos"></i> <!-- BOTON DE CERRADO, CAMBIAR ID -->
+  </div>
+  <div class="content_myDialog" style="width: 500px;height: 40vh;">  <!-- CAMBIAR STYLE (width y height (en vh)) -->
+
+  </div>
+</dialog>
+<dialog id="DiaInvCatCrear">
+  <div class="top_bar_myDialog" style="width: 500px;">
+    <span class="tittle">Crear Categoria</span>
+    <i class="fas fa-times close_myDialog" id="closeInvCatCrear"></i>
+  </div>
+  <div class="content_myDialog" style="width: 500px;height: 40vh;">
+    <form method="post" action="{% url 'crear_categoria' %}">
+      {% csrf_token %}
+      <label for="nombre_Cat_C">Nombre:</label>
+      <input type="text" id="nombre_Cat_C" name="nombre_Cat_C" required><br>
+
+      <label for="descripcion_Cat_C">Descripción:</label>
+      <textarea id="descripcion_Cat_C" name="descripcion_Cat_C" rows="4" cols="50"></textarea><br>
+
+      <div class="buttons_container_add_form" id="cancelInvCatCrear">
+        <button type="button">Cancelar</button>
+        <button type="submit">Guardar</button>
+      </div>
+    </form>
+  </div>
+</dialog>
+<!-- Dialog para editar Categorias-->
+<dialog id="DiaInvCatEdit">
+  <div class="top_bar_myDialog" style="width: 600px;">
+    <span class="tittle">Editar Categoria</span>
+    <i class="fas fa-times close_myDialog" id="closeInvCatEdit"></i>
+  </div>
+  <div class="content_myDialog" style="width: 500px;height: 40vh;">
+    <form id="editarCatPro__Form" method="post" action="">
+      {% csrf_token %}
+      <label for="nombre_Cat_E">Nombre:</label>
+      <input type="text" id="nombre_Cat_E" name="nombre_Cat_E" required><br>
+
+      <label for="descripcion_Cat_E">Descripción:</label>
+      <textarea id="descripcion_Cat_E" name="descripcion_Cat_E" rows="4" cols="50"></textarea><br>
+
+      <div class="buttons_container_edit_form" id="cancelButtonEdit">
+        <button type="button" id="cancelInvCatEdit">Cancelar</button>
+        <button type="submit">
+          <i class="fas fa-pencil-alt"></i>
+          <span>Editar</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</dialog>
+{% endblock %}
+{% block scripts %}
+<script src="{% static 'js/Inventario/dialogInventarioCategoria.js' %}"></script>
 {% endblock %}

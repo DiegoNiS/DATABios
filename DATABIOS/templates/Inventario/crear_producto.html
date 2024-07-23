@@ -6,15 +6,23 @@
   <h1>Crear Producto</h1>
   <form method="post">
     {% csrf_token %}
-    {% csrf_token %}
     <label for="nombre_Prod_C">Nombre:</label>
     <input type="text" id="nombre_Prod_C" name="nombre_Prod_C" required><br>
     
-    <label for="categorias_Prod_C">Categorías:</label> <br>
-    {% for categoria in categorias %}
-    <input type="checkbox" id="categoria_{{ categoria.id }}" name="categorias_Prod_C" value="{{ categoria.id }}">
-    <label for="categoria_{{ categoria.id }}">{{ categoria.nombre }}</label><br>
-    {% endfor %}
+    <label for="categorias_Prod_C">Categorías:</label>
+    <select id="categorias_Prod_C" name="categorias_Prod_C" multiple required>
+      {% for categoria in categorias %}
+        <option value="{{ categoria.id }}">{{ categoria.nombre }}</option>
+      {% endfor %}
+    </select><br>
+
+    <label for="proveedor_Prod_C">Proveedor:</label>
+    <select id="proveedor_Prod_C" name="proveedor_Prod_C" required>
+      <option>Seleccionar Proveedor</option>
+      {% for proveedor in proveedores %}
+        <option value="{{ proveedor.id }}">{{ proveedor.nombre }}</option>
+      {% endfor %}
+    </select><br>
 
     <label for="stock_Prod_C">Stock:</label>
     <input type="number" id="stock_Prod_C" name="stock_Prod_C" min="0" required><br>

@@ -20,8 +20,8 @@ from django.db import transaction, IntegrityError, DatabaseError
 @login_required
 def listar_productos(request):
     productos = Producto.objects.all().order_by('id')
-    categorias = Categoria.objects.all()
-
+    categorias = Categoria.objects.all().order_by('id')
+    proveedores = Proveedores.objects.all().order_by('id')
     # Obtener parámetros GET para filtrar
     categoria_id = request.GET.get('filtro_categoria')
     precio_min = request.GET.get('filtro_precio_min')
@@ -42,6 +42,7 @@ def listar_productos(request):
     return render(request, 'Inventario/listar_productos.html', {
         'productos': productos,
         'categorias': categorias,
+        'proveedores': proveedores,
     })
 
 # !!!!?
@@ -56,12 +57,14 @@ def detalle_producto(request, pk):
     }
     return JsonResponse(data)
 # Validadar errores formulario producto
-def validar_datos_producto(nombre, categorias_ids, stock, precio_compra, precio_venta, stock_min, stock_max):
+def validar_datos_producto(nombre, categorias_ids, proveedor_id, stock, precio_compra, precio_venta, stock_min, stock_max):
     errores = []
     if not nombre:
         errores.append('El campo nombre es obligatorio.')
     if not categorias_ids:
         errores.append('Debe seleccionar al menos una categoría.')
+    if not proveedor_id:
+        errores.append('Debe de seleccionar un un proveedor')
     if not stock or int(stock) <= 0:
         errores.append('El campo stock debe ser mayor que cero.')
     if not precio_compra or float(precio_compra) <= 0:
@@ -80,9 +83,11 @@ def validar_datos_producto(nombre, categorias_ids, stock, precio_compra, precio_
 @permisos_para(lambda u:u.id_permisos.inventario_pro_CUD)
 def crear_producto(request):
     categorias = Categoria.objects.all().order_by('id')
+    proveedores = Proveedores.objects.all().order_by('id') 
     if request.method == 'POST':
         nombre_Prod_C = request.POST.get('nombre_Prod_C')
         categorias_ids_Prod_C = request.POST.getlist('categorias_Prod_C')
+        proveedor_id_Prod_C = request.POST.get('proveedor_Prod_C')
         stock_Prod_C = request.POST.get('stock_Prod_C')
         precio_compra_Prod_C = request.POST.get('precio_compra_Prod_C')
         precio_venta_Prod_C = request.POST.get('precio_venta_Prod_C')
@@ -90,13 +95,14 @@ def crear_producto(request):
         stock_max_Prod_C = request.POST.get('stock_max_Prod_C')
         
         # Validaciones manuales
-        errores = validar_datos_producto(nombre_Prod_C, categorias_ids_Prod_C, stock_Prod_C, precio_compra_Prod_C, precio_venta_Prod_C, stock_min_Prod_C, stock_max_Prod_C)
+        errores = validar_datos_producto(nombre_Prod_C, categorias_ids_Prod_C, proveedor_id_Prod_C, stock_Prod_C, precio_compra_Prod_C, precio_venta_Prod_C, stock_min_Prod_C, stock_max_Prod_C)
         
         if not errores:
             try:
                 with transaction.atomic(): # Agregar por transaccion
                     producto = Producto(
                         nombre = nombre_Prod_C,
+                        proveedor_id=proveedor_id_Prod_C,
                         stock = stock_Prod_C,
                         precio_compra = precio_compra_Prod_C,
                         precio_venta = precio_venta_Prod_C,
@@ -118,7 +124,7 @@ def crear_producto(request):
     else:
         form = ProductoForm()
 
-    return render(request, 'Inventario/crear_producto.html', {'categorias': categorias})
+    return render(request, 'Inventario/crear_producto.html', {'categorias': categorias, 'proveedores': proveedores})
 
 # Vista para editar un producto
 @permisos_para(lambda u: u.id_permisos.inventario_pro_CUD)
@@ -126,10 +132,12 @@ def editar_producto(request, pk):
     try:
         producto = get_object_or_404(Producto, pk=pk)
         categorias = Categoria.objects.all().order_by('id')
+        proveedores = Proveedores.objects.all().order_by('id')
         if request.method == 'POST':
             # Recuperar los datos enviados en el formulario
             nombre_Prod_E = request.POST.get('nombre_Prod_E')
             categorias_ids_Prod_E = request.POST.getlist('categorias_Prod_E')
+            proveedor_id_Prod_E = request.POST.get('proveedor_Prod_E')
             stock_Prod_E = request.POST.get('stock_Prod_E')
             precio_compra_Prod_E = request.POST.get('precio_compra_Prod_E')
             precio_venta_Prod_E = request.POST.get('precio_venta_Prod_E')
@@ -137,37 +145,45 @@ def editar_producto(request, pk):
             stock_max_Prod_E = request.POST.get('stock_max_Prod_E')
 
             # Validar los datos
-            errores = validar_datos_producto(nombre_Prod_E, categorias_ids_Prod_E, stock_Prod_E, precio_compra_Prod_E, precio_venta_Prod_E, stock_min_Prod_E, stock_max_Prod_E)
+            errores = validar_datos_producto(nombre_Prod_E, categorias_ids_Prod_E, proveedor_id_Prod_E, stock_Prod_E, precio_compra_Prod_E, precio_venta_Prod_E, stock_min_Prod_E, stock_max_Prod_E)
 
             if not errores:
                 try:
                     with transaction.atomic():
                         producto.nombre = nombre_Prod_E
+                        producto.proveedor = proveedor_id_Prod_E
                         producto.stock = stock_Prod_E  # Cambiado para corregir la asignación
                         producto.precio_compra = precio_compra_Prod_E
                         producto.precio_venta = precio_venta_Prod_E
                         producto.stock_min = stock_min_Prod_E
                         producto.stock_max = stock_max_Prod_E
+                        print(producto.nombre)
+                        print("antes de clean")
                         producto.clean()  # Llamar a las validaciones del modelo
+                        print("Despues del clean")
                         producto.save()
                         producto.categorias.set(categorias_ids_Prod_E)
                         messages.success(request, 'Producto modificado exitosamente.')
                         return redirect('listar_productos')
                 except ValidationError as e:
                     messages.error(request, f'Error de validación: {e}')
+                    print("Error de validadcion")
                 except IntegrityError as e:
                     messages.error(request, f'Error de integridad: {e}')
+                    print("Error de Integridad")
                 except DatabaseError as e:
                     messages.error(request, f'Error de base de datos: {e}')
+                    print("Error de base de datos")
                 except Exception as e:
                     messages.error(request, f'Ocurrió un error inesperado: {e}')
+                    print("Otro error")
             else:
                 for error in errores:
                     messages.error(request, error)
-        else:            
-            form = {
-                'categorias': producto.categorias.values_list('id', flat=True),
-            }
+                    
+        form = {
+            'categorias': producto.categorias.values_list('id', flat=True),
+        }
             
     except Producto.DoesNotExist:
         messages.error(request, 'El producto no existe.')
@@ -175,7 +191,7 @@ def editar_producto(request, pk):
     except Exception as e:
         messages.error(request, f'Ha ocurrido un error: {str(e)}')
         return redirect('listar_productos')
-    return render(request, 'Inventario/editar_producto.html', {'form': form, 'producto': producto, 'categorias': categorias})
+    return render(request, 'Inventario/editar_producto.html', {'form': form, 'producto': producto, 'categorias': categorias, 'proveedores': proveedores})
 
 
 # Vista para eliminar un producto
@@ -340,8 +356,8 @@ def eliminar_categoria(request, pk):
                 return redirect('listar_categorias')
         except Exception as e:
             messages.error(request, f'Ocurrió un error al eliminar la categoría: {e}')
-
-    return render(request, 'Inventario/eliminar_categoria.html', {'categoria': categoria})
+    return redirect('eliminar_categoria')
+    #return render(request, 'Inventario/eliminar_categoria.html', {'categoria': categoria})
 
 @login_required
 def listar_pedidos(request):

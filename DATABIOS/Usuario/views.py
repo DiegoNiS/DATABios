@@ -13,7 +13,7 @@ from django.contrib.auth.hashers import make_password
 User = get_user_model()
 
 #@permisos_para(lambda u: u.is_superuser)
-@permisos_para(lambda u: u.categoria == 'Administrador')
+@permisos_para(lambda u: u.categoria == 'Administrador' or u.is_superuser)
 def list_usuarios(request):
     usuarios = User.objects.all().order_by('id')
     return render(request, 'lista_usuarios.html', {
@@ -22,7 +22,7 @@ def list_usuarios(request):
         'grupos_usuario': request.user.categoria
     })
 
-@permisos_para(lambda u: u.categoria == 'Administrador')
+@permisos_para(lambda u: u.categoria == 'Administrador' or u.is_superuser)
 def agregar_usuario(request):
     if request.method == 'POST':
         username = request.POST['username']
@@ -45,7 +45,7 @@ def agregar_usuario(request):
         messages.success(request, "Usuario agregado correctamente.")
         return redirect('lista_usuarios')
     
-@permisos_para(lambda u: u.categoria == 'Administrador')
+@permisos_para(lambda u: u.categoria == 'Administrador' or u.is_superuser)
 def eliminar_usuario(request, usuario_id): # TODO si uno es administrador puede eliminarse a si mismo ,y seo no edberia
     usuario = get_object_or_404(Usuario, id=usuario_id)
     if request.user == usuario:
@@ -73,7 +73,7 @@ def cerrar_sesion(request):
     logout(request)
     return redirect(reverse('login'))
 
-@permisos_para(lambda u: u.categoria == 'Administrador')
+@permisos_para(lambda u: u.categoria == 'Administrador' or u.is_superuser)
 def editar_permisos(request, usuario_id):
     usuario = get_object_or_404(Usuario, id=usuario_id)
     permisos = usuario.id_permisos
@@ -119,38 +119,38 @@ def editar_permisos(request, usuario_id):
         }
         return JsonResponse(permisos_data)
     
-# Max's Creations
+# # Max's Creations
     
-def is_admin(user):
-    return user.groups.filter(name='Administrador').exists()
+# def is_admin(user):
+#     return user.groups.filter(name='Administrador').exists()
 
-# Login view
-# def loginView(request):
-#     crear_grupos()  # Crear grupos si no existen
-#     if request.method == 'POST':
-#         username = request.POST['username']
-#         password = request.POST['password']
+# # Login view
+# # def loginView(request):
+# #     crear_grupos()  # Crear grupos si no existen
+# #     if request.method == 'POST':
+# #         username = request.POST['username']
+# #         password = request.POST['password']
 
-#         user = auth.authenticate(username=username, password=password)
+# #         user = auth.authenticate(username=username, password=password)
 
-#         if user is not None:
-#             auth.login(request, user)
-#             return redirect('home')  # Redirigir al sistema
+# #         if user is not None:
+# #             auth.login(request, user)
+# #             return redirect('home')  # Redirigir al sistema
 
-#         else:
-#             messages.error(request, 'Credenciales inválidas')
-#             return redirect('/')
-#     else:
-#         return render(request, 'login.html')
+# #         else:
+# #             messages.error(request, 'Credenciales inválidas')
+# #             return redirect('/')
+# #     else:
+# #         return render(request, 'login.html')
     
     
-# Vista de Home
-@login_required
-def homeView(request):
-    usuario = request.user
-    grupos_usuario = usuario.groups.values_list('name', flat=True)
-    context = {
-        'nombre_usuario': usuario.username,
-        'grupos_usuario': list(grupos_usuario)
-    }
-    return render(request, 'home.html', context)
+# # Vista de Home
+# @login_required
+# def homeView(request):
+#     usuario = request.user
+#     grupos_usuario = usuario.groups.values_list('name', flat=True)
+#     context = {
+#         'nombre_usuario': usuario.username,
+#         'grupos_usuario': list(grupos_usuario)
+#     }
+#     return render(request, 'home.html', context)
