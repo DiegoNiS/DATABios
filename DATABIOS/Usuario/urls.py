@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import homeView, logout, list_usuarios, agregar_usuario, inicio_sesion, cerrar_sesion, eliminar_usuario, editar_permisos
+from .views import list_usuarios, agregar_usuario, inicio_sesion, cerrar_sesion, eliminar_usuario, editar_permisos
 
 urlpatterns = [
     path('', inicio_sesion, name='login'),
@@ -9,6 +9,6 @@ urlpatterns = [
     path('editar_permisos/<int:usuario_id>/', editar_permisos, name='editar_permisos'),
     path('logout/', cerrar_sesion, name='logout'),
     #path('max', loginView, name='loginM'),  # Login es la primera ruta
-    path('logout/', logout, name='logoutM'),
+    # path('logout/', logout, name='logoutM'),
 ]
 
