@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Chart 1: doughnut
     let original_labels = ['Producto1' + space, 'Producto2', 'Producto3', 'Producto4', 'Producto5' + space];
     let changed_labels = original_labels;
-    let original_data = [18, 12, 11, 9, 6];
+    let original_data = [98, 12, 11, 9, 6];
     let changed_data = original_data;
 
     const selectProduct = document.getElementById('categories');

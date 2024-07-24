@@ -36,7 +36,7 @@ Lista de Categorias
           <!-- Form oculto para eliminar categorias -->
           <div class="separator"></div>
           <button type="button" class="editCatPro-button" data-categoria-id="{{ categoria.id }}"
-            data-categoria-nombre="{{ categoria.nombre }}" data-categoria-descripcion="{{ categoria.descripcion }}">
+          data-categoria-nombre="{{ categoria.nombre }}" data-categoria-descripcion="{{ categoria.descripcion }}">
             <i class="fas fa-pencil-alt"></i>
           </button>
         </td>
@@ -109,6 +109,13 @@ Lista de Categorias
     </form>
   </div>
 </dialog>
+{% if messages %}
+<div id="message-container" style="display: none;">
+    {% for message in messages %}
+        <div data-tag="{{ message.tags }}" data-text="{{ message }}"></div>
+    {% endfor %}
+</div>
+{% endif %}
 {% endblock %}
 {% block scripts %}
 <script src="{% static 'js/Inventario/dialogInventarioCategoria.js' %}"></script>
