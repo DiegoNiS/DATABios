@@ -38,6 +38,8 @@ def listar_productos(request):
             productos = productos.filter(precio_venta__lte=precio_max)
         if estado_stock:
             productos = [p for p in productos if p.estado_stock == estado_stock]
+    else:
+        redirect('listar_productos')
 
     return render(request, 'Inventario/listar_productos.html', {
         'productos': productos,
@@ -129,6 +131,7 @@ def crear_producto(request):
 # Vista para editar un producto
 @permisos_para(lambda u: u.id_permisos.inventario_pro_CUD)
 def editar_producto(request, pk):
+    productos = Producto.objects.all().order_by('id')
     try:
         producto = get_object_or_404(Producto, pk=pk)
         categorias = Categoria.objects.all().order_by('id')
@@ -137,7 +140,8 @@ def editar_producto(request, pk):
             # Recuperar los datos enviados en el formulario
             nombre_Prod_E = request.POST.get('nombre_Prod_E')
             categorias_ids_Prod_E = request.POST.getlist('categorias_Prod_E')
-            proveedor_id_Prod_E = request.POST.get('proveedor_Prod_E')
+            proveedor_id = int(request.POST.get('proveedor_Prod_E'))
+            proveedor_id_Prod_E = get_object_or_404(Proveedores, id=proveedor_id)
             stock_Prod_E = request.POST.get('stock_Prod_E')
             precio_compra_Prod_E = request.POST.get('precio_compra_Prod_E')
             precio_venta_Prod_E = request.POST.get('precio_venta_Prod_E')
@@ -176,7 +180,7 @@ def editar_producto(request, pk):
                     print("Error de base de datos")
                 except Exception as e:
                     messages.error(request, f'Ocurrió un error inesperado: {e}')
-                    print("Otro error")
+                    print("Otro error", e)
             else:
                 for error in errores:
                     messages.error(request, error)
@@ -191,7 +195,7 @@ def editar_producto(request, pk):
     except Exception as e:
         messages.error(request, f'Ha ocurrido un error: {str(e)}')
         return redirect('listar_productos')
-    return render(request, 'Inventario/editar_producto.html', {'form': form, 'producto': producto, 'categorias': categorias, 'proveedores': proveedores})
+    return redirect('listar_productos')
 
 
 # Vista para eliminar un producto
@@ -208,6 +212,7 @@ def eliminar_producto(request, pk):
                 messages.error(request, f'Error de integridad: {e}')
             except DatabaseError as e:
                 messages.error(request, f'Error de base de datos: {e}')
+                print("Error de base de datos: ", e)
             except Exception as e:
                 messages.error(request, f'Ocurrió un error inesperado: {e}')
     except Producto.DoesNotExist:
@@ -216,8 +221,8 @@ def eliminar_producto(request, pk):
     except Exception as e:
         messages.error(request, f'Ha ocurrido un error: {str(e)}')
         return redirect('listar_productos')
-    
-    return render(request, 'Inventario/eliminar_producto.html', {'producto': producto})
+    return redirect('listar_productos')
+    #return render(request, 'Inventario/eliminar_producto.html', {'producto': producto})
 
 
 # Exportar Excel de Productos
@@ -269,6 +274,10 @@ def exportar_productos_excel(request):
 
     return HttpResponse(status=400)
 
+@login_required
+def notificar_stock_bajo():
+    numero = 1
+    # Cuerpo de la funcion
 
 ########### CATEGORIAS ##########
 
