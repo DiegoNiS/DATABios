@@ -84,15 +84,26 @@
     transition: all 0.3s;
     border: none;
 }
-.addButton span{
+.addButton span,
+.excelButton span{
     margin-left: 2px;
     font-size: 15px;
 }
-.addButton:hover {
+.addButton:hover,
+.excelButton:hover {
     background-color: #f5f5f5;
     color: #00044a;
-}
-.addButton:hover {
-    color: #00044a;
     box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+}
+.excelButton {
+    width: 220px;
+    height: 70%;
+    background-color: #179b2d;;
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+    border-radius: 5px;
+    color: #f5f5f5;
+    cursor: pointer;
+    transition: all 0.3s;
+    border: none;
+    margin-left: 13px;
 }
