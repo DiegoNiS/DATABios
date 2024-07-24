@@ -45,6 +45,13 @@ Lista de Productos
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <!--<script src="{% static 'js/Inventario/filterTable.js' %}"></script> -->
+  {% if messages %}
+  <div id="message-container" style="display: none;">
+      {% for message in messages %}
+          <div data-tag="{{ message.tags }}" data-text="{{ message }}"></div>
+      {% endfor %}
+  </div>
+  {% endif %}
 {% endblock %}
 {% block scripts %}
 <script src="{% static 'js/Inventario/dialogInventarioProducto.js' %}"></script>

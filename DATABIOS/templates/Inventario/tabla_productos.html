@@ -14,7 +14,7 @@
   </thead>
   <tbody>
     {% for producto in productos %}
-    <tr data-producto-id = "{{ producto.id }}">
+    <tr data-producto-id="{{ producto.id }}">
       <td>{{ producto.id }}</td>
       <td>
         <ul>
@@ -29,13 +29,29 @@
       <td> S/. {{ producto.precio_compra }}</td>
       <td> S/. {{ producto.precio_venta}}</td>
       <td>
-        <a href="{% url 'editar_producto'  producto.id %}">Editar</a>
-        <a href="{% url 'eliminar_producto' producto.id  %}">Eliminar</a>
-        <select class="accion_producto" data_id="{{ producto.id }}">
-          <option value="">Accion</option>
-          <option value="editar">Editar</option>
-          <option value="eliminar">Eliminar</option>
-        </select>
+        <button type="button"class="deleteInvPro-button"
+        data-producto-id="{{ producto.id }}">
+        <i class="fas fa-trash"></i>
+        </button>
+        <!-- Form oculto para eliminar productos-->
+        <form method="POST" action="" id="deleteProForm">
+          {% csrf_token %}
+        </form>
+        <!-- Fin Form oculto para eliminar-->
+        <div class="separator"></div>
+        <!-- BUTTONS PARA EDITAR -->
+        <button type="button" class="openDiaInvProEdit"
+        data-producto-id="{{ producto.id }}"
+        data-producto-nombre="{{ producto.nombre }}"
+        data-producto-categorias="{% for categoria in producto.categorias.all %}{{ categoria.id }}{% if not forloop.last %},{% endif %}{% endfor %}"
+        data-producto-proveedor="{{ producto.proveedor.id }}"
+        data-producto-stock="{{ producto.stock }}"
+        data-producto-precio-C="{{ producto.precio_compra }}"
+        data-producto-precio-V="{{ producto.precio_venta }}"
+        data-producto-stock-min="{{ producto.stock_min }}"
+        data-producto-stock-max="{{ producto.stock_max }}">
+        <i class="fas fa-pencil-alt"></i>
+        </button>
       </td>
     </tr>
     {% endfor %}
@@ -48,13 +64,13 @@
 </form>
 <button type="button" id="openDiaInvProAdd">Agregar Producto</button>
 <script>
-  document.getElementById('exportarForm').addEventListener('submit', function(event) {
-      var productoIds = [];
-      var rows = document.querySelectorAll('tbody tr');
-      rows.forEach(function(row) {
-          productoIds.push(row.getAttribute('data-producto-id'));
-      });
-      document.getElementById('productoIds').value = productoIds.join(',');
+  document.getElementById('exportarForm').addEventListener('submit', function (event) {
+    var productoIds = [];
+    var rows = document.querySelectorAll('tbody tr');
+    rows.forEach(function (row) {
+      productoIds.push(row.getAttribute('data-producto-id'));
+    });
+    document.getElementById('productoIds').value = productoIds.join(',');
   });
 </script>
 <!-- Dialogs-->
@@ -62,67 +78,109 @@
 <dialog id="DiaInvProAdd">
   <div class="top_bar_myDialog" style="width: 600px;">
     <span class="tittle">Agregar Producto</span>
-    <i class="fas fa-times close_myDialog" id="closeDiaInvPraAdd"></i>
-</div>
-<div class="content_myDialog" style="width: 600px;height: 60vh;">  
-  <!-- Form crear producto -->
-  <form method="post" action="{% url 'crear_producto' %}">
-    {% csrf_token %}
-    <label for="nombre_Prod_C">Nombre:</label>
-    <input type="text" id="nombre_Prod_C" name="nombre_Prod_C" required><br>
-    
-    <label for="categorias_Prod_C">Categorías:</label>
-    <select id="categorias_Prod_C" name="categorias_Prod_C" multiple required>
-      {% for categoria in categorias %}
+    <i class="fas fa-times close_myDialog" id="closeDiaInvProAdd"></i>
+  </div>
+  <div class="content_myDialog" style="width: 600px;height: 60vh;">
+    <!-- Form crear producto -->
+    <form method="post" action="{% url 'crear_producto' %}">
+      {% csrf_token %}
+      <label for="nombre_Prod_C">Nombre:</label>
+      <input type="text" id="nombre_Prod_C" name="nombre_Prod_C" required><br>
+
+      <label for="categorias_Prod_C">Categorías:</label>
+      <select id="categorias_Prod_C" name="categorias_Prod_C" multiple required>
+        {% for categoria in categorias %}
         <option value="{{ categoria.id }}">{{ categoria.nombre }}</option>
-      {% endfor %}
-    </select><br>
+        {% endfor %}
+      </select><br>
 
-    <label for="proveedor_Prod_C">Proveedor:</label>
-    <select id="proveedor_Prod_C" name="proveedor_Prod_C" required>
-      <option>Seleccionar Proveedor</option>
-      {% for proveedor in proveedores %}
+      <label for="proveedor_Prod_C">Proveedor:</label>
+      <select id="proveedor_Prod_C" name="proveedor_Prod_C" required>
+        <option>Seleccionar Proveedor</option>
+        {% for proveedor in proveedores %}
         <option value="{{ proveedor.id }}">{{ proveedor.nombre }}</option>
-      {% endfor %}
-    </select><br>
+        {% endfor %}
+      </select><br>
 
-    <label for="stock_Prod_C">Stock:</label>
-    <input type="number" id="stock_Prod_C" name="stock_Prod_C" min="0" required><br>
+      <label for="stock_Prod_C">Stock:</label>
+      <input type="number" id="stock_Prod_C" name="stock_Prod_C" min="0" required><br>
 
-    <label for="precio_compra_Prod_C">Precio Compra:</label>
-    <input type="number" id="precio_compra_Prod_C" name="precio_compra_Prod_C" min="0" step="0.01" required><br>
+      <label for="precio_compra_Prod_C">Precio Compra:</label>
+      <input type="number" id="precio_compra_Prod_C" name="precio_compra_Prod_C" min="0" step="0.01" required><br>
 
-    <label for="precio_venta_Prod_C">Precio Venta:</label>
-    <input type="number" id="precio_venta_Prod_C" name="precio_venta_Prod_C" min="0" step="0.01" required><br>
+      <label for="precio_venta_Prod_C">Precio Venta:</label>
+      <input type="number" id="precio_venta_Prod_C" name="precio_venta_Prod_C" min="0" step="0.01" required><br>
 
-    <label for="stock_min_Prod_C">Stock Mínimo:</label>
-    <input type="number" id="stock_min_Prod_C" name="stock_min_Prod_C" min="0" value="10" required><br>
+      <label for="stock_min_Prod_C">Stock Mínimo:</label>
+      <input type="number" id="stock_min_Prod_C" name="stock_min_Prod_C" min="0" value="10" required><br>
 
-    <label for="stock_max_Prod_C">Stock Máximo:</label>
-    <input type="number" id="stock_max_Prod_C" name="stock_max_Prod_C" min="0" value="20" required><br>
+      <label for="stock_max_Prod_C">Stock Máximo:</label>
+      <input type="number" id="stock_max_Prod_C" name="stock_max_Prod_C" min="0" value="20" required><br>
 
-    <div class="buttons_container_add_form" id="cancelDiaInvProAdd">
-      <button type="button">Cancelar</button>
-      <button type="submit">Guardar</button>
-    </div>
-  </form>
-</div>
+      <div class="buttons_container_add_form" id="cancelDiaInvProAdd">
+        <button type="button">Cancelar</button>
+        <button type="submit">Guardar</button>
+      </div>
+    </form>
+  </div>
 </dialog>
+
 <!-- DIALOG EDITAR PRODUCTO -->
-<dialog id="editarProductoDialog">
-  <form method="dialog">
-      <h2>Editar Producto</h2>
-      <label for="editarNombreProducto">Nombre:</label>
-      <input type="text" id="editarNombreProducto">
-      <label for="editarStockProducto">Stock:</label>
-      <input type="number" id="editarStockProducto">
-      <label for="editarPrecioCompraProducto">Precio de Compra:</label>
-      <input type="number" step="0.01" id="editarPrecioCompraProducto">
-      <label for="editarPrecioVentaProducto">Precio de Venta:</label>
-      <input type="number" step="0.01" id="editarPrecioVentaProducto">
-      <button type="submit">Guardar</button>
-      <button type="button" id="cancelarEditarProducto">Cancelar</button>
-  </form>
+<dialog id="DiaInvProEdit">
+  <div class="top_bar_myDialog" style="width: 600px;">
+    <span class="tittle">Editar Producto</span>
+    <i class="fas fa-times close_myDialog" id="closeDiaInvProEdit"></i>
+  </div>
+  <div class="content_myDialog" style="width: 500px;height: 40vh;">
+    <form id="editarPro__Form" method="post" action="">
+      {% csrf_token %}
+      <label for="nombre_Prod_E">Nombre:</label>
+      <input type="text" id="nombre_Prod_E" name="nombre_Prod_E" required><br>
+
+      <label for="categorias_Prod_E">Categorías:</label>
+      <select id="categorias_Prod_E" name="categorias_Prod_E" multiple required>
+        {% for categoria in categorias %}
+        <option value="{{ categoria.id }}" {% if categoria in producto.categorias.all %}selected{% endif %}>
+          {{ categoria.nombre }}
+        </option>
+        {% endfor %}
+      </select><br>
+
+      <label for="proveedor_Prod_E">Proveedor:</label>
+      <select id="proveedor_Prod_E" name="proveedor_Prod_E" required>
+        {% for proveedor in proveedores %}
+        <option value="{{ proveedor.id }}">
+          {{ proveedor.nombre }}
+        </option>
+        {% endfor %}
+      </select><br>
+
+      <label for="stock_Prod_E">Stock:</label>
+      <input type="number" id="stock_Prod_E" name="stock_Prod_E" required><br>
+
+      <label for="precio_compra_Prod_E">Precio Compra:</label>
+      <input type="number" id="precio_compra_Prod_E" name="precio_compra_Prod_E" step="0.01"
+        precioC="{{ producto.precio_compra }}" required><br>
+
+      <label for="precio_venta_Prod_E">Precio Venta:</label>
+      <input type="number" id="precio_venta_Prod_E" name="precio_venta_Prod_E" step="0.01"
+        precioV="{{ producto.precio_venta }}" required><br>
+
+      <label for="stock_min_Prod_E">Stock Mínimo:</label>
+      <input type="number" id="stock_min_Prod_E" name="stock_min_Prod_E" required><br>
+
+      <label for="stock_max_Prod_E">Stock Máximo:</label>
+      <input type="number" id="stock_max_Prod_E" name="stock_max_Prod_E" required><br>
+
+      <div class="buttons_container_edit_form" id="cancelDiaInvProEdit">
+        <button type="button" id="cancelButtonProEdit">Cancelar</button>
+        <button type="submit">
+          <i class="fas fa-pencil-alt"></i>
+          <span>Editar</span>
+        </button>
+      </div>
+    </form>
+  </div>
 </dialog>
 <!--
 <dialog id="eliminarProductoDialog">
