@@ -125,13 +125,11 @@ def crear_producto(request):
             except Exception as e:
                 messages.error(request, f'Ocurrió un error inesperado: {e}')
         else:
-            messages.error(request, 'Por favor, corrija los errores en el formulario.')
-    else:
-        for error in errores:
-            messages.error(request, error)
+            for error in errores:
+                messages.error(request, error)
         form = ProductoForm()
 
-    return render(request, 'Inventario/crear_producto.html', {'categorias': categorias, 'proveedores': proveedores})
+    return redirect('listar_productos')
 
 # Vista para editar un producto
 @permisos_para(lambda u: u.id_permisos.inventario_pro_CUD)
@@ -348,6 +346,18 @@ def listar_categorias(request):
     categorias = Categoria.objects.all().order_by('id')
     return render(request, 'Inventario/listar_categorias.html', {'categorias': categorias})
 
+
+def validar_datos_categoria(nombre, descripcion):
+    errores = []
+    if not nombre:
+        errores.append('El campo nombre es obligatorio.')
+    if not descripcion:
+        errores.append('Debe agregar una descripcion a la categoria.')
+    if len(descripcion) > 500:
+        errores.append('La Descripcion no puede ser mayor a 500 letras.')
+    print(errores)
+    return errores
+
 # Vista para crear una nueva categoría
 @permisos_para(lambda u: u.id_permisos.inventario_cat_CUD)
 def crear_categoria(request):
@@ -355,63 +365,72 @@ def crear_categoria(request):
         nombre_Cat_C = request.POST.get('nombre_Cat_C')
         descripcion_Cat_C = request.POST.get('descripcion_Cat_C')
 
-        try:
-            with transaction.atomic():
-                categoria = Categoria(
-                    nombre=nombre_Cat_C, 
-                    descripcion=descripcion_Cat_C
-                )
-                categoria.save()
-                messages.success(request, 'Categoría creada exitosamente.')
-                return redirect('listar_categorias')
-        except ValidationError as e:
-            messages.error(request, f'Error de validación al crear la categoría: {e}')
-        except IntegrityError as e:
-            messages.error(request, f'Error de integridad al crear la categoría: {e}')
-        except DatabaseError as e:
-            messages.error(request, f'Error de base de datos al crear la categoría: {e}')
-        except Exception as e:
-            messages.error(request, f'Ocurrió un error inesperado al crear la categoría: {e}')
+        errores = validar_datos_categoria(nombre_Cat_C, descripcion_Cat_C)
+        if not errores:
+            try:
+                with transaction.atomic():
+                    categoria = Categoria(
+                        nombre=nombre_Cat_C, 
+                        descripcion=descripcion_Cat_C
+                    )
+                    categoria.save()
+                    messages.success(request, 'Categoría creada exitosamente.')
+                    return redirect('listar_categorias')
+            except ValidationError as e:
+                messages.error(request, f'Error de validación al crear la categoría: {e}')
+            except IntegrityError as e:
+                messages.error(request, f'Error de integridad al crear la categoría: {e}')
+            except DatabaseError as e:
+                messages.error(request, f'Error de base de datos al crear la categoría: {e}')
+            except Exception as e:
+                messages.error(request, f'Ocurrió un error inesperado al crear la categoría: {e}')
+        else:
+            for error in errores:
+                messages.error(request, error)
 
-    return render(request, 'Inventario/crear_categoria.html')
+    return redirect('listar_categorias')
 
 # Vista para editar una categoría
 @permisos_para(lambda u:u.id_permisos.inventario_cat_CUD)
 def editar_categoria(request, pk):
     try:
         categoria = get_object_or_404(Categoria, pk=pk)
-
         if request.method == 'POST':
             nombre_Cat_E = request.POST.get('nombre_Cat_E')
             descripcion_Cat_E = request.POST.get('descripcion_Cat_E')
-
-            try:
-                with transaction.atomic():
-                    categoria.nombre = nombre_Cat_E
-                    categoria.descripcion = descripcion_Cat_E
-                    categoria.save()
-                    messages.success(request, 'Categoría modificada exitosamente.')
-                    return redirect('listar_categorias')
-            except ValidationError as e:
-                messages.error(request, f'Error de validación al modificar la categoría: {e}')
-            except IntegrityError as e:
-                messages.error(request, f'Error de integridad al modificar la categoría: {e}')
-            except DatabaseError as e:
-                messages.error(request, f'Error de base de datos al modificar la categoría: {e}')
-            except Exception as e:
-                messages.error(request, f'Ocurrió un error inesperado al modificar la categoría: {e}')
+            
+            errores = validar_datos_categoria(nombre_Cat_E, descripcion_Cat_E)
+            if not errores:
+                try:
+                    with transaction.atomic():
+                        categoria.nombre = nombre_Cat_E
+                        categoria.descripcion = descripcion_Cat_E
+                        categoria.save()
+                        messages.success(request, 'Categoría modificada exitosamente.')
+                        return redirect('listar_categorias')
+                except ValidationError as e:
+                    messages.error(request, f'Error de validación al modificar la categoría: {e}')
+                except IntegrityError as e:
+                    messages.error(request, f'Error de integridad al modificar la categoría: {e}')
+                except DatabaseError as e:
+                    messages.error(request, f'Error de base de datos al modificar la categoría: {e}')
+                except Exception as e:
+                    messages.error(request, f'Ocurrió un error inesperado al modificar la categoría: {e}')
+            else:
+                for error in errores:
+                        messages.error(request, error)
         else:
             form = {
                 "nombre": categoria.nombre,
                 "descripcion": categoria.descripcion            
             }
     except Categoria.DoesNotExist:
-        messages.error(request, 'El producto no existe.')
+        messages.error(request, 'La categoria no existe.')
         return redirect('listar_categorias')
     except Exception as e:
         messages.error(request, f'Ha ocurrido un error: {str(e)}')
         return redirect('listar_categorias')
-    return render(request, 'Inventario/editar_categoria.html', {'categoria': categoria})
+    return redirect('listar_categorias')
 
 # Vista para eliminar una categoría
 @permisos_para(lambda u: u.id_permisos.inventario_cat_CUD)
@@ -426,7 +445,7 @@ def eliminar_categoria(request, pk):
                 return redirect('listar_categorias')
         except Exception as e:
             messages.error(request, f'Ocurrió un error al eliminar la categoría: {e}')
-    return redirect('eliminar_categoria')
+    return redirect('listar_categorias')
     #return render(request, 'Inventario/eliminar_categoria.html', {'categoria': categoria})
 
 @login_required
