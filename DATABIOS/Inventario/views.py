@@ -66,17 +66,17 @@ def validar_datos_producto(nombre, categorias_ids, proveedor_id, stock, precio_c
     if not categorias_ids:
         errores.append('Debe seleccionar al menos una categoría.')
     if not proveedor_id:
-        errores.append('Debe de seleccionar un un proveedor')
-    if not stock or int(stock) <= 0:
-        errores.append('El campo stock debe ser mayor que cero.')
-    if not precio_compra or float(precio_compra) <= 0:
-        errores.append('El campo precio de compra debe ser mayor que cero.')
-    if not precio_venta or float(precio_venta) <= 0:
-        errores.append('El campo precio de venta debe ser mayor que cero.')
-    if not stock_min or int(stock_min) <= 0:
-        errores.append('El campo stock mínimo debe ser mayor que cero.')
-    if not stock_max or int(stock_max) <= 0:
-        errores.append('El campo stock máximo debe ser mayor que cero.')
+        errores.append('Debe de seleccionar un proveedor')
+    if not stock or int(stock) < 0:
+        errores.append('El campo stock debe ser un numero positivo.')
+    if not precio_compra or float(precio_compra) < 0:
+        errores.append('El campo precio de compra debe ser un numero positivo.')
+    if not precio_venta or float(precio_venta) < 0:
+        errores.append('El campo precio de venta debe ser un numero positivo.')
+    if not stock_min or int(stock_min) < 0:
+        errores.append('El campo stock mínimo debe ser un numero positivo.')
+    if not stock_max or int(stock_max) < 0:
+        errores.append('El campo stock máximo debe ser un numero positivo.')
     if stock_min and stock_max and int(stock_min) > int(stock_max):
         errores.append('El campo stock mínimo no puede ser mayor que el stock máximo.')
     return errores
@@ -114,7 +114,8 @@ def crear_producto(request):
                     producto.save()
                     producto.categorias.set(categorias_ids_Prod_C)
                     messages.success(request, 'Producto creado exitosamente.')
-                    return redirect('listar_productos')
+                alertar_stock_bajo(request, producto.id)    
+                return redirect('listar_productos')
             except IntegrityError as e:
                 messages.error(request, f'Error de integridad: {e}')
             except DatabaseError as e:
@@ -124,6 +125,8 @@ def crear_producto(request):
         else:
             messages.error(request, 'Por favor, corrija los errores en el formulario.')
     else:
+        for error in errores:
+            messages.error(request, error)
         form = ProductoForm()
 
     return render(request, 'Inventario/crear_producto.html', {'categorias': categorias, 'proveedores': proveedores})
@@ -168,7 +171,8 @@ def editar_producto(request, pk):
                         producto.save()
                         producto.categorias.set(categorias_ids_Prod_E)
                         messages.success(request, 'Producto modificado exitosamente.')
-                        return redirect('listar_productos')
+                    alertar_stock_bajo(request, producto.id)
+                    return redirect('listar_productos')
                 except ValidationError as e:
                     messages.error(request, f'Error de validación: {e}')
                     print("Error de validadcion")
@@ -275,9 +279,10 @@ def exportar_productos_excel(request):
     return HttpResponse(status=400)
 
 @login_required
-def notificar_stock_bajo():
-    numero = 1
-    # Cuerpo de la funcion
+def alertar_stock_bajo(request, id):
+    producto = get_object_or_404(Producto, id=id)
+    if producto.estado_stock == 'bajo':
+        messages.warning(request, f"Stock Bajo en: {producto.id} - {producto.nombre}")
 
 ########### CATEGORIAS ##########
 
