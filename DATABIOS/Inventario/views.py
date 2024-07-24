@@ -12,6 +12,8 @@ from .forms import ProductoForm, CategoriaForm, PedidoForm, ActualizarEstadoPedi
 # excel
 import openpyxl
 from io import BytesIO
+from openpyxl.styles import PatternFill, Font, Border, Side, Alignment
+from openpyxl.worksheet.table import Table, TableStyleInfo
 import datetime
 # bd
 from django.db import transaction, IntegrityError, DatabaseError
@@ -239,24 +241,78 @@ def exportar_productos_excel(request):
 
             wb = openpyxl.Workbook()
             ws = wb.active
-            ws.title = 'Productos'
+            ws.title = 'Lista de Productos'
 
             encabezados = ['ID', 'Nombre', 'Categoria', 'Stock', 'Precio Compra', 'Precio Venta', 'Estado Stock']
             ws.append(encabezados)
 
+            # Estilos
+            header_fill = PatternFill(start_color="004080", end_color="004080", fill_type="solid")  # Azul oscuro
+            header_font = Font(bold=True, color="FFFFFF")  # Blanco
+            thin_border = Border(left=Side(style='thin'), 
+                                 right=Side(style='thin'), 
+                                 top=Side(style='thin'), 
+                                 bottom=Side(style='thin'))
+            center_alignment = Alignment(horizontal="center")
+            right_alignment = Alignment(horizontal="right")
+            
+            for cell in ws["1:1"]:
+                cell.fill = header_fill
+                cell.font = header_font
+                cell.border = thin_border
+                cell.alignment = center_alignment
+                
             # Escribir datos
-            for producto in productos:
-                categorias = ', '.join([str(c) for c in producto.categorias.all()])
+            for row in productos:
+                categorias = ', '.join([str(c) for c in row.categorias.all()])
                 ws.append([
-                    producto.id,
-                    producto.nombre,
+                    row.id,
+                    row.nombre,
                     categorias,
-                    producto.stock,
-                    producto.precio_compra,
-                    producto.precio_venta,
-                    producto.estado_stock
+                    row.stock,
+                    row.precio_compra,
+                    row.precio_venta,
+                    row.estado_stock
                 ])
 
+            # Aplicar estilos a todas las celdas de datos
+            for row in ws.iter_rows(min_row=2, max_col=7, max_row=ws.max_row):
+                for cell in row:
+                    cell.border = thin_border
+                    cell.alignment = center_alignment if cell.column <= 3 else right_alignment
+            
+            # Ajustar el ancho de las columnas
+            column_widths = {
+                'A': 10,  # ID
+                'B': 30,  # Nombre
+                'C': 30,  # Categoria
+                'D': 10,  # Stock
+                'E': 15,  # Precio Compra
+                'F': 15,  # Precio Venta
+                'G': 15,  # Estado Stock
+            }
+            for col, width in column_widths.items():
+                ws.column_dimensions[col].width = width
+            
+            # Crear y aplicar el formato de tabla
+            tab = Table(displayName="TablaProductos", ref=f"A1:G{ws.max_row}")
+
+            # Aplicar estilo de tabla
+            tab.tableStyleInfo = TableStyleInfo(
+                name="TableStyleMedium9",  # Estilo de tabla en tonos azules
+                showFirstColumn=False, 
+                showLastColumn=False,
+                showRowStripes=True, 
+                showColumnStripes=True
+            )
+
+            ws.add_table(tab)
+            
+            # Ajustar texto en toda la tabla
+            for row in ws.iter_rows(min_row=1, max_col=7, max_row=ws.max_row):
+                for cell in row:
+                    cell.alignment = cell.alignment.copy(wrap_text=True)
+                    
             # Guardar el archivo en memoria
             archivo = BytesIO()
             wb.save(archivo)
