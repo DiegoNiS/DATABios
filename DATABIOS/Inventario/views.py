@@ -21,7 +21,7 @@ from django.db import transaction, IntegrityError, DatabaseError
 # Vista para listar productos (para vendedor y administrador)    
 @login_required
 def listar_productos(request):
-    productos = Producto.objects.all().order_by('id')
+    productos = Producto.objects.filter(estado_registro='A').order_by('id')
     categorias = Categoria.objects.all().order_by('id')
     proveedores = Proveedores.objects.all().order_by('id')
     # Obtener parámetros GET para filtrar
@@ -209,7 +209,8 @@ def eliminar_producto(request, pk):
         producto = get_object_or_404(Producto, pk=pk)
         if request.method == 'POST':
             try:
-                producto.delete()
+                producto.estado_registro = '*'
+                producto.save()
                 messages.success(request, 'Producto eliminado exitosamente.')
                 return redirect('listar_productos')
             except IntegrityError as e:
