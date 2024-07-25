@@ -15,12 +15,16 @@
 <div class="form_filter" id="my_form_filter">
     <button class="addButton" id="openAdd">
         <i class="fas fa-plus-circle"></i>
-        <span>Agregar usuario.</span>
+        <span>Agregar proveedor</span>
     </button>
-    <button class="excelButton" id="excelButton">
-        <i class="fas fa-file-excel"></i>
-        <span>Crear excel</span>
-    </button>
+    <form id="exportarForm" method="POST" action="{% url 'exportar_proveedores_excel'%}">
+        {% csrf_token %}
+        <input type="hidden" name="proveedoresIds" id="proveedoresIds">
+        <button class="excelButton" id="excelButton">
+            <i class="fas fa-file-excel"></i>
+            <span>Crear excel</span>
+        </button>
+    </form>
 </div>
 <table id="myTable" class="table display">
     <thead>
@@ -31,27 +35,25 @@
             <th>Teléfono</th>
             <th>Fecha de creacion</th>
             <th>Acción</th>
-         </tr>
+        </tr>
     </thead>
     <tbody>
         {% for proveedores in listar_proveedores %}
-        <tr>
+        <tr data-proveedor-id = "{{ proveedores.id }}">
             <td>{{ proveedores.id }}</td>
             <td>{{ proveedores.nombre }}</td>
             <td>{{ proveedores.ruc }}</td>
             <td>{{ proveedores.telefono }}</td>
             <td>{{ proveedores.fecha_creacion }}</td>
-            
+
             <td>
                 <div class="flex_cont">
                     <button type="button" class="delete_button openDelete" data-usuario-id="{{ proveedores.id }}">
                         <i class="fas fa-trash"></i>
                     </button>
-                    <div class="separator" ></div>
-                    <button type="button" class="edit_button openEdit" 
-                        data-id="{{ proveedores.id }}"
-                        data-nombre="{{ proveedores.nombre }}"
-                        data-ruc="{{ proveedores.ruc }}"
+                    <div class="separator"></div>
+                    <button type="button" class="edit_button openEdit" data-id="{{ proveedores.id }}"
+                        data-nombre="{{ proveedores.nombre }}" data-ruc="{{ proveedores.ruc }}"
                         data-telefono="{{ proveedores.telefono }}">
                         <i class="fas fa-pencil-alt"></i>
                     </button>
@@ -62,6 +64,18 @@
     </tbody>
 </table>
 
+<script>
+    document.getElementById('exportarForm').addEventListener('submit', function (event) {
+        var proveedoresIds = [];
+        var rows = document.querySelectorAll('tbody tr');
+        rows.forEach(function (row) {
+            proveedoresIds.push(row.getAttribute('data-proveedor-id'));
+        });
+        console.log(proveedoresIds);
+        document.getElementById('proveedoresIds').value = proveedoresIds.join(',');
+    });
+</script>
+
 <dialog id="addProveedores"> <!-- CAMBIAR ID DEL DIALOG -->
     <div class="top_bar_myDialog" style="width: 500px;"> <!-- CAMBIAR STYLE (solo el width) -->
         <span class="tittle">
@@ -70,8 +84,8 @@
         </span> <!-- INSERTAR TITULO AQUI -->
         <i class="fas fa-times close_myDialog" id="closeAdd"></i> <!-- BOTON DE CERRADO, CAMBIAR ID -->
     </div>
-    <div class="content_myDialog" style="width: 500px;height: 27vh;">  <!-- CAMBIAR STYLE (width y height (en vh)) -->
-        <form  id="editForm" action="{% url 'crear_proveedores' %}" method="POST">
+    <div class="content_myDialog" style="width: 500px;height: 27vh;"> <!-- CAMBIAR STYLE (width y height (en vh)) -->
+        <form id="editForm" action="{% url 'crear_proveedores' %}" method="POST">
             {% csrf_token %}
             <label for="id_nombre">Nombre:</label>
             <input type="text" name="nombre" maxlength="100" required id="id_nombre">
@@ -95,8 +109,8 @@
         </span> <!-- INSERTAR TITULO AQUI -->
         <i class="fas fa-times close_myDialog" id="closeEdit"></i> <!-- BOTON DE CERRADO, CAMBIAR ID -->
     </div>
-    <div class="content_myDialog" style="width: 500px;height: 27vh;">  <!-- CAMBIAR STYLE (width y height (en vh)) -->
-        <form action="">
+    <div class="content_myDialog" style="width: 500px;height: 27vh;"> <!-- CAMBIAR STYLE (width y height (en vh)) -->
+        <form method="post" id="formProv_Edit" action="">
             {% csrf_token %}
             <label for="id_nombre_edit">Nombre:</label>
             <input type="text" name="nombre" maxlength="100" required id="id_nombre_edit">
@@ -111,9 +125,12 @@
         </form>
     </div>
 </dialog>
+<form method="POST" id="formProv_Delete">
+    {% csrf_token %}
+</form>
 {% endblock %}
 
 
 {% block scripts %}
-    <script src="{% static 'js/dialog/list_proveedores.js' %}"></script>
+<script src="{% static 'js/dialog/list_proveedores.js' %}"></script>
 {% endblock %}

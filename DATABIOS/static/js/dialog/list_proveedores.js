@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const openEditButtons = document.querySelectorAll('.openEdit');
     const closeEdit = document.getElementById('closeEdit');
     const cancelEdit = document.getElementById('cancelEdit');
+    const formEdit = document.getElementById('formProv_Edit')
 
     const iptNombre = document.getElementById('id_nombre_edit');
     const iptRuc = document.getElementById('id_ruc_edit');
@@ -38,6 +39,8 @@ document.addEventListener('DOMContentLoaded', function() {
             iptRuc.value = Number(ruc);
             iptTelefono.value = telefono;
 
+            formEdit.action =  `/inventario/proveedor/editar/${Id}/`;
+
             myEditDialog.showModal();
             console.log(Id, nombre, ruc, telefono);
         });
@@ -54,6 +57,8 @@ document.addEventListener('DOMContentLoaded', function() {
     openDeleteButtons.forEach(button => {
         button.addEventListener('click', function() {
             const userId = this.getAttribute('data-usuario-id');
+            const deleteProvForm = document.getElementById('formProv_Delete');
+            deleteProvForm.action = `/inventario/proveedor/eliminar/${userId}/`;
             console.log(userId);
             
             Swal.fire({
@@ -68,6 +73,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 cancelButtonText: "Cancelar"
             }).then((result) => {
                 if (result.isConfirmed) {
+                    deleteProvForm.submit();
                     console.log("Confirmado");
                 }
             });
