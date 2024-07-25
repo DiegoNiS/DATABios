@@ -1,4 +1,4 @@
-const Toast = Swal.mixin({
+/*const Toast = Swal.mixin({
     toast: true,
     position: "top-end",
     showConfirmButton: false,
@@ -12,4 +12,4 @@ const Toast = Swal.mixin({
   Toast.fire({
     icon: "success",
     title: "Guardado con éxito."
-  });
+  });*/
