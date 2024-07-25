@@ -8,6 +8,9 @@ from django.contrib import messages
 
 @login_required
 def listar_pedidos(request):
+    pedidos_en_proceso = Pedido.objects.filter(estado='en_proceso')
+    pedidos_entregados = Pedido.objects.filter(estado='entregado')
+
     if request.method == 'POST':
         form = ActualizarEstadoPedidoForm(request.POST)
         if form.is_valid():
@@ -15,13 +18,25 @@ def listar_pedidos(request):
             pedido = get_object_or_404(Pedido, id=pedido_id)
             pedido.estado = form.cleaned_data['estado']
             pedido.save()
-            return redirect('listar_pedidos')  # Asegúrate de que el nombre de tu URL coincida
+            return redirect('listar_pedidos')  # Redirigir después de actualizar estado
     else:
         form = ActualizarEstadoPedidoForm()
     
-    listar_pedidos = Pedido.objects.all()
-    return render(request, 'listar_pedidos.html', {'listar_pedidos': listar_pedidos, 'form': form})
+    return render(request, 'listar_pedidos.html', {
+        'pedidos_en_proceso': pedidos_en_proceso,
+        'pedidos_entregados': pedidos_entregados,
+        'form': form
+    })
+    
+@login_required
+def listar_pedidos_entregados(request):
+    pedidos_entregados = Pedido.objects.filter(estado='entregado')
+    
+    return render(request, 'listar_pedidos_entregados.html', {
+        'pedidos_entregados': pedidos_entregados,
+    })
 
+    
 #@login_required
 def crear_pedidos(request):
     if request.method == 'POST':
@@ -36,3 +51,4 @@ def crear_pedidos(request):
         form = PedidoForm()
     
     return render(request, 'crear_pedidos.html', {'form': form})
+

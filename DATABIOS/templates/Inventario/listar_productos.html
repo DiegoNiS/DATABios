@@ -26,7 +26,7 @@ Productos
 
   <button class="addButton" id="openDiaInvProAdd">
       <i class="fas fa-plus-circle"></i>
-      <span>Agregar categoría</span>
+      <span>Agregar producto</span>
   </button>
   <form id="exportarForm" method="post" action="{% url 'exportar_productos_excel' %}">
     {% csrf_token %}
@@ -171,7 +171,7 @@ Productos
           {% for categoria in categorias %}
           <option value="{{ categoria.id }}">{{ categoria.nombre }}</option>
           {% endfor %}
-        </select><br>
+        </select>
   
         <label for="proveedor_Prod_C">Proveedor:</label>
         <select id="proveedor_Prod_C" name="proveedor_Prod_C" required>
@@ -179,7 +179,7 @@ Productos
           {% for proveedor in proveedores %}
           <option value="{{ proveedor.id }}">{{ proveedor.nombre }}</option>
           {% endfor %}
-        </select><br>
+        </select>
   
         <label for="stock_Prod_C">Stock:</label>
         <input type="number" id="stock_Prod_C" name="stock_Prod_C" min="0" required><br>

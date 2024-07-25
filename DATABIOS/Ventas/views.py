@@ -15,9 +15,10 @@ def ventas_list(request):
         messages.error(request, 'No tienes permiso para acceder a esta página.')
         return redirect('home')  # Asume que tienes una vista 'home'
     
-    ventas = Venta.objects.all().order_by('-fecha_creacion')
-    usuarios = Usuario.objects.all()
-    return render(request, 'ventas/ventas_list.html', {'ventas': ventas, 'usuarios': usuarios, 'productos': productos})
+    venta = Venta.objects.all().order_by('-fecha_creacion')
+    producto =  Producto.objects.all().order_by('id')
+
+    return render(request, 'ventas/ventas_list.html', {'venta': venta, 'producto': producto})
 
 
 @login_required
@@ -35,53 +36,34 @@ def detalle_venta(request, venta_id):
 
 @login_required
 def agregar_venta(request):
+    print(request.POST)
+
     if not request.user.id_permisos.ventas_CD:
         return JsonResponse({'success': False, 'error': 'No tienes permiso para realizar esta acción.'}, status=403)
     
     if request.method == 'POST':
-        total = Decimal(request.POST.get('total', '0'))
-        
-        try:
-            with transaction.atomic():
-                venta = Venta.objects.create(
-                    vendedor=request.user,
-                    total=total
-                )
-                
-                i = 0
-                while f'producto_id_{i}' in request.POST:
-                    producto_id = request.POST[f'producto_id_{i}']
-                    unidades = int(request.POST[f'producto_unidades_{i}'])
-                    producto = Producto.objects.get(id=producto_id)
-                    DetalleVenta.objects.create(
-                        venta=venta,
-                        producto=producto,
-                        unidades=unidades,
-                        precio_unitario=producto.precio_venta
-                    )
-                    i += 1
+        user = request.user
 
-                # Devolver detalles de la venta creada
-                venta_data = {
-                    'id': venta.id,
-                    'vendedor': venta.vendedor.username,
-                    'fecha_creacion': venta.fecha_creacion.strftime('%Y-%m-%d'),
-                    'total': str(venta.total),
-                    'detalles': [
-                        {
-                            'producto': detalle.producto.nombre,
-                            'precio_unitario': str(detalle.precio_unitario),
-                            'unidades': detalle.unidades,
-                            'importe': str(detalle.precio_unitario * detalle.unidades),
-                        }
-                        for detalle in DetalleVenta.objects.filter(venta=venta)
-                    ]
-                }
-                
-                return JsonResponse({'success': True, 'venta': venta_data})
-            
-        except Exception as e:
-            return JsonResponse({'success': False, 'error': str(e)})
+        
+        vendedor = get_object_or_404(Usuario, id=user.id)
+
+        #venta = Venta(vendedor=vendedor)
+        #venta.save()
+
+        productos_ids = request.POST.getlist('MyProds')
+
+        '''
+        for item in productos_ids:
+            id_p, unidad = item.split('-')
+            producto = get_object_or_404(Producto, id=id_p)
+            precio_unitario = producto.precio_venta
+            detalle = DetalleVenta(
+                venta=venta,
+                producto=producto
+            )
+            detalle.save()
+        '''
+        return redirect('ventas_list')
     
     productos = Producto.objects.all().order_by('id')
     return render(request, 'ventas/ventas_list.html', {'productos': productos})
