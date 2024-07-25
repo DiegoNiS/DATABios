@@ -1,11 +1,16 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
+from django.db import transaction, IntegrityError, DatabaseError
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+<<<<<<< HEAD
 <<<<<<< HEAD
 from django.db.models import Q
 =======
 from .models import Venta, DetalleVenta
+=======
+from .models import Producto, Venta, DetalleVenta
+>>>>>>> main
 from Core.models import Usuario, Producto
 from decimal import Decimal
 >>>>>>> 56abafefa3d15a8862e4c433a8f526ec39b49008
@@ -13,6 +18,7 @@ from decimal import Decimal
 
 @login_required
 def ventas_list(request):
+<<<<<<< HEAD
 <<<<<<< HEAD
     vendedores = Usuario.objects.all()
     ventas = Venta.objects.all().order_by('-id')
@@ -36,37 +42,88 @@ def ventas_list(request):
         'vendedores': vendedores
     })
 =======
+=======
+    productos = Producto.objects.all().order_by('id')
+>>>>>>> main
     if not request.user.id_permisos.ventas_CD:
         messages.error(request, 'No tienes permiso para acceder a esta página.')
         return redirect('home')  # Asume que tienes una vista 'home'
     
-    venta = Venta.objects.all().order_by('-fecha_creacion')
+    ventas = Venta.objects.all().order_by('-fecha_creacion')
     usuarios = Usuario.objects.all()
+<<<<<<< HEAD
     return render(request, 'ventas/ventas_list.html', {'venta': venta, 'usuarios': usuarios})
 >>>>>>> 56abafefa3d15a8862e4c433a8f526ec39b49008
+=======
+    return render(request, 'ventas/ventas_list.html', {'ventas': ventas, 'usuarios': usuarios, 'productos': productos})
+>>>>>>> main
 
 
 @login_required
-def venta_detail(request, venta_id):
+def detalle_venta(request, venta_id):
     if not request.user.id_permisos.ventas_CD:
         messages.error(request, 'No tienes permiso para acceder a esta página.')
         return redirect('home')
     
     venta = get_object_or_404(Venta, id=venta_id)
-    return render(request, 'ventas/detalle_venta.html', {'venta': venta})
-
+    detalles = DetalleVenta.objects.filter(venta=venta)
+    return render(request, 'ventas/detalle_venta.html', {
+        'venta': venta,
+        'detalles': detalles
+    })
 
 @login_required
 def agregar_venta(request):
     if not request.user.id_permisos.ventas_CD:
-        return JsonResponse({'error': 'No tienes permiso para realizar esta acción.'}, status=403)
+        return JsonResponse({'success': False, 'error': 'No tienes permiso para realizar esta acción.'}, status=403)
     
     if request.method == 'POST':
-        venta = Venta.objects.create(vendedor=request.user)
-        return JsonResponse({'venta_id': venta.id})
+        total = Decimal(request.POST.get('total', '0'))
+        
+        try:
+            with transaction.atomic():
+                venta = Venta.objects.create(
+                    vendedor=request.user,
+                    total=total
+                )
+                
+                i = 0
+                while f'producto_id_{i}' in request.POST:
+                    producto_id = request.POST[f'producto_id_{i}']
+                    unidades = int(request.POST[f'producto_unidades_{i}'])
+                    producto = Producto.objects.get(id=producto_id)
+                    DetalleVenta.objects.create(
+                        venta=venta,
+                        producto=producto,
+                        unidades=unidades,
+                        precio_unitario=producto.precio_venta
+                    )
+                    i += 1
+
+                # Devolver detalles de la venta creada
+                venta_data = {
+                    'id': venta.id,
+                    'vendedor': venta.vendedor.username,
+                    'fecha_creacion': venta.fecha_creacion.strftime('%Y-%m-%d'),
+                    'total': str(venta.total),
+                    'detalles': [
+                        {
+                            'producto': detalle.producto.nombre,
+                            'precio_unitario': str(detalle.precio_unitario),
+                            'unidades': detalle.unidades,
+                            'importe': str(detalle.precio_unitario * detalle.unidades),
+                        }
+                        for detalle in DetalleVenta.objects.filter(venta=venta)
+                    ]
+                }
+                
+                return JsonResponse({'success': True, 'venta': venta_data})
+            
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
     
-    producto = Producto.objects.all()
-    return render(request, 'ventas/agregar_venta.html', {'producto': producto})
+    productos = Producto.objects.all().order_by('id')
+    return render(request, 'ventas/ventas_list.html', {'productos': productos})
 
 
 @login_required
@@ -105,26 +162,7 @@ def agregar_producto_venta(request):
             'unidades': detalle.unidades,
             'importe': float(detalle.importe)
         })
-
-
-@login_required
-def eliminar_producto_venta(request, detalle_id):
-    if not request.user.id_permisos.ventas_CD:
-        return JsonResponse({'error': 'No tienes permiso para realizar esta acción.'}, status=403)
-    
-    detalle = get_object_or_404(DetalleVenta, id=detalle_id)
-    venta = detalle.venta
-    producto = detalle.producto
-    
-    producto.stock += detalle.unidades
-    producto.save()
-    
-    venta.total -= detalle.importe
-    venta.save()
-    
-    detalle.delete()
-    return JsonResponse({'success': True})
-
+    return redirect('ventas/ventas_list.html')
 
 @login_required
 def eliminar_venta(request, venta_id):

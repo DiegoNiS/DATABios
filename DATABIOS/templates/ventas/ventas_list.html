@@ -2,167 +2,193 @@
 {% load static %}
 
 {% block content %}
-<div class="container">
-    <h2>Ventas</h2>
-    <div class="row mb-3">
-        <div class="col">
-            <input type="date" class="form-control" id="fecha-filtro">
-        </div>
-        <div class="col">
-            <select class="form-control" id="vendedor-filtro">
-                <option value="">Todos los vendedores</option>
-                {% for usuario in usuarios %}
-                <option value="{{ usuario.id }}">{{ usuario.username }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="col">
-            <button class="btn btn-primary" id="filtrar">FILTRAR</button>
-        </div>
+<!--<h2>Ventas</h2>
+<div class="row mb-3">
+    <div class="col">
+        <input type="date" class="form-control" id="fecha-filtro">
     </div>
-    <table class="table">
-        <thead>
-            <tr>
-                <th># Venta</th>
-                <th>Descripción</th>
-                <th>Vendedor</th>
-                <th>Fecha de Creación</th>
-                <th>Acción</th>
-            </tr>
-        </thead>
-        <tbody id="ventas-table-body">
-            {% for venta in ventas %}
-            <tr>
-                <td>{{ venta.id }}</td>
-                <td><button class="btn btn-link btn-sm ver-detalle" data-venta-id="{{ venta.id }}">...</button></td>
-                <td>{{ venta.vendedor.username }}</td>
-                <td>{{ venta.fecha_creacion|date:"Y-m-d" }}</td>
-                <td>
-                    <button class="btn btn-danger btn-sm eliminar-venta" data-venta-id="{{ venta.id }}">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </td>
-            </tr>
+    <div class="col">
+        <select class="form-control" id="vendedor-filtro">
+            <option value="">Todos los vendedores</option>
+            {% for usuario in usuarios %}
+            <option value="{{ usuario.id }}">{{ usuario.username }}</option>
             {% endfor %}
-        </tbody>
-    </table>
-    <div class="row">
-        <div class="col">
-            <button class="btn btn-success" id="crear-excel">Crear Excel</button>
-        </div>
-        <div class="col text-right">
-            <button class="btn btn-primary" id="agregar-venta">Agregar Venta</button>
-        </div>
+        </select>
     </div>
-</div>
+    <div class="col">
+        <button class="btn btn-primary" id="filtrar">FILTRAR</button>
+    </div>
+</div>-->
+<p class="page_tittle">
+    Gestión de Ventas
+</p>
+<div class="form_filter" id="my_form_filter">
+    <button class="addButton" id="openDiaVentaAdd">
+        <i class="fas fa-plus-circle"></i>
+        <span>Agregar Venta</span>
+    </button>
 
-<!-- Modal Detalle de Venta -->
-<div class="modal fade" id="detalleVentaModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Detalle de Venta</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
+    
+    <button class="excelButton" id="excelButton">
+        <i class="fas fa-file-excel"></i>
+        <span>Crear excel</span>
+    </button>
+</div>
+<table class="table" id="myTable">
+    <thead>
+        <tr>
+            <th># Venta</th>
+            <th>Descripción</th>
+            <th>Vendedor</th>
+            <th>Fecha de Creación</th>
+            <th>Acción</th>
+        </tr>
+    </thead>
+    <tbody id="ventas-table-body">
+        {% for Venta in Ventas %}
+        <tr>
+            <td>{{ venta.id }}</td>
+
+            <td><button class="btn btn-link btn-sm ver-detalle" data-venta-id="{{ venta.id }}">...</button></td>
+
+            <td>{{ venta.vendedor.username }}</td>
+
+            <td>{{ venta.fecha_creacion|date:"Y-m-d" }}</td>
+
+            <td>
+                <button class="btn btn-danger btn-sm eliminar-venta" data-venta-id="{{ venta.id }}">
+                    <i class="fas fa-trash"></i>
                 </button>
-            </div>
-            <div class="modal-body">
-                <p>Número de Venta: <span id="ventaId"></span></p>
-                <p>Fecha de Creación: <span id="fechaCreacion"></span></p>
-                <p>Vendedor: <span id="nombreVendedor"></span></p>
+            </td>
 
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th># Producto</th>
-                            <th>Nombre Producto</th>
-                            <th>Precio Unitario</th>
-                            <th>Unidades</th>
-                            <th>Importe</th>
-                        </tr>
-                    </thead>
-                    <tbody id="detalleProductosBody">
-                        <!-- Contenido de productos se carga dinámicamente aquí -->
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <td colspan="4" class="text-right"><strong>Total</strong></td>
-                            <td><span id="importeTotal"></span></td>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-success" id="descargar-excel">Descargar Excel</button>
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-            </div>
-        </div>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+<script>
+    document.getElementById('exportarForm').addEventListener('submit', function (event) {
+      var productoIds = [];
+      var rows = document.querySelectorAll('tbody tr');
+      rows.forEach(function (row) {
+        productoIds.push(row.getAttribute('data-producto-id'));
+      });
+      document.getElementById('productoIds').value = productoIds.join(',');
+    });
+  </script>
+<!-- Dialogs-->
+<!-- Crear Ventas -->
+<dialog id="DiaVentaAdd">
+    <div class="top_bar_myDialog">
+      <span class="tittle">Agregar venta</span>
+      <i class="fas fa-times close_myDialog" id="closeDiaVentaAdd"></i>
     </div>
-</div>
-
-
-
-<!-- Modal Agregar Venta -->
-<div class="modal fade" id="agregarVentaModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Agregar Venta</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+    
+    <div class="content_myDialog">
+        <div class="form-row">
+            <div class="form-group">
+              <label for="producto_select">Producto:</label>
+              <select id="producto_select" required>
+                <option value="">Selecciona un producto</option>
+                {% for producto in productos %}
+                <option value="{{ producto.id }}" data-precio="{{ producto.precio_venta }}">{{ producto.nombre }}</option>
+                {% endfor %}
+              </select>
             </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label for="producto-select">Producto:</label>
-                    <select class="form-control" id="producto-select">
-                        <option value="">Selecciona un producto</option>
-                        {% for producto in productos %}
-                        <option value="{{ producto.id }}">{{ producto.nombre }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="unidades-input">Cantidad:</label>
-                    <input type="number" class="form-control" id="unidades-input" min="1" value="1">
-                </div>
+            
+            <div class="form-group">
+              <label for="unidades_input">Unidades:</label>
+              <input type="number" id="unidades_input" min="1" value="1" required>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary" id="agregar-producto">Agregar Venta</button>
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-            </div>
+            
+            <button type="button" id="agregarProducto">AGREGAR PRODUCTO</button>
+          </div>
+      <form method="post" action="{% url 'crear_venta' %}" id="ventaForm">
+        {% csrf_token %}
+  
+        <table id="productosTable">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Producto</th>
+              <th>Precio Unitario</th>
+              <th>Unidades</th>
+              <th>Importe</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Los productos se agregarán aquí dinámicamente -->
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="4" style="text-align: right;"><strong>Total:</strong></td>
+              <td id="totalVenta">S/. 0.00</td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+        
+        <input type="hidden" id="total-venta" name="total">
+        
+        <div class="buttons_container">
+          <button type="button" id="cancelDiaVentaAdd" class="btn-secondary">CANCELAR</button>
+          <button type="submit" class="btn-primary">CREAR</button>
         </div>
+      </form>
     </div>
-</div>
+  </dialog>
 
-<!-- Modal Confirmar Eliminación de Venta -->
-<div class="modal fade" id="confirmarEliminacionModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Confirmar Eliminación</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <p>¿Estás seguro que quieres eliminar esta venta?</p>
-                <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="reabastecerStock">
-                    <label class="form-check-label" for="reabastecerStock">Reabastecer stock</label>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-danger" id="confirmar-eliminacion">Eliminar</button>
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-            </div>
-        </div>
+<!-- Formulario Detalle de Venta -->
+<dialog id="detalleVentaForm" style="width: 800px; height: 70vh;">
+    <div class="top_bar_myDialog" style="width: 100%;">
+      <span class="tittle">Detalle de Venta</span>
+      <i class="fas fa-times close_myDialog" id="closeDetalleVentaForm"></i>
     </div>
-</div>
+    
+    <div class="content_myDialog" style="width: 100%; height: calc(70vh - 40px); overflow-y: auto;">
+      <!-- Formulario Detalle de Venta -->
+      <form method="post" action="{% url 'crear_excel' %}">
+        {% csrf_token %}
+        
+        <p>Número de Venta: <span id="ventaId"></span></p>
+        <p>Fecha de Creación: <span id="fechaCreacion"></span></p>
+        <p>Vendedor: <span id="nombreVendedor"></span></p>
+        
+        <table class="table">
+          <thead>
+            <tr>
+              <th># Producto</th>
+              <th>Nombre Producto</th>
+              <th>Precio Unitario</th>
+              <th>Unidades</th>
+              <th>Importe</th>
+            </tr>
+          </thead>
+          <tbody id="detalleProductosBody">
+            <!-- Contenido de productos se carga dinámicamente aquí -->
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="4" class="text-right"><strong>Total</strong></td>
+              <td><span id="importeTotal"></span></td>
+            </tr>
+          </tfoot>
+        </table>
+        
+        <div class="buttons_container_add_form buttons_container" id="cancelDetalleVentaForm">
+          <button type="button" class="btn btn-secondary" id="cerrar-form">Cerrar</button>
+          <button type="submit" class="btn btn-success">Descargar Excel</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+  
 
 {% endblock %}
 
 {% block scripts %}
-{{ block.super }}
-<script src="{% static 'js/ventas/ventas.js' %}"></script>
+
+<script src="{% static 'js/Ventas/dialogVentas.js' %}"></script>
 {% endblock %}

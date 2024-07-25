@@ -6,42 +6,23 @@ from Core.models import Usuario
 from django.contrib.auth import get_user_model
 from django.contrib.auth import logout
 from django.urls import reverse
-
-from functools import wraps
-
-def permisos_para(permiso_check):
-    def check_permiso(user):
-        try:
-            return user.is_authenticated and permiso_check(user)
-        except Usuario.DoesNotExist:
-            return False
-
-    def decorator(view_func):
-        @wraps(view_func)
-        def wrapper(request, *args, **kwargs):
-            if check_permiso(request.user):
-                return view_func(request, *args, **kwargs)
-            else:
-                # Redireccionar a la página de permisos denegados
-                return render(request, 'permisos_denegados.html')
-
-        return wrapper
-
-    return decorator
-
+from Core.decorators import permisos_para
+from django.http import JsonResponse
+from django.contrib.auth.hashers import make_password 
 
 User = get_user_model()
 
-@login_required
+#@permisos_para(lambda u: u.is_superuser)
+@permisos_para(lambda u: u.categoria == 'Administrador' or u.is_superuser)
 def list_usuarios(request):
-    usuarios = User.objects.all()
+    usuarios = User.objects.all().order_by('id')
     return render(request, 'lista_usuarios.html', {
         'usuarios': usuarios,
-        'nombre_usuario': request.user.username
+        'nombre_usuario': request.user.username, 
+        'grupos_usuario': request.user.categoria
     })
 
-@login_required
-@permisos_para(lambda u: u.is_superuser)
+@permisos_para(lambda u: u.categoria == 'Administrador' or u.is_superuser)
 def agregar_usuario(request):
     if request.method == 'POST':
         username = request.POST['username']
@@ -63,10 +44,8 @@ def agregar_usuario(request):
 
         messages.success(request, "Usuario agregado correctamente.")
         return redirect('lista_usuarios')
-    return render(request, 'agregar_usuario.html', { 'nombre_usuario': request.user.username})
     
-@login_required
-@permisos_para(lambda u: u.is_superuser)
+@permisos_para(lambda u: u.categoria == 'Administrador' or u.is_superuser)
 def eliminar_usuario(request, usuario_id): # TODO si uno es administrador puede eliminarse a si mismo ,y seo no edberia
     usuario = get_object_or_404(Usuario, id=usuario_id)
     if request.user == usuario:
@@ -94,13 +73,27 @@ def cerrar_sesion(request):
     logout(request)
     return redirect(reverse('login'))
 
-@login_required
-@permisos_para(lambda u: u.is_superuser)
+@permisos_para(lambda u: u.categoria == 'Administrador' or u.is_superuser)
 def editar_permisos(request, usuario_id):
     usuario = get_object_or_404(Usuario, id=usuario_id)
     permisos = usuario.id_permisos
 
     if request.method == 'POST':
+        # Actualizar campos del usuario
+        usuario.username = request.POST.get('username', usuario.username)
+        usuario.email = request.POST.get('email', usuario.email)
+
+        # Actualizar la contraseña solo si se proporciona una nueva
+        nueva_password = request.POST.get('password')
+        if nueva_password:
+            usuario.password = make_password(nueva_password)
+        
+        usuario.nombre = request.POST.get('nombre', usuario.nombre)
+        usuario.apellido = request.POST.get('apellido', usuario.apellido)
+        usuario.categoria = request.POST.get('categoria', usuario.categoria)
+        usuario.save()
+
+        # Actualizar permisos
         permisos.pedidos_pen_CUD = 'pedidos_pen_CUD' in request.POST
         permisos.pedidos_pen_S = 'pedidos_pen_S' in request.POST
         permisos.pedidos_rec_G = 'pedidos_rec_G' in request.POST
@@ -110,48 +103,54 @@ def editar_permisos(request, usuario_id):
         permisos.ventas_CD = 'ventas_CD' in request.POST
         permisos.panel_admin = 'panel_admin' in request.POST
         permisos.save()
-        messages.success(request, "permisos registrados correctamente.")
+        messages.success(request, "Cambios realizados correctamente.")
         return redirect('lista_usuarios')
-
-    return render(request, 'editar_permisos.html', {'usuario': usuario, 'permisos': permisos})
-
-
-
-
-
-
-# Max's Creations
     
-def is_admin(user):
-    return user.groups.filter(name='Administrador').exists()
+    if request.method == 'GET':
+        permisos_data = {
+            'pedidos_pen_CUD': permisos.pedidos_pen_CUD,
+            'pedidos_pen_S': permisos.pedidos_pen_S,
+            'pedidos_rec_G': permisos.pedidos_rec_G,
+            'inventario_cat_CUD': permisos.inventario_cat_CUD,
+            'inventario_pro_CUD': permisos.inventario_pro_CUD,
+            'inventario_pro_G': permisos.inventario_pro_G,
+            'ventas_CD': permisos.ventas_CD,
+            'panel_admin': permisos.panel_admin
+        }
+        return JsonResponse(permisos_data)
+    
+# # Max's Creations
+    
+# def is_admin(user):
+#     return user.groups.filter(name='Administrador').exists()
 
-# Login view
-def loginView(request):
-    crear_grupos()  # Crear grupos si no existen
-    if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
+# # Login view
+# # def loginView(request):
+# #     crear_grupos()  # Crear grupos si no existen
+# #     if request.method == 'POST':
+# #         username = request.POST['username']
+# #         password = request.POST['password']
 
-        user = auth.authenticate(username=username, password=password)
+# #         user = auth.authenticate(username=username, password=password)
 
-        if user is not None:
-            auth.login(request, user)
-            return redirect('home')  # Redirigir al sistema
+# #         if user is not None:
+# #             auth.login(request, user)
+# #             return redirect('home')  # Redirigir al sistema
 
-        else:
-            messages.error(request, 'Credenciales inválidas')
-            return redirect('/')
-    else:
-        return render(request, 'login.html')
+# #         else:
+# #             messages.error(request, 'Credenciales inválidas')
+# #             return redirect('/')
+# #     else:
+# #         return render(request, 'login.html')
     
     
-# Vista de Home
-@login_required
-def homeView(request):
-    usuario = request.user
-    grupos_usuario = usuario.groups.values_list('name', flat=True)
-    context = {
-        'nombre_usuario': usuario.username,
-        'grupos_usuario': list(grupos_usuario)
-    }
-    return render(request, 'home.html', context)
+# # Vista de Home
+# @login_required
+# def homeView(request):
+#     usuario = request.user
+#     grupos_usuario = usuario.groups.values_list('name', flat=True)
+#     context = {
+#         'nombre_usuario': usuario.username,
+#         'grupos_usuario': list(grupos_usuario)
+#     }
+#     return render(request, 'home.html', context)

@@ -4,26 +4,166 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="{% static 'img/myIco.ico' %}" type="image/x-icon">
     <title>{% block title %}LIBRERA STOCK{% endblock %}</title>
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"> <!-- aded by Diego  -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>                                 <!-- aded by Diego  -->
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>      <!-- aded by Diego  -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">  <!-- Librería CSS de logos -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.1.0/css/dataTables.dataTables.css" />
+    <link rel="stylesheet" href="{% static 'css/slidebar.css' %}">
+    <link rel="stylesheet" href="{% static 'css/content.css' %}">
+    <link rel="stylesheet" href="{% static 'css/table.css' %}">
+    <link rel="stylesheet" href="{% static 'css/filter.css' %}">
+    <link rel="stylesheet" href="{% static 'css/dialog.css' %}">
+    {% block extra_css %}
+    {% endblock %}
+    <!--<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">--> <!-- aded by Diego  -->
+                                  <!-- aded by Diego  -->
+    <!--<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>-->      <!-- aded by Diego  -->
 </head>
-<body>
-    <div id="mySidenav" class="sidenav">
-        <div class="logo">
-            <img src="{% static 'img/logo.png' %}" alt="LIBRERA STOCK">
+<body><div class="flex_cont">
+    <div class="container">
+        <div class="slidebar">
+            <div class="head">
+                <div class="logo_img">
+                    <img src="{% static 'img/logosolo.png' %}" alt="Darabios Logo">
+                </div>
+                <div class="logo_description">
+                    <p class="tittle">Databios</p>
+                </div>
+            </div>
+            <div class="nav">
+                <div class="menu">
+                    <p class="tittle">Menu</p>
+                    <ul>
+                        <li>
+                            <a href="{% url 'dashboard' %}" class="principal">
+                                <i class="fas fa-chart-line"></i>
+                                <span class="text">Dashboard</span>
+                            </a>
+                        </li>
+                    </ul>
+                    <ul>
+                        <li>
+                            <a href="#Pedidos" class="principal">
+                                <i class="fas fa-truck"></i>
+                                <span class="text">Pedidos</span>
+                                <i class="fas fa-chevron-down arrow"></i>
+                            </a>
+                            <ul class="sub_menu">
+                                <li>
+                                    <a href="{% url 'listar_pedidos' %}">
+                                        <span class="text">Pendientes</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'crear_pedidos' %}">
+                                        <span class="text">Registro</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <ul>
+                        <li>
+                            <a href="#Inventario" class="principal">
+                                <i class="fas fa-boxes"></i>
+                                <span class="text">Inventario</span>
+                                <i class="fas fa-chevron-down arrow"></i>
+                            </a>
+                            <ul class="sub_menu">
+                                <li>
+                                    <a href="{% url 'listar_categorias' %}">
+                                        <span class="text">Categorías</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'listar_productos' %}">
+                                        <span class="text">Productos</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <ul>
+                        <li>
+                            <a href="{% url 'ventas_list' %}" class="principal">
+                                <i class="fas fa-tag"></i>
+                                <span class="text">Ventas</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                
+                {# if 'Administrador' == grupos_usuario #}
+                <div class="menu">
+                    <p class="tittle">Panel Administrador</p>
+                    <ul>
+                        <li>
+                            <a href="{% url 'lista_usuarios' %}" class="principal">
+                                <i class="fas fa-users"></i>
+                                <span class="text">Usuarios</span>
+                            </a>
+                        </li>
+                    </ul>
+                    <ul>
+                        <li>
+                            <a href="{% url 'listar_proveedores' %}" class="principal">
+                                <i class="fas fa-briefcase"></i>
+                                <span class="text">Proveedores</span>
+                            </a>
+                        </li>
+                    </ul>
+                    <ul>
+                        <li>
+                            <a href="{% url 'home' %}" class="principal">
+                                <i class="fas fa-cog"></i>
+                                <span class="text">Ajustes</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                {# endif #}
+            </div>
+            <div class="menu">
+                <p class="tittle">Cuenta</p>
+                <ul>
+                    <li>
+                        <a href="{% url 'logout' %}" class="principal">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span class="text">Logout</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </div>
-        <a href="{% url 'home' %}">Dashboard</a>
-        <a href="#pedidos">Pedidos</a>
-        <a href="#Inventario">Inventario</a>
-        <a href="{% url 'ventas_list' %}">Ventas</a>
-        <a href="{% url 'lista_usuarios' %}">Usuarios</a>
-        <a href="#proveedores">Proveedores</a>
-        <a href="#ajustes">Ajustes</a>
-        <a href="{% url 'logout' %}">Salir</a>
+        <div class="design_space">
+            <div class="top_bar">
+                <div class="info_user">
+                    {% if user.is_authenticated %}
+                    <div class="user_connect"></div>
+                    <i class="fas fa-user"></i>
+                    <p>Bienvenido <strong>{{ user.username |upper }}</strong></p>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="content">
+                {% block content %}
+                {% endblock %}
+            </div>
+        </div>
     </div>
+
+    <!--<dialog id="mydialog">
+        <div style="width: 600px;height: 40px;background-color: green;">Hola</div>
+        <div style="width: 600px;height: 300px;background-color: red;">
+            <button id="closeDialog" type="button">
+                cerrar Dialogo
+            </button>
+        </div>
+    </dialog>
+    <button id="openDialog" type="button">
+        Abrir Dialogo
+    </button>
+-->
 <!--
     <div class="topnav">
         {% if user.is_authenticated %}
@@ -56,7 +196,7 @@
         {% endif %}
     </div>                  <!-- aded by Diego  
     -->
-
+<!--
     <div id="main" class="main-content">
         <div class="topnav">
             <span style="font-size: 30px; cursor: pointer; color: white; margin-left: 10px;" onclick="toggleNav()">&#9776;</span>
@@ -70,16 +210,33 @@
             </div>
         </div>
 
-        {% block content %}
-        {% endblock %}
+
     </div>
     
     <footer>
         <p>&copy; 2024 Django project</p>
     </footer>
+-->
+{% if messages %}
+<div id="message-container" style="display: none;">
+    {% for message in messages %}
+        <div data-tag="{{ message.tags }}" data-text="{{ message }}"></div>
+    {% endfor %}
+</div>
+{% endif %}
 
+    <script type="text/javascript">
+        let gruposUsuario = "{{ grupos_usuario }}";
+    </script>
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <script src="https://cdn.datatables.net/2.1.0/js/dataTables.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{% static 'js/scripts.js' %}"></script>
-    <script src="{% static 'js/ventas/ventas.js' %}"></script>
+    <script src="{% static 'js/slidebar.js' %}"></script>
+    <script src="{% static 'js/table.js' %}"></script>
+    <script src="{% static 'js/myMessages.js' %}"></script>
+    {% block scripts %}
+    {% endblock %}
 </body>
 </html>
 
