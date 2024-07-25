@@ -47,19 +47,21 @@ Categorías
       <td>{{ categoria.descripcion }}</td>
       <td>{{ categoria.created_at|date:"d M Y H:i" }}</td>
       <td>
-        <button type="button" class="delete_button deleteCatPro-button" data-categoria-id="{{ categoria.id }}">
-          <i class="fas fa-trash"></i>
-        </button>
-        <!-- Form oculto ?-->
-        <form method="POST" action="" id="deleteCatForm">
-          {% csrf_token %}
-        </form>
-        <!-- Form oculto para eliminar categorias -->
-        <div class="separator"></div>
-        <button type="button" class="edit_button editCatPro-button" data-categoria-id="{{ categoria.id }}"
-        data-categoria-nombre="{{ categoria.nombre }}" data-categoria-descripcion="{{ categoria.descripcion }}">
-          <i class="fas fa-pencil-alt"></i>
-        </button>
+        <div class="flex_cont">
+          <button type="button" class="delete_button deleteCatPro-button" data-categoria-id="{{ categoria.id }}">
+            <i class="fas fa-trash"></i>
+          </button>
+          <!-- Form oculto ?-->
+          <form method="POST" action="" id="deleteCatForm">
+            {% csrf_token %}
+          </form>
+          <!-- Form oculto para eliminar categorias -->
+          <div class="separator"></div>
+          <button type="button" class="edit_button editCatPro-button" data-categoria-id="{{ categoria.id }}"
+          data-categoria-nombre="{{ categoria.nombre }}" data-categoria-descripcion="{{ categoria.descripcion }}">
+            <i class="fas fa-pencil-alt"></i>
+          </button>
+        </div>
       </td>
     </tr>
     {% endfor %}
@@ -113,14 +115,8 @@ Categorías
     </form>
   </div>
 </dialog>
-{% if messages %}
-<div id="message-container" style="display: none;">
-    {% for message in messages %}
-        <div data-tag="{{ message.tags }}" data-text="{{ message }}"></div>
-    {% endfor %}
-</div>
-{% endif %}
 {% endblock %}
+
 {% block scripts %}
 <script src="{% static 'js/Inventario/dialogInventarioCategoria.js' %}"></script>
 {% endblock %}
