@@ -48,23 +48,25 @@
             </td>
             <td>{{ usuario.fecha_creacion }}</td>
             <td>
-                <button type="button" class="delete_button" data-usuario-id="{{ usuario.id }}">
-                    <i class="fas fa-trash"></i>
-                </button>
-
-                <div class="separator" ></div>
-                <!--<form method="GET" action="{% url 'editar_permisos' usuario.id %}" style="display:inline;">
-                    {% csrf_token %}
-                </form>-->
-                <button type="button" class="edit_button" 
-                data-usuario-id="{{ usuario.id }}"
-                data-usuario-username="{{ usuario.username }}"
-                data-usuario-email="{{ usuario.email }}"
-                data-usuario-nombre="{{ usuario.nombre }}"
-                data-usuario-apellido="{{ usuario.apellido }}"
-                data-usuario-categoria="{{ usuario.categoria }}">
-                    <i class="fas fa-pencil-alt"></i>
-                </button>
+                <div class="flex_cont">
+                    <button type="button" class="delete_button" data-usuario-id="{{ usuario.id }}">
+                        <i class="fas fa-trash"></i>
+                    </button>
+    
+                    <div class="separator" ></div>
+                    <!--<form method="GET" action="{% url 'editar_permisos' usuario.id %}" style="display:inline;">
+                        {% csrf_token %}
+                    </form>-->
+                    <button type="button" class="edit_button" 
+                    data-usuario-id="{{ usuario.id }}"
+                    data-usuario-username="{{ usuario.username }}"
+                    data-usuario-email="{{ usuario.email }}"
+                    data-usuario-nombre="{{ usuario.nombre }}"
+                    data-usuario-apellido="{{ usuario.apellido }}"
+                    data-usuario-categoria="{{ usuario.categoria }}">
+                        <i class="fas fa-pencil-alt"></i>
+                    </button>
+                </div>
             </td>
         </tr>
         {% endfor %}

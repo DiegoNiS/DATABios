@@ -43,17 +43,19 @@
             <td>{{ proveedores.fecha_creacion }}</td>
             
             <td>
-                <button type="button" class="delete_button openDelete" data-usuario-id="{{ proveedores.id }}">
-                    <i class="fas fa-trash"></i>
-                </button>
-                <div class="separator" ></div>
-                <button type="button" class="edit_button openEdit" 
-                    data-id="{{ proveedores.id }}"
-                    data-nombre="{{ proveedores.nombre }}"
-                    data-ruc="{{ proveedores.ruc }}"
-                    data-telefono="{{ proveedores.telefono }}">
-                    <i class="fas fa-pencil-alt"></i>
-                </button>
+                <div class="flex_cont">
+                    <button type="button" class="delete_button openDelete" data-usuario-id="{{ proveedores.id }}">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                    <div class="separator" ></div>
+                    <button type="button" class="edit_button openEdit" 
+                        data-id="{{ proveedores.id }}"
+                        data-nombre="{{ proveedores.nombre }}"
+                        data-ruc="{{ proveedores.ruc }}"
+                        data-telefono="{{ proveedores.telefono }}">
+                        <i class="fas fa-pencil-alt"></i>
+                    </button>
+                </div>
             </td>
         </tr>
         {% endfor %}
