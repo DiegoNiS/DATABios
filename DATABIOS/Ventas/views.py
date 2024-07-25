@@ -14,8 +14,9 @@ def ventas_list(request):
         return redirect('home')  # Asume que tienes una vista 'home'
     
     venta = Venta.objects.all().order_by('-fecha_creacion')
-    usuarios = Usuario.objects.all()
-    return render(request, 'ventas/ventas_list.html', {'venta': venta, 'usuarios': usuarios})
+    producto =  Producto.objects.all().order_by('id')
+
+    return render(request, 'ventas/ventas_list.html', {'venta': venta, 'producto': producto})
 
 
 @login_required
@@ -30,12 +31,34 @@ def venta_detail(request, venta_id):
 
 @login_required
 def agregar_venta(request):
+    print(request.POST)
+
     if not request.user.id_permisos.ventas_CD:
         return JsonResponse({'error': 'No tienes permiso para realizar esta acción.'}, status=403)
     
     if request.method == 'POST':
-        venta = Venta.objects.create(vendedor=request.user)
-        return JsonResponse({'venta_id': venta.id})
+        user = request.user
+
+        
+        vendedor = get_object_or_404(Usuario, id=user.id)
+
+        #venta = Venta(vendedor=vendedor)
+        #venta.save()
+
+        productos_ids = request.POST.getlist('MyProds')
+
+        '''
+        for item in productos_ids:
+            id_p, unidad = item.split('-')
+            producto = get_object_or_404(Producto, id=id_p)
+            precio_unitario = producto.precio_venta
+            detalle = DetalleVenta(
+                venta=venta,
+                producto=producto
+            )
+            detalle.save()
+        '''
+        return redirect('ventas_list')
     
     producto = Producto.objects.all()
     return render(request, 'ventas/agregar_venta.html', {'producto': producto})
