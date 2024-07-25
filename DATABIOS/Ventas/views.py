@@ -3,60 +3,21 @@ from django.http import JsonResponse
 from django.db import transaction, IntegrityError, DatabaseError
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-<<<<<<< HEAD
-<<<<<<< HEAD
-from django.db.models import Q
-=======
-from .models import Venta, DetalleVenta
-=======
 from .models import Producto, Venta, DetalleVenta
->>>>>>> main
 from Core.models import Usuario, Producto
 from decimal import Decimal
->>>>>>> 56abafefa3d15a8862e4c433a8f526ec39b49008
 
 
 @login_required
 def ventas_list(request):
-<<<<<<< HEAD
-<<<<<<< HEAD
-    vendedores = Usuario.objects.all()
-    ventas = Venta.objects.all().order_by('-id')
-    if request.method == 'POST':
-        fdesde = request.POST['fecha1']
-        fhasta = request.POST['fecha2']
-        vend = request.POST['vendedor']
-
-        filtros = Q()
-
-        if fdesde and fhasta:
-            filtros &= Q(fecha_creacion__range=[fdesde, fhasta])
-        if vend and vend != "*":
-            vendedor = get_object_or_404(Usuario, id=vend)
-            filtros &= Q(vendedor=vendedor)
-
-        if filtros:
-            ventas = Venta.objects.filter(filtros).order_by('-id')
-    return render(request, 'ventas_list.html', {
-        'ventas': ventas,
-        'vendedores': vendedores
-    })
-=======
-=======
     productos = Producto.objects.all().order_by('id')
->>>>>>> main
     if not request.user.id_permisos.ventas_CD:
         messages.error(request, 'No tienes permiso para acceder a esta página.')
         return redirect('home')  # Asume que tienes una vista 'home'
     
     ventas = Venta.objects.all().order_by('-fecha_creacion')
     usuarios = Usuario.objects.all()
-<<<<<<< HEAD
-    return render(request, 'ventas/ventas_list.html', {'venta': venta, 'usuarios': usuarios})
->>>>>>> 56abafefa3d15a8862e4c433a8f526ec39b49008
-=======
     return render(request, 'ventas/ventas_list.html', {'ventas': ventas, 'usuarios': usuarios, 'productos': productos})
->>>>>>> main
 
 
 @login_required
