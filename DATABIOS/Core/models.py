@@ -3,7 +3,7 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 from django.forms import ValidationError
 from django.utils import timezone  # Importar timezone
 from django.forms import ValidationError
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 
 
@@ -200,3 +200,15 @@ class Pedido(models.Model):
 def actualizar_stock(sender, instance, **kwargs):
     # Llamar al método actualizar_stock_productos después de guardar un pedido
     instance.actualizar_stock_productos()
+
+@receiver(pre_save, sender=Pedido)
+def eliminar_pedido_si_cancelado(sender, instance, **kwargs):
+    # Verifica si el estado cambió a "cancelado"
+    if instance.pk:  # Verifica si es una instancia existente
+        try:
+            pedido_anterior = Pedido.objects.get(pk=instance.pk)
+            if pedido_anterior.estado != instance.estado and instance.estado == 'cancelado':
+                # Si el estado anterior no era "cancelado" y el nuevo estado es "cancelado", elimina el pedido
+                instance.delete()
+        except Pedido.DoesNotExist:
+            pass  # Manejar el caso donde no se encuentra el pedido anteriormente
