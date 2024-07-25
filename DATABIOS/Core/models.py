@@ -102,6 +102,7 @@ class Producto(models.Model):
     precio_venta = models.FloatField()
     stock_min = models.IntegerField(default=10)
     stock_max = models.IntegerField(default=20)
+    estado_registro = models.CharField(max_length=1, default='A')
     
     @property
     def estado_stock(self):
