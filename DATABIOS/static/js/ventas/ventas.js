@@ -5,6 +5,41 @@ document.addEventListener('DOMContentLoaded', function() {
     const closeAdd = document.getElementById('closeAdd');
     const cancelAdd = document.getElementById('cancelAdd');
 
+    document.addEventListener('DOMContentLoaded', function() {
+        /* Detalle Venta */
+        const myDetalleVentaDialog = document.getElementById('detalleVenta');
+        const openDetalleVenta = document.getElementById('openDetalleVenta');
+        const closeDetalleVenta = document.getElementById('closeDetalleVenta');
+    
+        /* Detalle Venta dialog */
+        openDetalleVenta.addEventListener('click', function() {
+            myDetalleVentaDialog.showModal();
+        });
+        closeDetalleVenta.addEventListener('click', function() {
+            myDetalleVentaDialog.close();
+        });
+    
+        /* Eliminar Venta */
+        const myDeleteDialog = document.getElementById('deleteDialog');
+        const openDelete = document.querySelectorAll('.openDelete');
+        const closeDelete = document.getElementById('closeDelete');
+        const cancelDelete = document.getElementById('cancelDelete');
+    
+        openDelete.forEach(function(button) {
+            button.addEventListener('click', function() {
+                myDeleteDialog.showModal();
+            });
+        });
+    
+        closeDelete.addEventListener('click', function() {
+            myDeleteDialog.close();
+        });
+    
+        cancelDelete.addEventListener('click', function() {
+            myDeleteDialog.close();
+        });
+    });
+
     /* ADD dialog */ 
     openAdd.addEventListener('click', function() {
         myAddDialog.showModal();
@@ -93,3 +128,4 @@ document.addEventListener('DOMContentLoaded', function() {
         $('#totalAmount').text(total.toFixed(2));
     }
 });
+

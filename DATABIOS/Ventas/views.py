@@ -10,6 +10,7 @@ from decimal import Decimal
 
 @login_required
 def ventas_list(request):
+    ventas = Venta.objects.all().order_by('-fecha_creacion')
     productos = Producto.objects.all().order_by('id')
     if not request.user.id_permisos.ventas_CD:
         messages.error(request, 'No tienes permiso para acceder a esta página.')
@@ -18,7 +19,7 @@ def ventas_list(request):
     venta = Venta.objects.all().order_by('-fecha_creacion')
     producto =  Producto.objects.all().order_by('id')
 
-    return render(request, 'ventas/ventas_list.html', {'venta': venta, 'producto': producto})
+    return render(request, 'ventas/ventas_list.html', {'ventas': ventas, 'producto': producto})
 
 
 @login_required
@@ -33,6 +34,7 @@ def detalle_venta(request, venta_id):
         'venta': venta,
         'detalles': detalles
     })
+
 
 @login_required
 def agregar_venta(request):
@@ -51,7 +53,7 @@ def agregar_venta(request):
         #venta.save()
 
         productos_ids = request.POST.getlist('MyProds')
-
+        
         '''
         for item in productos_ids:
             id_p, unidad = item.split('-')

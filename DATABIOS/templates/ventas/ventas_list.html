@@ -34,18 +34,18 @@
         </tr>
     </thead>
     <tbody id="ventas-table-body">
-
-        <tr>
-            <td>Insertar</td>
+      {% for venta in ventas %}
+        <tr data-producto-id="{{ venta.id }}">
+            <td>{{ venta.id }}</td>
             <td>
-                <div class="flex_cont">
-                    <button type="button" class="delete_button openList" venta-id="">
+                <div class="flex_cont" >
+                    <button id="openDetalleVenta" class="delete_button openList">
                         <i class="fas fa-list"></i>
                     </button>
                 </div>
             </td>
-            <td>Insertar</td>
-            <td>Insertar</td>
+            <td>{{ venta.vendedor.username }}</td></td>
+            <td>{{ venta.fecha_creacion|date:"Y-m-d" }}</td>
             <td>
                 <div class="flex_cont">
                     <button type="button" class="delete_button openDelete" venta-id="">
@@ -55,6 +55,7 @@
             </td>
 
         </tr>
+        {% endfor %}
     </tbody>
 </table>
 
@@ -122,6 +123,50 @@
         </form>
     </div>
 </dialog>
+
+<!-- Contenido de detalle_venta.html en forma de dialogo -->
+<dialog id="detalleVenta"> <!-- CAMBIAR ID DEL DIALOG -->
+  <div class="top_bar_myDialog" style="width: 800px;"> <!-- CAMBIAR STYLE (solo el width) -->
+      <span class="tittle">
+          <i class="fas fa-info-circle" style="font-size: 15px;margin-right: 2px;"></i>
+          Detalle de Venta <!-- INSERTAR TITULO AQUI -->
+      </span>
+      <i class="fas fa-times close_myDialog" id="closeDetalleVenta"></i> <!-- BOTON DE CERRADO, CAMBIAR ID -->
+  </div>
+  <div class="content_myDialog" style="width: 800px;height: 60vh;"> <!-- CAMBIAR STYLE (width y height (en vh)) -->
+      <p>Número de Venta: {{ venta.id }}</p>
+      <p>Fecha de Creación: {{ venta.fecha_creacion|date:"Y-m-d" }}</p>
+      <p>Vendedor: {{ venta.vendedor.username }}</p>
+
+      <table class="table">
+          <thead>
+              <tr>
+                  <th># Producto</th>
+                  <th>Nombre Producto</th>
+                  <th>Precio Unitario</th>
+                  <th>Unidades</th>
+                  <th>Importe</th>
+              </tr>
+          </thead>
+          <tbody>
+              {% for item in venta.items %}
+              <tr>
+                  <td>{{ forloop.counter }}</td>
+                  <td>{{ item.producto.nombre }}</td>
+                  <td>{{ item.precio_unitario }}</td>
+                  <td>{{ item.unidades }}</td>
+                  <td>{{ item.importe }}</td>
+              </tr>
+              {% endfor %}
+              <tr>
+                  <td colspan="4" class="text-right"><strong>Total</strong></td>
+                  <td>{{ venta.total }}</td>
+              </tr>
+          </tbody>
+      </table>
+  </div>
+</dialog>
+
 
 {% endblock %}
 
