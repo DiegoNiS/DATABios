@@ -89,6 +89,7 @@ class Proveedores(models.Model):
     ruc = models.CharField(max_length=9)
     telefono = models.CharField(max_length=9, default='Sin Número') 
     fecha_creacion = models.DateField(auto_now_add=True)
+    estado_registro = models.CharField(max_length=1, default='A')
     
     def __str__(self):
         return self.nombre

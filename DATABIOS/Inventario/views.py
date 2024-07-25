@@ -448,7 +448,7 @@ def eliminar_categoria(request, pk):
             messages.error(request, f'Ocurrió un error al eliminar la categoría: {e}')
     return redirect('listar_categorias')
     #return render(request, 'Inventario/eliminar_categoria.html', {'categoria': categoria})
-
+"""
 @login_required
 def listar_pedidos(request):
     if request.method == 'POST':
@@ -479,25 +479,180 @@ def crear_pedidos(request):
         form = PedidoForm()
     
     return render(request, 'crear_pedidos.html', {'form': form})
+"""
 
 @login_required
 def crear_proveedores(request):
     if request.method == 'POST':
         form = ProveedoresForm(request.POST)
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Proveedor creado exitosamente.')
-            return redirect('listar_proveedores')
+            try:
+                with transaction.atomic():
+                    form.save()
+                    messages.success(request, 'Proveedor creado exitosamente.')
+                    return redirect('listar_proveedores')
+            except IntegrityError as e:
+                messages.error(request, f'Error de integridad: {e}')
+            except DatabaseError as e:
+                messages.error(request, f'Error de base de datos: {e}')
+                print("Error de base de datos: ", e)
+            except Exception as e:
+                messages.error(request, f'Ocurrió un error inesperado: {e}')
         else:
             messages.error(request, 'Por favor corrige los errores del formulario.')
-    else:
-        form = ProveedoresForm()
-    
-    return render(request, 'crear_proveedores.html', {'form': form})
 
+    return redirect('listar_proveedores')
+
+@login_required
+def editar_proveedor(request, pk):
+    proveedor = get_object_or_404(Proveedores, pk=pk)
+    print(proveedor.nombre)
+    if request.method == 'POST':
+        form = ProveedoresForm(request.POST, instance=proveedor)
+        if form.is_valid():
+            try:
+                with transaction.atomic():
+                    form.save()
+                    messages.success(request, 'Proveedor actualizado exitosamente.')
+                    return redirect('listar_proveedores')
+            except IntegrityError as e:
+                messages.error(request, f'Error de integridad: {e}')
+            except DatabaseError as e:
+                messages.error(request, f'Error de base de datos: {e}')
+                print("Error de base de datos: ", e)
+            except Exception as e:
+                messages.error(request, f'Ocurrió un error inesperado: {e}')
+        else:
+            messages.error(request, 'Por favor corrige los errores del formulario.')
+
+    return redirect('listar_proveedores')
+
+@login_required
+def eliminar_proveedor(request, pk):
+    proveedor = get_object_or_404(Proveedores, pk=pk)
+    print(proveedor.nombre)
+    if request.method == 'POST':
+        try:
+            with transaction.atomic():
+                proveedor.estado_registro = '*'  # Suponiendo que '*' es el estado eliminado
+                proveedor.save()
+                print(proveedor.estado_registro)
+                messages.success(request, 'Proveedor eliminado exitosamente.')
+                return redirect('listar_proveedores')
+        except IntegrityError as e:
+            messages.error(request, f'Error de integridad: {e}')
+        except DatabaseError as e:
+            messages.error(request, f'Error de base de datos: {e}')
+            print("Error de base de datos: ", e)
+        except Exception as e:
+            messages.error(request, f'Ocurrió un error inesperado: {e}')
+    print("No entro para eliminar")
+    print("Método de solicitud:", request.method)
+    return redirect('listar_proveedores')
 
 @login_required
 def listar_proveedores(request):
-    listar_proveedores = Proveedores.objects.all()
+    listar_proveedores = Proveedores.objects.filter(estado_registro='A').order_by('id')
     form = ProveedoresForm()
     return render(request, 'listar_proveedores.html', {'listar_proveedores': listar_proveedores, 'form': form})
+
+#Exportar excel proveedores
+@login_required
+def exportar_proveedores_excel(request):
+    try:
+        if request.method == 'POST':
+            proveedor_ids = request.POST.get('proveedoresIds').split(',')
+            print(proveedor_ids)
+            proveedores = Proveedores.objects.order_by('id').filter(id__in=proveedor_ids)
+
+            wb = openpyxl.Workbook()
+            ws = wb.active
+            ws.title = 'Lista de Proveedores'
+
+            encabezados = ['ID', 'Nombre', 'RUC', 'Teléfono', 'Fecha de Creación', 'Estado de Registro']
+            ws.append(encabezados)
+
+            # Estilos
+            header_fill = PatternFill(start_color="004080", end_color="004080", fill_type="solid")  # Azul oscuro
+            header_font = Font(bold=True, color="FFFFFF")  # Blanco
+            thin_border = Border(left=Side(style='thin'), 
+                                 right=Side(style='thin'), 
+                                 top=Side(style='thin'), 
+                                 bottom=Side(style='thin'))
+            center_alignment = Alignment(horizontal="center")
+            right_alignment = Alignment(horizontal="right")
+            
+            for cell in ws["1:1"]:
+                cell.fill = header_fill
+                cell.font = header_font
+                cell.border = thin_border
+                cell.alignment = center_alignment
+                
+            # Escribir datos
+            for proveedor in proveedores:
+                ws.append([
+                    proveedor.id,
+                    proveedor.nombre,
+                    proveedor.ruc,
+                    proveedor.telefono,
+                    proveedor.fecha_creacion.strftime("%Y-%m-%d"),
+                    proveedor.estado_registro
+                ])
+
+            # Aplicar estilos a todas las celdas de datos
+            for row in ws.iter_rows(min_row=2, max_col=6, max_row=ws.max_row):
+                for cell in row:
+                    cell.border = thin_border
+                    cell.alignment = center_alignment if cell.column <= 3 else right_alignment
+            
+            # Ajustar el ancho de las columnas
+            column_widths = {
+                'A': 10,  # ID
+                'B': 30,  # Nombre
+                'C': 15,  # RUC
+                'D': 15,  # Teléfono
+                'E': 20,  # Fecha de Creación
+                'F': 20,  # Estado de Registro
+            }
+            for col, width in column_widths.items():
+                ws.column_dimensions[col].width = width
+            
+            # Crear y aplicar el formato de tabla
+            tab = Table(displayName="TablaProveedores", ref=f"A1:F{ws.max_row}")
+
+            # Aplicar estilo de tabla
+            tab.tableStyleInfo = TableStyleInfo(
+                name="TableStyleMedium9",  # Estilo de tabla en tonos azules
+                showFirstColumn=False, 
+                showLastColumn=False,
+                showRowStripes=True, 
+                showColumnStripes=True
+            )
+
+            ws.add_table(tab)
+            
+            # Ajustar texto en toda la tabla
+            for row in ws.iter_rows(min_row=1, max_col=6, max_row=ws.max_row):
+                for cell in row:
+                    cell.alignment = cell.alignment.copy(wrap_text=True)
+                    
+            # Guardar el archivo en memoria
+            archivo = BytesIO()
+            wb.save(archivo)
+            archivo.seek(0)
+
+            now = datetime.datetime.now()
+            formatted_date = now.strftime("%Y%m%d_%H%M%S")
+            filename = f'proveedores_{formatted_date}.xlsx'
+
+            response = HttpResponse(
+                archivo,
+                content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            )
+            response['Content-Disposition'] = f'attachment; filename={filename}.xlsx'
+            return response
+    except Exception as e:
+        messages.error(request, f'Ha ocurrido un error al exportar: {str(e)}')
+        return redirect('listar_proveedores')
+
+    return HttpResponse(status=400)
