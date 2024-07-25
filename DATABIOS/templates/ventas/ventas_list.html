@@ -68,7 +68,7 @@
         <i class="fas fa-times close_myDialog" id="closeAdd"></i> <!-- BOTON DE CERRADO, CAMBIAR ID -->
     </div>
     <div class="content_myDialog" style="width: 800px;height: 40vh;">  <!-- CAMBIAR STYLE (width y height (en vh)) -->
-        <form method="post" action="{% url 'agregar_venta' %}">
+        <form method="post" action="{% url 'crear_venta' %}">
             {% csrf_token %}
             <div class="bar_add">
                 <div class="ipt">
