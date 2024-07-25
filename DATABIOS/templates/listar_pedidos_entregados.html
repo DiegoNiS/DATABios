@@ -7,7 +7,7 @@ Lista de Pedidos
 {% block content %}
 <h2>Lista de Pedidos</h2>
 <div class="content">
-    <table id="tablePro" class="table display">
+    <table class="table">
         <thead>
             <tr>
                 <th>id</th>
@@ -23,7 +23,7 @@ Lista de Pedidos
             </tr>
         </thead>
         <tbody>
-            {% for pedido in pedidos_en_proceso %}
+            {% for pedido in pedidos_entregados %}
             <tr>
                 <td>{{ pedido.id }}</td>
                 <td>{{ pedido.proveedor }}</td>
@@ -52,6 +52,6 @@ Lista de Pedidos
             {% endfor %}
         </tbody>
     </table>
-    <a href="{% url 'crear_pedidos' %}" class="btn btn-primary">Crear Nuevo Pedido</a>
+    
 </div>
 {% endblock %}
