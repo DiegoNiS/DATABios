@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'Inventario',
     'Ventas.apps.VentasConfig',
     'rest_framework',
+    'Pedidos',
 ]
 
 MIDDLEWARE = [
